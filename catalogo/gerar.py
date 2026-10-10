@@ -12,33 +12,72 @@ P = [
  ("Condicionador Natural Hidratação Capilar Pitaia Vegano","Senhor Saboeiro","Nacional","90 g","—","28,69","—","10 dias úteis","Condicionador vegano com pitaia para fios macios e hidratados."),
  ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,35","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
 ]
-cards = ""
-for n,m,o,e,d,p,pd,pr,desc in P:
-    dose = f'<div class="dose">R$ {pd} por dose</div>' if pd!="—" else ""
-    info = e + (f" · {d}" if d!="—" else "")
-    cards += f'''<div class="card"><div class="tag {o.lower()}">{o}</div>
-<h3>{n}</h3><div class="marca">{m}</div><p>{desc}</p>
-<div class="info">{info}</div><div class="pr">R$ {p}</div>{dose}
-<div class="prazo">🚚 Entrega: {pr}</div></div>'''
-html = f'''<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálogo Do Rei</title>
+import html as H
+def icon(kind):
+    if kind=="frasco": return '<svg viewBox="0 0 60 80"><rect x="18" y="4" width="24" height="10" rx="2" fill="#c9a227"/><rect x="10" y="14" width="40" height="62" rx="8" fill="#1d5c3a"/><rect x="14" y="32" width="32" height="26" rx="3" fill="#f6efd9"/><text x="30" y="49" font-size="10" text-anchor="middle" fill="#1d5c3a" font-weight="bold">♛</text></svg>'
+    if kind=="gotas": return '<svg viewBox="0 0 60 80"><rect x="24" y="2" width="12" height="16" rx="3" fill="#c9a227"/><rect x="16" y="18" width="28" height="58" rx="6" fill="#1d5c3a"/><rect x="20" y="36" width="20" height="24" rx="3" fill="#f6efd9"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#1d5c3a">♛</text></svg>'
+    if kind=="pote": return '<svg viewBox="0 0 60 80"><rect x="8" y="12" width="44" height="10" rx="3" fill="#c9a227"/><rect x="6" y="22" width="48" height="52" rx="6" fill="#1d5c3a"/><rect x="12" y="36" width="36" height="24" rx="3" fill="#f6efd9"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#1d5c3a">♛</text></svg>'
+    return '<svg viewBox="0 0 60 80"><rect x="20" y="4" width="20" height="12" rx="3" fill="#c9a227"/><path d="M14 16h32l4 58H10z" fill="#1d5c3a"/><rect x="16" y="34" width="28" height="22" rx="3" fill="#f6efd9"/><text x="30" y="49" font-size="9" text-anchor="middle" fill="#1d5c3a">♛</text></svg>'
+KIND=["frasco","frasco","frasco","frasco","frasco","gotas","frasco","pote","tubo","tubo","tubo"]
+GR=[("Suplementos Importados","Qualidade internacional selecionada",[0,1,2,3]),
+    ("Suplementos Nacionais","Entrega rápida, marcas de confiança",[4,5,6,7]),
+    ("Cuidados Pessoais Naturais","Higiene e beleza veganas",[8,9,10])]
+def card(i):
+    n,m,o,e,d,p,pd,pr,desc=P[i]
+    dose=f'<span class="dose">R$ {pd} / dose</span>' if pd!="—" else ""
+    info=e+(f" · {d}" if d!="—" else "")
+    return f'''<div class="card"><div class="img">{icon(KIND[i])}</div><div class="body">
+<div class="top"><span class="marca">{m}</span><span class="tag {o.lower()}">{o}</span></div>
+<h3>{H.escape(n)}</h3><p>{desc}</p><div class="info">{info}</div>
+<div class="bottom"><div><span class="rs">R$</span><span class="pr">{p}</span>{dose}</div><div class="prazo">Entrega<br><b>{pr}</b></div></div></div></div>'''
+secoes=""
+for t,sub,ids in GR:
+    secoes+=f'<div class="page"><div class="hdr"><b>♛ Do Rei</b><span>Catálogo · Outubro 2026</span></div><section><div class="sec"><span class="num">{GR.index((t,sub,ids))+1:02d}</span><div><h2>{t}</h2><div class="secsub">{sub}</div></div></div>'+"".join(card(i) for i in ids)+'</section></div>'
+idx="".join(f'<tr><td>{H.escape(x[0])}</td><td>{x[1]}</td><td>{x[7]}</td><td class="r">R$ {x[5]}</td></tr>' for x in P)
+html=f'''<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálogo Do Rei</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-@page{{size:A4;margin:12mm}} body{{font-family:Arial,Helvetica,sans-serif;color:#222;margin:0}}
-header{{text-align:center;border-bottom:4px solid #c9a227;padding-bottom:10px;margin-bottom:14px}}
-.logo{{height:90px}} h1{{margin:6px 0 2px;color:#1d5c3a;font-size:28px}} .sub{{color:#666}}
-.grid{{display:grid;grid-template-columns:1fr 1fr;gap:10px}}
-.card{{border:1px solid #ddd;border-radius:10px;padding:10px 12px;break-inside:avoid;position:relative}}
-.card h3{{margin:0 70px 2px 0;font-size:14px;color:#1d5c3a}} .marca{{font-size:12px;color:#888}}
-.card p{{font-size:12px;margin:6px 0}} .info{{font-size:11px;color:#555}}
-.pr{{font-size:22px;font-weight:bold;color:#c0392b;margin-top:4px}} .dose{{font-size:11px;color:#555}}
-.prazo{{font-size:11px;margin-top:4px}}
-.tag{{position:absolute;top:8px;right:8px;font-size:10px;padding:2px 6px;border-radius:8px;color:#fff}}
-.importado{{background:#2c6fbb}} .nacional{{background:#1d8a4a}}
-footer{{margin-top:14px;text-align:center;font-size:13px;background:#1d5c3a;color:#fff;padding:10px;border-radius:8px}}
-</style><body><header>
-<img class="logo" src="logo.png" onerror="this.style.display='none'">
-<h1>👑 Do Rei – Saúde e Suplementos</h1><div class="sub">Catálogo de Produtos · Outubro 2026</div></header>
-<div class="grid">{cards}</div>
-<footer>📲 Faça seu pedido pelo WhatsApp! · Preços sujeitos a alteração · Prazos de entrega em dias úteis</footer>
+@page{{size:A4;margin:0}} *{{box-sizing:border-box}} body{{margin:0;font-family:Montserrat,Arial,sans-serif;color:#1f2a24;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.page{{width:210mm;height:297mm;overflow:hidden;padding:16mm 15mm 14mm;position:relative;page-break-after:always}}
+.cover{{background:radial-gradient(circle at 50% 35%,#24704a,#0f3522 75%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:297mm}}
+.cover .logo{{max-height:60mm;margin-bottom:8mm}} .crown{{font-size:70px;color:#e2c15a}}
+.cover h1{{font-family:'Playfair Display',serif;font-size:54px;margin:4mm 0 0;letter-spacing:1px}}
+.cover .tg{{color:#e2c15a;letter-spacing:6px;font-size:14px;text-transform:uppercase;margin-top:3mm}}
+.cover .line{{width:60mm;height:2px;background:#e2c15a;margin:12mm auto}}
+.cover .ed{{font-family:'Playfair Display',serif;font-size:26px}} .cover .ed2{{font-size:13px;opacity:.8;margin-top:3mm;letter-spacing:2px}}
+.cover .foot{{position:absolute;bottom:16mm;font-size:12px;opacity:.85;letter-spacing:1px}}
+.hdr{{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #c9a227;padding-bottom:3mm;margin-bottom:6mm;font-size:10px;color:#1d5c3a;letter-spacing:2px;text-transform:uppercase}}
+.hdr b{{font-family:'Playfair Display',serif;font-size:15px;letter-spacing:0;text-transform:none}}
+section{{break-inside:auto}}
+.sec{{display:flex;gap:4mm;align-items:center;margin:2mm 0 5mm;break-after:avoid}} .num{{font-family:'Playfair Display';font-size:34px;color:#c9a227;font-weight:800}}
+h2{{font-family:'Playfair Display',serif;font-size:24px;margin:0;color:#14452c}} .secsub{{font-size:11px;color:#7a857f;letter-spacing:1px}}
+.card{{display:flex;border-radius:4mm;background:#fbf8ef;margin-bottom:6mm;min-height:52mm;overflow:hidden;break-inside:avoid;border:1px solid #ece3c6}}
+.img{{width:38mm;background:linear-gradient(160deg,#f3e9c8,#e6d7a6);display:flex;align-items:center;justify-content:center}} .img svg{{width:26mm;height:36mm}}
+.body{{flex:1;padding:4mm 5mm}} .top{{display:flex;justify-content:space-between;align-items:center}}
+.marca{{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:#9a7b16;font-weight:700}}
+.tag{{font-size:8.5px;padding:1mm 2.5mm;border-radius:10px;color:#fff;letter-spacing:1px;text-transform:uppercase}} .importado{{background:#2b5d8f}} .nacional{{background:#1d8a4a}}
+h3{{font-family:'Playfair Display',serif;font-size:17px;margin:1.5mm 0 1mm;color:#14452c}}
+p{{font-size:11px;margin:0 0 1.5mm;color:#45524b;line-height:1.4}} .info{{font-size:10px;color:#7a857f}}
+.bottom{{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2mm;border-top:1px dashed #d8cba0;padding-top:2mm}}
+.rs{{font-size:12px;font-weight:700;color:#14452c;margin-right:1mm}} .pr{{font-size:24px;font-weight:700;color:#14452c}}
+.dose{{display:inline-block;margin-left:3mm;font-size:9.5px;background:#14452c;color:#e2c15a;padding:1mm 2.5mm;border-radius:10px}}
+.prazo{{text-align:right;font-size:9px;color:#7a857f;text-transform:uppercase;letter-spacing:1px}} .prazo b{{color:#14452c;font-size:11px;text-transform:none;letter-spacing:0}}
+table{{width:100%;border-collapse:collapse;font-size:11px}} th{{background:#14452c;color:#e2c15a;text-align:left;padding:2.5mm;font-weight:600;letter-spacing:1px}}
+td{{padding:2.3mm 2.5mm;border-bottom:1px solid #ece3c6}} tr:nth-child(even) td{{background:#fbf8ef}} .r{{text-align:right;font-weight:700;white-space:nowrap}}
+.cta{{margin-top:8mm;background:#14452c;color:#fff;border-radius:4mm;padding:7mm;text-align:center}}
+.cta h2{{color:#e2c15a;font-size:22px}} .cta div{{font-size:12px;margin-top:2mm;line-height:1.6}}
+.note{{font-size:9px;color:#7a857f;margin-top:5mm;text-align:center}}
+</style><body>
+<div class="page cover"><img class="logo" src="logo.png" onerror="this.outerHTML='<div class=crown>♛</div>'">
+<h1>Do Rei</h1><div class="tg">Saúde &amp; Suplementos</div><div class="line"></div>
+<div class="ed">Catálogo de Produtos</div><div class="ed2">OUTUBRO · 2026</div>
+<div class="foot">Suplementos importados e nacionais · Cuidados naturais</div></div>
+{secoes}
+<div class="page"><div class="hdr"><b>♛ Do Rei</b><span>Tabela de preços</span></div>
+<h2 style="margin-bottom:5mm">Tabela de Preços Resumida</h2>
+<table><tr><th>Produto</th><th>Marca</th><th>Entrega</th><th class="r">Preço</th></tr>{idx}</table>
+<div class="cta"><h2>Faça seu pedido!</h2><div>Chame a gente no WhatsApp e garanta o seu.<br>Atendimento personalizado da equipe Do Rei.</div></div>
+<div class="note">Preços válidos para outubro/2026, sujeitos a alteração sem aviso prévio. Prazos de entrega em dias úteis após a confirmação do pedido.<br>Suplementos não substituem uma alimentação equilibrada. Consulte um profissional de saúde.</div></div>
 </body></html>'''
 open("catalogo.html","w").write(html)
 msg = "MENSAGENS PARA AS FOTOS DOS PRODUTOS NO WHATSAPP\n(copie e cole como legenda de cada foto)\n\n"
