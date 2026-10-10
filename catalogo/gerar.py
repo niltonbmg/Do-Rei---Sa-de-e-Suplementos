@@ -14,10 +14,10 @@ P = [
 ]
 import html as H
 def icon(kind):
-    if kind=="frasco": return '<svg viewBox="0 0 60 80"><rect x="18" y="4" width="24" height="10" rx="2" fill="#c9a227"/><rect x="10" y="14" width="40" height="62" rx="8" fill="#1d5c3a"/><rect x="14" y="32" width="32" height="26" rx="3" fill="#f6efd9"/><text x="30" y="49" font-size="10" text-anchor="middle" fill="#1d5c3a" font-weight="bold">♛</text></svg>'
-    if kind=="gotas": return '<svg viewBox="0 0 60 80"><rect x="24" y="2" width="12" height="16" rx="3" fill="#c9a227"/><rect x="16" y="18" width="28" height="58" rx="6" fill="#1d5c3a"/><rect x="20" y="36" width="20" height="24" rx="3" fill="#f6efd9"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#1d5c3a">♛</text></svg>'
-    if kind=="pote": return '<svg viewBox="0 0 60 80"><rect x="8" y="12" width="44" height="10" rx="3" fill="#c9a227"/><rect x="6" y="22" width="48" height="52" rx="6" fill="#1d5c3a"/><rect x="12" y="36" width="36" height="24" rx="3" fill="#f6efd9"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#1d5c3a">♛</text></svg>'
-    return '<svg viewBox="0 0 60 80"><rect x="20" y="4" width="20" height="12" rx="3" fill="#c9a227"/><path d="M14 16h32l4 58H10z" fill="#1d5c3a"/><rect x="16" y="34" width="28" height="22" rx="3" fill="#f6efd9"/><text x="30" y="49" font-size="9" text-anchor="middle" fill="#1d5c3a">♛</text></svg>'
+    if kind=="frasco": return '<svg viewBox="0 0 60 80"><rect x="18" y="4" width="24" height="10" rx="2" fill="#2fa36b"/><rect x="10" y="14" width="40" height="62" rx="8" fill="#17804f"/><rect x="14" y="32" width="32" height="26" rx="3" fill="#ffffff"/><text x="30" y="49" font-size="10" text-anchor="middle" fill="#17804f" font-weight="bold">♛</text></svg>'
+    if kind=="gotas": return '<svg viewBox="0 0 60 80"><rect x="24" y="2" width="12" height="16" rx="3" fill="#2fa36b"/><rect x="16" y="18" width="28" height="58" rx="6" fill="#17804f"/><rect x="20" y="36" width="20" height="24" rx="3" fill="#ffffff"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#17804f">♛</text></svg>'
+    if kind=="pote": return '<svg viewBox="0 0 60 80"><rect x="8" y="12" width="44" height="10" rx="3" fill="#2fa36b"/><rect x="6" y="22" width="48" height="52" rx="6" fill="#17804f"/><rect x="12" y="36" width="36" height="24" rx="3" fill="#ffffff"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#17804f">♛</text></svg>'
+    return '<svg viewBox="0 0 60 80"><rect x="20" y="4" width="20" height="12" rx="3" fill="#2fa36b"/><path d="M14 16h32l4 58H10z" fill="#17804f"/><rect x="16" y="34" width="28" height="22" rx="3" fill="#ffffff"/><text x="30" y="49" font-size="9" text-anchor="middle" fill="#17804f">♛</text></svg>'
 KIND=["frasco","frasco","frasco","frasco","frasco","gotas","frasco","pote","tubo","tubo","tubo"]
 GR=[("Suplementos Importados","Qualidade internacional selecionada",[0,1,2,3]),
     ("Suplementos Nacionais","Entrega rápida, marcas de confiança",[4,5,6,7]),
@@ -37,35 +37,35 @@ idx="".join(f'<tr><td>{H.escape(x[0])}</td><td>{x[1]}</td><td>{x[7]}</td><td cla
 html=f'''<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálogo Do Rei</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-@page{{size:A4;margin:0}} *{{box-sizing:border-box}} body{{margin:0;font-family:Montserrat,Arial,sans-serif;color:#1f2a24;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@page{{size:A4;margin:0}} *{{box-sizing:border-box}} body{{background:#fff;margin:0;font-family:Montserrat,Arial,sans-serif;color:#1f2a24;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .page{{width:210mm;height:297mm;overflow:hidden;padding:16mm 15mm 14mm;position:relative;page-break-after:always}}
-.cover{{background:radial-gradient(circle at 50% 35%,#24704a,#0f3522 75%);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:297mm}}
-.cover .logo{{max-height:60mm;margin-bottom:8mm}} .crown{{font-size:70px;color:#e2c15a}}
+.cover{{background:linear-gradient(160deg,#2fa36b,#17804f);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:297mm}}
+.cover .logo{{max-height:60mm;margin-bottom:8mm}} .crown{{font-size:70px;color:#ffffff}}
 .cover h1{{font-family:'Playfair Display',serif;font-size:54px;margin:4mm 0 0;letter-spacing:1px}}
-.cover .tg{{color:#e2c15a;letter-spacing:6px;font-size:14px;text-transform:uppercase;margin-top:3mm}}
-.cover .line{{width:60mm;height:2px;background:#e2c15a;margin:12mm auto}}
+.cover .tg{{color:#ffffff;letter-spacing:6px;font-size:14px;text-transform:uppercase;margin-top:3mm}}
+.cover .line{{width:60mm;height:2px;background:#ffffff;margin:12mm auto}}
 .cover .ed{{font-family:'Playfair Display',serif;font-size:26px}} .cover .ed2{{font-size:13px;opacity:.8;margin-top:3mm;letter-spacing:2px}}
 .cover .foot{{position:absolute;bottom:16mm;font-size:12px;opacity:.85;letter-spacing:1px}}
-.hdr{{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #c9a227;padding-bottom:3mm;margin-bottom:6mm;font-size:10px;color:#1d5c3a;letter-spacing:2px;text-transform:uppercase}}
+.hdr{{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #2fa36b;padding-bottom:3mm;margin-bottom:6mm;font-size:10px;color:#17804f;letter-spacing:2px;text-transform:uppercase}}
 .hdr b{{font-family:'Playfair Display',serif;font-size:15px;letter-spacing:0;text-transform:none}}
 section{{break-inside:auto}}
-.sec{{display:flex;gap:4mm;align-items:center;margin:2mm 0 5mm;break-after:avoid}} .num{{font-family:'Playfair Display';font-size:34px;color:#c9a227;font-weight:800}}
-h2{{font-family:'Playfair Display',serif;font-size:24px;margin:0;color:#14452c}} .secsub{{font-size:11px;color:#7a857f;letter-spacing:1px}}
-.card{{display:flex;border-radius:4mm;background:#fbf8ef;margin-bottom:6mm;min-height:52mm;overflow:hidden;break-inside:avoid;border:1px solid #ece3c6}}
-.img{{width:38mm;background:linear-gradient(160deg,#f3e9c8,#e6d7a6);display:flex;align-items:center;justify-content:center}} .img svg{{width:26mm;height:36mm}}
+.sec{{display:flex;gap:4mm;align-items:center;margin:2mm 0 5mm;break-after:avoid}} .num{{font-family:'Playfair Display';font-size:34px;color:#2fa36b;font-weight:800}}
+h2{{font-family:'Playfair Display',serif;font-size:24px;margin:0;color:#17804f}} .secsub{{font-size:11px;color:#7a857f;letter-spacing:1px}}
+.card{{display:flex;border-radius:4mm;box-shadow:0 1mm 3mm rgba(23,128,79,.08);background:#ffffff;margin-bottom:6mm;min-height:52mm;overflow:hidden;break-inside:avoid;border:1px solid #e3f1e9}}
+.img{{width:38mm;background:#eef8f2;display:flex;align-items:center;justify-content:center}} .img svg{{width:26mm;height:36mm}}
 .body{{flex:1;padding:4mm 5mm}} .top{{display:flex;justify-content:space-between;align-items:center}}
-.marca{{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:#9a7b16;font-weight:700}}
-.tag{{font-size:8.5px;padding:1mm 2.5mm;border-radius:10px;color:#fff;letter-spacing:1px;text-transform:uppercase}} .importado{{background:#2b5d8f}} .nacional{{background:#1d8a4a}}
-h3{{font-family:'Playfair Display',serif;font-size:17px;margin:1.5mm 0 1mm;color:#14452c}}
+.marca{{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:#2fa36b;font-weight:700}}
+.tag{{font-size:8.5px;padding:1mm 2.5mm;border-radius:10px;color:#fff;letter-spacing:1px;text-transform:uppercase}} .importado{{background:#17804f}} .nacional{{background:#7cc7a0}}
+h3{{font-family:'Playfair Display',serif;font-size:17px;margin:1.5mm 0 1mm;color:#17804f}}
 p{{font-size:11px;margin:0 0 1.5mm;color:#45524b;line-height:1.4}} .info{{font-size:10px;color:#7a857f}}
-.bottom{{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2mm;border-top:1px dashed #d8cba0;padding-top:2mm}}
-.rs{{font-size:12px;font-weight:700;color:#14452c;margin-right:1mm}} .pr{{font-size:24px;font-weight:700;color:#14452c}}
-.dose{{display:inline-block;margin-left:3mm;font-size:9.5px;background:#14452c;color:#e2c15a;padding:1mm 2.5mm;border-radius:10px}}
-.prazo{{text-align:right;font-size:9px;color:#7a857f;text-transform:uppercase;letter-spacing:1px}} .prazo b{{color:#14452c;font-size:11px;text-transform:none;letter-spacing:0}}
-table{{width:100%;border-collapse:collapse;font-size:11px}} th{{background:#14452c;color:#e2c15a;text-align:left;padding:2.5mm;font-weight:600;letter-spacing:1px}}
-td{{padding:2.3mm 2.5mm;border-bottom:1px solid #ece3c6}} tr:nth-child(even) td{{background:#fbf8ef}} .r{{text-align:right;font-weight:700;white-space:nowrap}}
-.cta{{margin-top:8mm;background:#14452c;color:#fff;border-radius:4mm;padding:7mm;text-align:center}}
-.cta h2{{color:#e2c15a;font-size:22px}} .cta div{{font-size:12px;margin-top:2mm;line-height:1.6}}
+.bottom{{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2mm;border-top:1px dashed #cfe6d9;padding-top:2mm}}
+.rs{{font-size:12px;font-weight:700;color:#17804f;margin-right:1mm}} .pr{{font-size:24px;font-weight:700;color:#17804f}}
+.dose{{display:inline-block;margin-left:3mm;font-size:9.5px;background:#e3f1e9;color:#17804f;padding:1mm 2.5mm;border-radius:10px}}
+.prazo{{text-align:right;font-size:9px;color:#7a857f;text-transform:uppercase;letter-spacing:1px}} .prazo b{{color:#17804f;font-size:11px;text-transform:none;letter-spacing:0}}
+table{{width:100%;border-collapse:collapse;font-size:11px}} th{{background:#17804f;color:#ffffff;text-align:left;padding:2.5mm;font-weight:600;letter-spacing:1px}}
+td{{padding:2.3mm 2.5mm;border-bottom:1px solid #e3f1e9}} tr:nth-child(even) td{{background:#ffffff}} .r{{text-align:right;font-weight:700;white-space:nowrap}}
+.cta{{margin-top:8mm;background:#17804f;color:#fff;border-radius:4mm;padding:7mm;text-align:center}}
+.cta h2{{color:#ffffff;font-size:22px}} .cta div{{font-size:12px;margin-top:2mm;line-height:1.6}}
 .note{{font-size:9px;color:#7a857f;margin-top:5mm;text-align:center}}
 </style><body>
 <div class="page cover"><img class="logo" src="logo.png" onerror="this.outerHTML='<div class=crown>♛</div>'">
