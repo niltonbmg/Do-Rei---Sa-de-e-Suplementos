@@ -22,7 +22,7 @@ def ftr(n): return f'<div class="ftr"><span>Catálogo Outubro 2026</span><span>{
 CAT=[g[0] for g in GR for _ in g[2]]
 import os
 def foto(i):
-    for ext in ("jpg","jpeg","png","webp"):
+    for ext in ("jpg","jpeg","png","webp","avif"):
         f=f"fotos/{i+1:02d}.{ext}"
         if os.path.exists(f): return f'<img class="foto" src="{f}">'
     return ""
