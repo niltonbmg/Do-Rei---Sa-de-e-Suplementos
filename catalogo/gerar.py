@@ -16,20 +16,37 @@ import html as H
 GR=[("Suplementos Importados","Seleção internacional das marcas mais reconhecidas",[0,1,2,3]),
     ("Suplementos Nacionais","Qualidade nacional com entrega rápida",[4,5,6,7]),
     ("Cuidados Pessoais","Higiene e beleza com ingredientes naturais e veganos",[8,9,10])]
-def card(i):
-    n,m,o,e,d,p,pd,pr,desc=P[i]
-    rows=f'<tr><td>Embalagem</td><td>{e}</td></tr>'
-    if d!="—": rows+=f'<tr><td>Rendimento</td><td>{d}</td></tr>'
-    rows+=f'<tr><td>Origem</td><td>{o}</td></tr><tr><td>Entrega</td><td>{pr}</td></tr>'
-    dose=f'<div class="dose">R$ {pd} por dose</div>' if pd!="—" else '<div class="dose">&nbsp;</div>'
-    return f"""<div class="card"><div class="cod">{i+1:02d}</div><div class="marca">{m}</div>
-<h3>{H.escape(n)}</h3><p>{desc}</p><table class="spec">{rows}</table>
-<div class="price"><div><span class="rs">R$</span>{p}</div>{dose}</div></div>"""
+from dados import D
 def hdr(t): return f'<div class="hdr"><span class="brand">DO REI <i>Saúde &amp; Suplementos</i></span><span>{t}</span></div>'
 def ftr(n): return f'<div class="ftr"><span>Catálogo Outubro 2026</span><span>{n:02d}</span></div>'
-secoes=""
+CAT=[g[0] for g in GR for _ in g[2]]
+import os
+def foto(i):
+    for ext in ("jpg","jpeg","png","webp"):
+        f=f"fotos/{i+1:02d}.{ext}"
+        if os.path.exists(f): return f'<img class="foto" src="{f}">'
+    return ""
+def li(x): return "".join(f"<li>{v}</li>" for v in x)
+def prod(i,pg):
+    n,m,o,e,d,p,pd,pr,desc=P[i]; x=D[i]
+    sup=x["porcao"] is not None
+    tit="Informação Nutricional" if sup else "Características"
+    cab=f'<tr><th>Porção: {x["porcao"]}</th><th class="r">Quantidade</th></tr>' if sup else '<tr><th colspan=2>Produto</th></tr>'
+    rows="".join(f'<tr><td>{k}</td><td class="r">{v}</td></tr>' for k,v in x["nut"])
+    dose=f'<div class="dose">R$ {pd} por dose</div>' if pd!="—" else ""
+    rend=f"<div><span>Rendimento</span><b>{d}</b></div>" if d!="—" else ""
+    return f"""<div class="page">{hdr(CAT[i])}
+<div class="ph">{foto(i)}<div class="phl"><div class="cod">PRODUTO {i+1:02d} · {o.upper()}</div><div class="marca">{m}</div><h2 class="pn">{H.escape(n)}</h2><p class="desc">{desc}</p></div>
+<div class="pbox"><div class="lbl">Preço</div><div class="big"><span class="rs">R$</span>{p}</div>{dose}</div></div>
+<div class="facts"><div><span>Embalagem</span><b>{e}</b></div>{rend}<div><span>Origem</span><b>{o}</b></div><div><span>Entrega</span><b>{pr}</b></div></div>
+<div class="cols"><div><h4>Benefícios</h4><ul class="ben">{li(x["ben"])}</ul>
+<h4>Modo de uso</h4><p class="uso">{x["uso"]}</p></div>
+<div><h4>{tit}</h4><table class="nut">{cab}{rows}</table>{'<div class="obs">Valores por porção conforme rótulo do fabricante.</div>' if sup else ''}</div></div>
+<div class="con"><h4>Contraindicações e precauções</h4><ul>{li(x["con"])}</ul></div>
+{ftr(pg)}</div>"""
+secoes=""; pg=2
 for k,(t,sub,ids) in enumerate(GR):
-    secoes+=f'<div class="page">{hdr("Catálogo de Produtos")}<div class="sec"><div class="secn">0{k+1}</div><h2>{t}</h2><div class="secsub">{sub}</div></div><div class="grid">'+"".join(card(i) for i in ids)+f'</div>{ftr(k+2)}</div>'
+    for i in ids: secoes+=prod(i,pg); pg+=1
 idx="".join(f'<tr><td class="c">{j+1:02d}</td><td><b>{H.escape(x[0])}</b><br><span>{x[1]}</span></td><td>{x[4] if x[4]!="—" else x[3]}</td><td>{x[7]}</td><td class="r">R$ {x[5]}</td></tr>' for j,x in enumerate(P))
 html=f"""<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálogo Do Rei</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -63,6 +80,22 @@ p{{font-size:10.5px;color:var(--m);line-height:1.5;margin:0 0 4mm}}
 .price{{margin-top:auto;background:var(--gl);border-radius:1.5mm;padding:3mm 4mm;display:flex;justify-content:space-between;align-items:center}}
 .price>div:first-child{{font-size:22px;font-weight:800;color:var(--gd)}} .rs{{font-size:11px;font-weight:600;margin-right:1mm}}
 .dose{{font-size:9.5px;color:var(--gd);font-weight:500}}
+.ph .cod{{position:static}} .foto{{width:45mm;height:45mm;object-fit:contain;border:1px solid var(--b);border-radius:2mm;background:#fff}} .ph{{display:flex;justify-content:space-between;gap:8mm;margin:10mm 0 6mm}} .phl{{flex:1}}
+.cod{{font-size:9px;letter-spacing:2.5px;color:#9aa69f;font-weight:600}} .ph .marca{{margin-top:4mm;font-size:10px}}
+.pn{{font-size:30px;line-height:1.15;margin:2mm 0 3mm}} .desc{{font-size:13px;color:var(--m);line-height:1.6;margin:0}}
+.pbox{{background:var(--g);color:#fff;border-radius:2mm;padding:6mm 7mm;min-width:55mm;align-self:flex-start}}
+.pbox .lbl{{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.8}} .big{{font-size:34px;font-weight:800;margin:1mm 0}} .pbox .dose{{color:#fff;opacity:.9}}
+.facts{{display:flex;border:1px solid var(--b);border-radius:2mm;margin-bottom:8mm}} .facts div{{flex:1;padding:4mm 5mm;border-right:1px solid var(--b)}} .facts div:last-child{{border:0}}
+.facts span{{display:block;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:1mm}} .facts b{{font-size:12px}}
+.cols{{display:grid;grid-template-columns:1fr 1fr;gap:10mm}}
+h4{{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin:0 0 3mm;padding-bottom:2mm;border-bottom:2px solid var(--g)}}
+.ben{{list-style:none;padding:0;margin:0 0 7mm}} .ben li{{font-size:11.5px;padding:2mm 0 2mm 6mm;position:relative;line-height:1.45;border-bottom:1px solid var(--b)}}
+.ben li:before{{content:"";position:absolute;left:0;top:3.4mm;width:2.2mm;height:2.2mm;border-radius:50%;background:var(--g)}}
+.uso{{font-size:11.5px;line-height:1.6;margin:0}}
+.nut{{width:100%;border-collapse:collapse;font-size:10.5px;border:1.5px solid var(--t)}} .nut th{{text-align:left;background:var(--t);color:#fff;padding:2.2mm 3mm;font-size:10px}}
+.nut td{{padding:1.8mm 3mm;border-bottom:1px solid #d4d9d6}} .nut .r{{text-align:right;font-weight:600}} .obs{{font-size:8.5px;color:var(--m);margin-top:2mm}}
+.con{{margin-top:8mm;background:#fff7f5;border-left:3px solid #c0392b;border-radius:1.5mm;padding:5mm 6mm}} .con h4{{color:#c0392b;border-color:#f0c9c2}}
+.con ul{{margin:0;padding-left:5mm}} .con li{{font-size:11px;line-height:1.5;margin-bottom:1mm}}
 .tab{{width:100%;border-collapse:collapse;font-size:10px;margin-top:2mm}}
 .tab th{{text-align:left;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);font-weight:600;padding:2.5mm 2mm;border-bottom:2px solid var(--g)}}
 .tab td{{padding:2.6mm 2mm;border-bottom:1px solid var(--b);vertical-align:middle}} .tab td span{{color:var(--m);font-size:9px}}
@@ -78,7 +111,7 @@ p{{font-size:10.5px;color:var(--m);line-height:1.5;margin:0 0 4mm}}
 <div class="page">{hdr("Tabela de Preços")}<div class="sec"><div class="secn">RESUMO</div><h2>Tabela de Preços</h2><div class="secsub">Todos os produtos em uma visão rápida</div></div>
 <table class="tab"><tr><th>Cód.</th><th>Produto</th><th>Rend.</th><th>Entrega</th><th class="r">Preço</th></tr>{idx}</table>
 <div class="cta"><div><h4>Faça seu pedido</h4><div>Atendimento direto pelo WhatsApp.</div></div><div style="text-align:right">Informe o código do produto<br>e a quantidade desejada.</div></div>
-<div class="note">Preços válidos para outubro de 2026, sujeitos a alteração sem aviso prévio. Prazos de entrega contados em dias úteis após a confirmação do pedido. Suplementos alimentares não substituem uma alimentação equilibrada; consulte um profissional de saúde.</div>{ftr(5)}</div>
+<div class="note">Preços válidos para outubro de 2026, sujeitos a alteração sem aviso prévio. Prazos de entrega contados em dias úteis após a confirmação do pedido. As informações nutricionais seguem os rótulos dos fabricantes e podem variar entre lotes. Suplementos alimentares não substituem uma alimentação equilibrada; consulte um profissional de saúde.</div>{ftr(pg)}</div>
 </body></html>"""
 open("catalogo.html","w").write(html)
 msg = "MENSAGENS PARA AS FOTOS DOS PRODUTOS NO WHATSAPP\n(copie e cole como legenda de cada foto)\n\n"
