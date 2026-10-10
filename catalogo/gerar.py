@@ -13,72 +13,73 @@ P = [
  ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,35","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
 ]
 import html as H
-def icon(kind):
-    if kind=="frasco": return '<svg viewBox="0 0 60 80"><rect x="18" y="4" width="24" height="10" rx="2" fill="#2fa36b"/><rect x="10" y="14" width="40" height="62" rx="8" fill="#17804f"/><rect x="14" y="32" width="32" height="26" rx="3" fill="#ffffff"/><text x="30" y="49" font-size="10" text-anchor="middle" fill="#17804f" font-weight="bold">♛</text></svg>'
-    if kind=="gotas": return '<svg viewBox="0 0 60 80"><rect x="24" y="2" width="12" height="16" rx="3" fill="#2fa36b"/><rect x="16" y="18" width="28" height="58" rx="6" fill="#17804f"/><rect x="20" y="36" width="20" height="24" rx="3" fill="#ffffff"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#17804f">♛</text></svg>'
-    if kind=="pote": return '<svg viewBox="0 0 60 80"><rect x="8" y="12" width="44" height="10" rx="3" fill="#2fa36b"/><rect x="6" y="22" width="48" height="52" rx="6" fill="#17804f"/><rect x="12" y="36" width="36" height="24" rx="3" fill="#ffffff"/><text x="30" y="52" font-size="9" text-anchor="middle" fill="#17804f">♛</text></svg>'
-    return '<svg viewBox="0 0 60 80"><rect x="20" y="4" width="20" height="12" rx="3" fill="#2fa36b"/><path d="M14 16h32l4 58H10z" fill="#17804f"/><rect x="16" y="34" width="28" height="22" rx="3" fill="#ffffff"/><text x="30" y="49" font-size="9" text-anchor="middle" fill="#17804f">♛</text></svg>'
-KIND=["frasco","frasco","frasco","frasco","frasco","gotas","frasco","pote","tubo","tubo","tubo"]
-GR=[("Suplementos Importados","Qualidade internacional selecionada",[0,1,2,3]),
-    ("Suplementos Nacionais","Entrega rápida, marcas de confiança",[4,5,6,7]),
-    ("Cuidados Pessoais Naturais","Higiene e beleza veganas",[8,9,10])]
+GR=[("Suplementos Importados","Seleção internacional das marcas mais reconhecidas",[0,1,2,3]),
+    ("Suplementos Nacionais","Qualidade nacional com entrega rápida",[4,5,6,7]),
+    ("Cuidados Pessoais","Higiene e beleza com ingredientes naturais e veganos",[8,9,10])]
 def card(i):
     n,m,o,e,d,p,pd,pr,desc=P[i]
-    dose=f'<span class="dose">R$ {pd} / dose</span>' if pd!="—" else ""
-    info=e+(f" · {d}" if d!="—" else "")
-    return f'''<div class="card"><div class="img">{icon(KIND[i])}</div><div class="body">
-<div class="top"><span class="marca">{m}</span><span class="tag {o.lower()}">{o}</span></div>
-<h3>{H.escape(n)}</h3><p>{desc}</p><div class="info">{info}</div>
-<div class="bottom"><div><span class="rs">R$</span><span class="pr">{p}</span>{dose}</div><div class="prazo">Entrega<br><b>{pr}</b></div></div></div></div>'''
+    rows=f'<tr><td>Embalagem</td><td>{e}</td></tr>'
+    if d!="—": rows+=f'<tr><td>Rendimento</td><td>{d}</td></tr>'
+    rows+=f'<tr><td>Origem</td><td>{o}</td></tr><tr><td>Entrega</td><td>{pr}</td></tr>'
+    dose=f'<div class="dose">R$ {pd} por dose</div>' if pd!="—" else '<div class="dose">&nbsp;</div>'
+    return f"""<div class="card"><div class="cod">{i+1:02d}</div><div class="marca">{m}</div>
+<h3>{H.escape(n)}</h3><p>{desc}</p><table class="spec">{rows}</table>
+<div class="price"><div><span class="rs">R$</span>{p}</div>{dose}</div></div>"""
+def hdr(t): return f'<div class="hdr"><span class="brand">DO REI <i>Saúde &amp; Suplementos</i></span><span>{t}</span></div>'
+def ftr(n): return f'<div class="ftr"><span>Catálogo Outubro 2026</span><span>{n:02d}</span></div>'
 secoes=""
-for t,sub,ids in GR:
-    secoes+=f'<div class="page"><div class="hdr"><b>♛ Do Rei</b><span>Catálogo · Outubro 2026</span></div><section><div class="sec"><span class="num">{GR.index((t,sub,ids))+1:02d}</span><div><h2>{t}</h2><div class="secsub">{sub}</div></div></div>'+"".join(card(i) for i in ids)+'</section></div>'
-idx="".join(f'<tr><td>{H.escape(x[0])}</td><td>{x[1]}</td><td>{x[7]}</td><td class="r">R$ {x[5]}</td></tr>' for x in P)
-html=f'''<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálogo Do Rei</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+for k,(t,sub,ids) in enumerate(GR):
+    secoes+=f'<div class="page">{hdr("Catálogo de Produtos")}<div class="sec"><div class="secn">0{k+1}</div><h2>{t}</h2><div class="secsub">{sub}</div></div><div class="grid">'+"".join(card(i) for i in ids)+f'</div>{ftr(k+2)}</div>'
+idx="".join(f'<tr><td class="c">{j+1:02d}</td><td><b>{H.escape(x[0])}</b><br><span>{x[1]}</span></td><td>{x[4] if x[4]!="—" else x[3]}</td><td>{x[7]}</td><td class="r">R$ {x[5]}</td></tr>' for j,x in enumerate(P))
+html=f"""<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálogo Do Rei</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-@page{{size:A4;margin:0}} *{{box-sizing:border-box}} body{{background:#fff;margin:0;font-family:Montserrat,Arial,sans-serif;color:#1f2a24;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-.page{{width:210mm;height:297mm;overflow:hidden;padding:16mm 15mm 14mm;position:relative;page-break-after:always}}
-.cover{{background:linear-gradient(160deg,#2fa36b,#17804f);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;height:297mm}}
-.cover .logo{{max-height:60mm;margin-bottom:8mm}} .crown{{font-size:70px;color:#ffffff}}
-.cover h1{{font-family:'Playfair Display',serif;font-size:54px;margin:4mm 0 0;letter-spacing:1px}}
-.cover .tg{{color:#ffffff;letter-spacing:6px;font-size:14px;text-transform:uppercase;margin-top:3mm}}
-.cover .line{{width:60mm;height:2px;background:#ffffff;margin:12mm auto}}
-.cover .ed{{font-family:'Playfair Display',serif;font-size:26px}} .cover .ed2{{font-size:13px;opacity:.8;margin-top:3mm;letter-spacing:2px}}
-.cover .foot{{position:absolute;bottom:16mm;font-size:12px;opacity:.85;letter-spacing:1px}}
-.hdr{{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #2fa36b;padding-bottom:3mm;margin-bottom:6mm;font-size:10px;color:#17804f;letter-spacing:2px;text-transform:uppercase}}
-.hdr b{{font-family:'Playfair Display',serif;font-size:15px;letter-spacing:0;text-transform:none}}
-section{{break-inside:auto}}
-.sec{{display:flex;gap:4mm;align-items:center;margin:2mm 0 5mm;break-after:avoid}} .num{{font-family:'Playfair Display';font-size:34px;color:#2fa36b;font-weight:800}}
-h2{{font-family:'Playfair Display',serif;font-size:24px;margin:0;color:#17804f}} .secsub{{font-size:11px;color:#7a857f;letter-spacing:1px}}
-.card{{display:flex;border-radius:4mm;box-shadow:0 1mm 3mm rgba(23,128,79,.08);background:#ffffff;margin-bottom:6mm;min-height:52mm;overflow:hidden;break-inside:avoid;border:1px solid #e3f1e9}}
-.img{{width:38mm;background:#eef8f2;display:flex;align-items:center;justify-content:center}} .img svg{{width:26mm;height:36mm}}
-.body{{flex:1;padding:4mm 5mm}} .top{{display:flex;justify-content:space-between;align-items:center}}
-.marca{{font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:#2fa36b;font-weight:700}}
-.tag{{font-size:8.5px;padding:1mm 2.5mm;border-radius:10px;color:#fff;letter-spacing:1px;text-transform:uppercase}} .importado{{background:#17804f}} .nacional{{background:#7cc7a0}}
-h3{{font-family:'Playfair Display',serif;font-size:17px;margin:1.5mm 0 1mm;color:#17804f}}
-p{{font-size:11px;margin:0 0 1.5mm;color:#45524b;line-height:1.4}} .info{{font-size:10px;color:#7a857f}}
-.bottom{{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2mm;border-top:1px dashed #cfe6d9;padding-top:2mm}}
-.rs{{font-size:12px;font-weight:700;color:#17804f;margin-right:1mm}} .pr{{font-size:24px;font-weight:700;color:#17804f}}
-.dose{{display:inline-block;margin-left:3mm;font-size:9.5px;background:#e3f1e9;color:#17804f;padding:1mm 2.5mm;border-radius:10px}}
-.prazo{{text-align:right;font-size:9px;color:#7a857f;text-transform:uppercase;letter-spacing:1px}} .prazo b{{color:#17804f;font-size:11px;text-transform:none;letter-spacing:0}}
-table{{width:100%;border-collapse:collapse;font-size:11px}} th{{background:#17804f;color:#ffffff;text-align:left;padding:2.5mm;font-weight:600;letter-spacing:1px}}
-td{{padding:2.3mm 2.5mm;border-bottom:1px solid #e3f1e9}} tr:nth-child(even) td{{background:#ffffff}} .r{{text-align:right;font-weight:700;white-space:nowrap}}
-.cta{{margin-top:8mm;background:#17804f;color:#fff;border-radius:4mm;padding:7mm;text-align:center}}
-.cta h2{{color:#ffffff;font-size:22px}} .cta div{{font-size:12px;margin-top:2mm;line-height:1.6}}
-.note{{font-size:9px;color:#7a857f;margin-top:5mm;text-align:center}}
+@page{{size:A4;margin:0}} *{{box-sizing:border-box}}
+:root{{--g:#0f7a4a;--gd:#0b5c38;--gl:#e8f4ee;--t:#1b1f1d;--m:#6b756f;--b:#e3e8e5}}
+body{{margin:0;background:#fff;font-family:Inter,Arial,sans-serif;color:var(--t);-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.page{{width:210mm;height:297mm;padding:14mm 16mm;position:relative;overflow:hidden;page-break-after:always}}
+.cover{{padding:0;display:flex}}
+.cl{{width:62%;padding:22mm 16mm;display:flex;flex-direction:column}} .cr{{width:38%;background:var(--g)}}
+.mark{{font-size:11px;font-weight:700;letter-spacing:4px;color:var(--g)}}
+.cover h1{{font-size:64px;line-height:1;font-weight:800;margin:auto 0 6mm;letter-spacing:-2px}}
+.cover h1 span{{color:var(--g)}} .cover .lead{{font-size:15px;color:var(--m);font-weight:300;line-height:1.6;max-width:110mm}}
+.cover .bar{{width:18mm;height:3px;background:var(--g);margin:10mm 0}}
+.cover .meta{{font-size:11px;color:var(--m);letter-spacing:2px;text-transform:uppercase;margin-top:auto}}
+.cover .meta b{{display:block;color:var(--t);font-size:13px;letter-spacing:1px;margin-bottom:1mm}}
+.logo{{max-width:50mm;max-height:30mm}}
+.hdr{{display:flex;justify-content:space-between;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);padding-bottom:4mm;border-bottom:1px solid var(--b)}}
+.brand{{color:var(--g);font-weight:800}} .brand i{{font-style:normal;font-weight:400;color:var(--m);margin-left:2mm}}
+.ftr{{position:absolute;left:16mm;right:16mm;bottom:10mm;display:flex;justify-content:space-between;font-size:9px;color:var(--m);letter-spacing:1px;border-top:1px solid var(--b);padding-top:3mm}}
+.sec{{margin:9mm 0 7mm}} .secn{{font-size:11px;font-weight:700;color:var(--g);letter-spacing:3px}}
+h2{{font-size:28px;font-weight:800;margin:1mm 0 1mm;letter-spacing:-.5px}} .secsub{{font-size:12px;color:var(--m)}}
+.grid{{display:grid;grid-template-columns:1fr 1fr;gap:6mm}}
+.card{{border:1px solid var(--b);border-top:3px solid var(--g);border-radius:2mm;padding:6mm;display:flex;flex-direction:column;position:relative;min-height:98mm}}
+.cod{{position:absolute;top:5mm;right:6mm;font-size:10px;color:#b7c2bc;font-weight:600}}
+.marca{{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g)}}
+h3{{font-size:15px;line-height:1.3;font-weight:700;margin:2mm 0 2mm}}
+p{{font-size:10.5px;color:var(--m);line-height:1.5;margin:0 0 4mm}}
+.spec{{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:4mm}} .spec td{{padding:1.6mm 0;border-bottom:1px solid var(--b)}}
+.spec td:first-child{{color:var(--m)}} .spec td:last-child{{text-align:right;font-weight:600}}
+.price{{margin-top:auto;background:var(--gl);border-radius:1.5mm;padding:3mm 4mm;display:flex;justify-content:space-between;align-items:center}}
+.price>div:first-child{{font-size:22px;font-weight:800;color:var(--gd)}} .rs{{font-size:11px;font-weight:600;margin-right:1mm}}
+.dose{{font-size:9.5px;color:var(--gd);font-weight:500}}
+.tab{{width:100%;border-collapse:collapse;font-size:10px;margin-top:2mm}}
+.tab th{{text-align:left;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);font-weight:600;padding:2.5mm 2mm;border-bottom:2px solid var(--g)}}
+.tab td{{padding:2.6mm 2mm;border-bottom:1px solid var(--b);vertical-align:middle}} .tab td span{{color:var(--m);font-size:9px}}
+.c{{color:#b7c2bc;font-weight:600}} .r{{text-align:right;font-weight:700;color:var(--gd);white-space:nowrap}}
+.cta{{margin-top:8mm;background:var(--g);color:#fff;border-radius:2mm;padding:8mm;display:flex;justify-content:space-between;align-items:center}}
+.cta h4{{margin:0;font-size:20px;font-weight:800}} .cta div{{font-size:11px;opacity:.9;line-height:1.6}}
+.note{{font-size:8.5px;color:var(--m);margin-top:6mm;line-height:1.6}}
 </style><body>
-<div class="page cover"><img class="logo" src="logo.png" onerror="this.outerHTML='<div class=crown>♛</div>'">
-<h1>Do Rei</h1><div class="tg">Saúde &amp; Suplementos</div><div class="line"></div>
-<div class="ed">Catálogo de Produtos</div><div class="ed2">OUTUBRO · 2026</div>
-<div class="foot">Suplementos importados e nacionais · Cuidados naturais</div></div>
+<div class="page cover"><div class="cl"><img class="logo" src="logo.png" onerror="this.outerHTML='<div class=mark>DO REI</div>'">
+<h1>Saúde &amp;<br><span>Suplementos</span></h1><div class="lead">Suplementos importados e nacionais selecionados, com qualidade garantida e atendimento personalizado.</div>
+<div class="bar"></div><div class="meta"><b>Catálogo de Produtos</b>Outubro 2026</div></div><div class="cr"></div></div>
 {secoes}
-<div class="page"><div class="hdr"><b>♛ Do Rei</b><span>Tabela de preços</span></div>
-<h2 style="margin-bottom:5mm">Tabela de Preços Resumida</h2>
-<table><tr><th>Produto</th><th>Marca</th><th>Entrega</th><th class="r">Preço</th></tr>{idx}</table>
-<div class="cta"><h2>Faça seu pedido!</h2><div>Chame a gente no WhatsApp e garanta o seu.<br>Atendimento personalizado da equipe Do Rei.</div></div>
-<div class="note">Preços válidos para outubro/2026, sujeitos a alteração sem aviso prévio. Prazos de entrega em dias úteis após a confirmação do pedido.<br>Suplementos não substituem uma alimentação equilibrada. Consulte um profissional de saúde.</div></div>
-</body></html>'''
+<div class="page">{hdr("Tabela de Preços")}<div class="sec"><div class="secn">RESUMO</div><h2>Tabela de Preços</h2><div class="secsub">Todos os produtos em uma visão rápida</div></div>
+<table class="tab"><tr><th>Cód.</th><th>Produto</th><th>Rend.</th><th>Entrega</th><th class="r">Preço</th></tr>{idx}</table>
+<div class="cta"><div><h4>Faça seu pedido</h4><div>Atendimento direto pelo WhatsApp.</div></div><div style="text-align:right">Informe o código do produto<br>e a quantidade desejada.</div></div>
+<div class="note">Preços válidos para outubro de 2026, sujeitos a alteração sem aviso prévio. Prazos de entrega contados em dias úteis após a confirmação do pedido. Suplementos alimentares não substituem uma alimentação equilibrada; consulte um profissional de saúde.</div>{ftr(5)}</div>
+</body></html>"""
 open("catalogo.html","w").write(html)
 msg = "MENSAGENS PARA AS FOTOS DOS PRODUTOS NO WHATSAPP\n(copie e cole como legenda de cada foto)\n\n"
 for n,m,o,e,d,p,pd,pr,desc in P:
