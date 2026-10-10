@@ -17,7 +17,7 @@ GR=[("Suplementos Importados","Seleção internacional das marcas mais reconheci
     ("Suplementos Nacionais","Qualidade nacional com entrega rápida",[4,5,6,7]),
     ("Cuidados Pessoais","Higiene e beleza com ingredientes naturais e veganos",[8,9,10])]
 from dados import D
-def hdr(t): return f'<div class="hdr"><span class="brand">DO REI <i>Saúde &amp; Suplementos</i></span><span>{t}</span></div>'
+def hdr(t): return f'<div class="hdr"><span class="brand"><img class="hlogo" src="logo.png"><i>Saúde &amp; Suplementos</i></span><span>{t}</span></div>'
 def ftr(n): return f'<div class="ftr"><span>Catálogo Outubro 2026</span><span>{n:02d}</span></div>'
 CAT=[g[0] for g in GR for _ in g[2]]
 import os
@@ -58,12 +58,12 @@ body{{margin:0;background:#fff;font-family:Inter,Arial,sans-serif;color:var(--t)
 .cover{{padding:0;display:flex}}
 .cl{{width:62%;padding:22mm 16mm;display:flex;flex-direction:column}} .cr{{width:38%;background:var(--g)}}
 .mark{{font-size:11px;font-weight:700;letter-spacing:4px;color:var(--g)}}
-.cover h1{{font-size:64px;line-height:1;font-weight:800;margin:auto 0 6mm;letter-spacing:-2px}}
+.cover h1{{font-size:54px;line-height:1;font-weight:800;margin:auto 0 6mm;letter-spacing:-2px}}
 .cover h1 span{{color:var(--g)}} .cover .lead{{font-size:15px;color:var(--m);font-weight:300;line-height:1.6;max-width:110mm}}
 .cover .bar{{width:18mm;height:3px;background:var(--g);margin:10mm 0}}
 .cover .meta{{font-size:11px;color:var(--m);letter-spacing:2px;text-transform:uppercase;margin-top:auto}}
 .cover .meta b{{display:block;color:var(--t);font-size:13px;letter-spacing:1px;margin-bottom:1mm}}
-.logo{{max-width:50mm;max-height:30mm}}
+.logo{{width:95mm}} .hlogo{{height:7mm;vertical-align:middle;margin-right:2mm}} .hdr{{align-items:center}}
 .hdr{{display:flex;justify-content:space-between;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);padding-bottom:4mm;border-bottom:1px solid var(--b)}}
 .brand{{color:var(--g);font-weight:800}} .brand i{{font-style:normal;font-weight:400;color:var(--m);margin-left:2mm}}
 .ftr{{position:absolute;left:16mm;right:16mm;bottom:10mm;display:flex;justify-content:space-between;font-size:9px;color:var(--m);letter-spacing:1px;border-top:1px solid var(--b);padding-top:3mm}}
@@ -80,12 +80,12 @@ p{{font-size:10.5px;color:var(--m);line-height:1.5;margin:0 0 4mm}}
 .price{{margin-top:auto;background:var(--gl);border-radius:1.5mm;padding:3mm 4mm;display:flex;justify-content:space-between;align-items:center}}
 .price>div:first-child{{font-size:22px;font-weight:800;color:var(--gd)}} .rs{{font-size:11px;font-weight:600;margin-right:1mm}}
 .dose{{font-size:9.5px;color:var(--gd);font-weight:500}}
-.ph .cod{{position:static}} .foto{{width:45mm;height:45mm;object-fit:contain;border:1px solid var(--b);border-radius:2mm;background:#fff}} .ph{{display:flex;justify-content:space-between;gap:8mm;margin:10mm 0 6mm}} .phl{{flex:1}}
+.ph .cod{{position:static}} .foto{{width:45mm;height:45mm;object-fit:contain;border:1px solid var(--b);border-radius:2mm;background:#fff}} .ph{{display:flex;justify-content:space-between;gap:8mm;margin:6mm 0 5mm}} .phl{{flex:1}}
 .cod{{font-size:9px;letter-spacing:2.5px;color:#9aa69f;font-weight:600}} .ph .marca{{margin-top:4mm;font-size:10px}}
 .pn{{font-size:30px;line-height:1.15;margin:2mm 0 3mm}} .desc{{font-size:13px;color:var(--m);line-height:1.6;margin:0}}
 .pbox{{background:var(--g);color:#fff;border-radius:2mm;padding:6mm 7mm;min-width:55mm;align-self:flex-start}}
 .pbox .lbl{{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.8}} .big{{font-size:34px;font-weight:800;margin:1mm 0}} .pbox .dose{{color:#fff;opacity:.9}}
-.facts{{display:flex;border:1px solid var(--b);border-radius:2mm;margin-bottom:8mm}} .facts div{{flex:1;padding:4mm 5mm;border-right:1px solid var(--b)}} .facts div:last-child{{border:0}}
+.facts{{display:flex;border:1px solid var(--b);border-radius:2mm;margin-bottom:5mm}} .facts div{{flex:1;padding:4mm 5mm;border-right:1px solid var(--b)}} .facts div:last-child{{border:0}}
 .facts span{{display:block;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:1mm}} .facts b{{font-size:12px}}
 .cols{{display:grid;grid-template-columns:1fr 1fr;gap:10mm}}
 h4{{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin:0 0 3mm;padding-bottom:2mm;border-bottom:2px solid var(--g)}}
@@ -93,8 +93,8 @@ h4{{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g);ma
 .ben li:before{{content:"";position:absolute;left:0;top:3.4mm;width:2.2mm;height:2.2mm;border-radius:50%;background:var(--g)}}
 .uso{{font-size:11.5px;line-height:1.6;margin:0}}
 .nut{{width:100%;border-collapse:collapse;font-size:10.5px;border:1.5px solid var(--t)}} .nut th{{text-align:left;background:var(--t);color:#fff;padding:2.2mm 3mm;font-size:10px}}
-.nut td{{padding:1.8mm 3mm;border-bottom:1px solid #d4d9d6}} .nut .r{{text-align:right;font-weight:600}} .obs{{font-size:8.5px;color:var(--m);margin-top:2mm}}
-.con{{margin-top:8mm;background:#fff7f5;border-left:3px solid #c0392b;border-radius:1.5mm;padding:5mm 6mm}} .con h4{{color:#c0392b;border-color:#f0c9c2}}
+.nut td{{padding:1.4mm 3mm;border-bottom:1px solid #d4d9d6}} .nut .r{{text-align:right;font-weight:600}} .obs{{font-size:8.5px;color:var(--m);margin-top:2mm}}
+.con{{margin-top:5mm;background:#fff7f5;border-left:3px solid #c0392b;border-radius:1.5mm;padding:5mm 6mm}} .con h4{{color:#c0392b;border-color:#f0c9c2}}
 .con ul{{margin:0;padding-left:5mm}} .con li{{font-size:11px;line-height:1.5;margin-bottom:1mm}}
 .tab{{width:100%;border-collapse:collapse;font-size:10px;margin-top:2mm}}
 .tab th{{text-align:left;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);font-weight:600;padding:2.5mm 2mm;border-bottom:2px solid var(--g)}}
