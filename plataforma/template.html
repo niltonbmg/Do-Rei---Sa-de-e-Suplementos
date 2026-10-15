@@ -128,6 +128,17 @@ textarea{min-height:64px;resize:vertical}
 .reco .rr{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;align-items:center}.reco img{width:84px;height:84px;object-fit:contain;background:#fff;border:1px solid var(--line)}
 .reco h3{font:500 26px/1.05 var(--f-display)}.reco h3 em{color:var(--royal)}.reco b.pr{font-size:20px;font-variant-numeric:tabular-nums}
 .fale{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:26;display:flex;align-items:center;gap:8px;background:#1E7A4C;color:#fff;text-decoration:none;border-radius:999px;padding:12px 18px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.25);min-height:48px}
+.painel{padding-block:28px 120px}.pn-h{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.pn-h h1{font:500 clamp(32px,4vw,46px)/1.05 var(--f-display)}.pn-h h1 em{color:var(--royal)}
+.pn-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:20px;align-items:start}
+.pn-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ord{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--st,var(--line));padding:14px 16px;margin-bottom:10px;display:flex;flex-direction:column;gap:6px}
+.ord .oh{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}.ord .on{font:600 12px var(--f-label);letter-spacing:.12em;color:var(--gold-ink)}
+.ord b.ot{font-size:18px;font-variant-numeric:tabular-nums}.ord ul{margin:0;padding-left:18px;font-size:14px}.ord .oc{font-size:13.5px;color:var(--muted)}
+.ord select{max-width:220px}.pill{font:600 10.5px var(--f-label);letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line);color:var(--muted)}
+.pn-side{display:flex;flex-direction:column;gap:14px}.pn-box{background:var(--surface);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:8px}
+.buy{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:6px 0;font-size:14px}.buy b{font-variant-numeric:tabular-nums}
+@media (max-width:760px){.pn-grid{grid-template-columns:1fr}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -156,11 +167,24 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
 
 <header class="top"><div class="wrap">
   <img src="logo-horizontal-branca.svg" alt="Do Rei · Saúde &amp; Suplementos">
+  <button class="bagbtn" id="openPanel" type="button" hidden>Painel de pedidos</button>
   <button class="bagbtn" id="openBag" type="button"><span class="lbltxt">Sua lista</span><b id="bagCount">0</b><span id="bagTotal">R$ 0,00</span></button>
 </div></header>
 
 <a href="#grid" class="skip">Pular para os produtos</a>
-<main class="wrap">
+<section class="wrap painel" id="painel" hidden aria-label="Painel de pedidos">
+  <div class="pn-h"><div><div class="lbl">Só você vê esta área</div><h1>Painel de <em>pedidos</em></h1></div><button class="btn ghost" type="button" id="closePanel">Voltar para a loja</button></div>
+  <p class="note" id="pnState">Carregando pedidos…</p>
+  <div class="pn-grid">
+    <div class="pn-col"><div class="pn-filters" id="pnFilters"></div><div id="pnList"></div></div>
+    <aside class="pn-side">
+      <div class="pn-box"><div class="lbl">Comprar nesta semana</div><p class="note">Soma dos pedidos aguardando pagamento e pagos.</p><div id="pnBuy"></div></div>
+      <div class="pn-box"><div class="lbl">Registrar pedido do WhatsApp</div><p class="note">Cole aqui a mensagem do pedido que chegou no WhatsApp.</p>
+        <textarea id="pnPaste" rows="7" aria-label="Mensagem do pedido"></textarea><button class="btn wide" type="button" id="pnAdd">Registrar pedido</button><p class="note" id="pnMsg"></p></div>
+    </aside>
+  </div>
+</section>
+<main class="wrap" id="loja">
   <section class="intro">
     <div>
       <div class="lbl">Pedidos da semana · fecham sexta, 18 h</div>
@@ -348,8 +372,9 @@ function gerar(){
   const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
   const linhas=it.map(i=>`• ${i.q}× ${i.p.id} ${i.p.t1} ${i.p.t2} — ${brl(i.p.preco*i.q)}`).join("\n");
   const texto=`👑 *Pedido Do Rei · ${num}*\n\n${linhas}\n\n${m==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada"}${ac?"\nAcréscimo cartão: "+brl(ac):""}\n*Total: ${brl(total)}*\n\nNome: ${nome}\nWhatsApp: ${tel}${m==="entrega"?"\nEndereço: "+end:""}${obs?"\nObs.: "+obs:""}\n\nPagamento: ${pg==="cartao"?"cartão de crédito (enviar link de pagamento)":"Pix"}.`;
-  pedido={num,modo:m,pag:pg,ac,frete:fr,total,itens:it.map(i=>({q:i.q,nome:`${i.p.id} ${i.p.t1} ${i.p.t2}`,v:i.p.preco*i.q})),texto,pix:(pg==="pix"&&CONFIG.pixChave)?pixCode(total,num):""};
+  pedido={num,modo:m,pag:pg,ac,frete:fr,total,itens:it.map(i=>({id:i.p.id,q:i.q,nome:`${i.p.id} ${i.p.t1} ${i.p.t2}`,v:i.p.preco*i.q})),texto,pix:(pg==="pix"&&CONFIG.pixChave)?pixCode(total,num):""};
   step="pagamento"; renderBag();
+  salvarPedido({num,nome,tel,modo:m,end,obs,pag:pg,frete:fr,acrescimo:ac,total,itens:pedido.itens,status:"aguardando",origem:"loja",criadoEm:new Date().toISOString()});
 }
 function toast(t){$("toast").textContent=t;$("toast").hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>$("toast").hidden=true,2200)}
 function copy(text,ok,sel){navigator.clipboard.writeText(text).then(()=>toast(ok),()=>{if(sel){const r=document.createRange();r.selectNodeContents(sel);const s=getSelection();s.removeAllRanges();s.addRange(r)}toast("Selecione o texto e copie")})}
@@ -373,4 +398,50 @@ $("scrim").addEventListener("click",closeAll);
 document.addEventListener("change",e=>{if(e.target.name==="modo"){$("endW").hidden=modo()!=="entrega";updateFoot()}if(e.target.name==="pag")updateFoot()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
 renderFilters();renderGrid();renderTotals();
+/* ===== Pedidos salvos e painel do dono ===== */
+let DB=null, USER=null, ORDERS=[], pnFilter="ativos";
+const ST={aguardando:["Aguardando pagamento","#B8913A"],pago:["Pago","#1F4FA3"],comprado:["Comprado","#6B4FA3"],entregue:["Entregue","#1E7A4C"],cancelado:["Cancelado","#B4483C"]};
+async function salvarPedido(o){try{const db=DB||await window.claude?.use?.("db");const u=USER||await window.claude?.use?.("user");if(!db||!u)return;DB=db;const id=await u.id();if(!id)return;const ref=db.doc("pedidos/"+id);try{await ref.update({[o.num]:o})}catch(e){await ref.set({[o.num]:o})}}catch(e){}}
+(async()=>{try{
+  USER=await window.claude?.use?.("user"); if(!USER||!(await USER.isOwner()))return;
+  $("openPanel").hidden=false;
+}catch(e){}})();
+function showPanel(on){$("painel").hidden=!on;$("loja").hidden=on;document.querySelector("footer").hidden=on;$("mbar").style.visibility=on?"hidden":"";if(on)startPanel();window.scrollTo(0,0)}
+let started=false;
+async function startPanel(){if(started)return;started=true;
+  try{DB=DB||await window.claude.use("db")}catch(e){}
+  if(!DB){$("pnState").textContent="Não foi possível abrir os pedidos agora. Recarregue a página.";return}
+  DB.collection("pedidos").onSnapshot(s=>{ORDERS=[];s.docs.forEach(d=>{const x=d.data()||{};Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==="object"&&v.num)ORDERS.push({...v,_doc:d.id,_key:k})})});ORDERS.sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));renderPanel()},e=>{$("pnState").textContent="Erro ao carregar pedidos: "+e.message});
+}
+function renderPanel(){
+  const act=ORDERS.filter(o=>o.status==="aguardando"||o.status==="pago"||o.status==="comprado");
+  const groups={ativos:["Em andamento",act],todos:["Todos",ORDERS],entregue:["Entregues",ORDERS.filter(o=>o.status==="entregue")]};
+  $("pnFilters").innerHTML=Object.entries(groups).map(([k,[t,l]])=>`<button type="button" class="chip" aria-pressed="${pnFilter===k}" data-pnf="${k}">${t} (${l.length})</button>`).join("");
+  const list=groups[pnFilter][1];
+  const soma=act.reduce((s,o)=>s+(+o.total||0),0);
+  $("pnState").textContent=ORDERS.length?`${act.length} pedido(s) em andamento · ${brl(soma)}`:"Nenhum pedido ainda. Os pedidos feitos na loja aparecem aqui sozinhos; os que chegarem só pelo WhatsApp, cole ao lado para registrar.";
+  $("pnList").innerHTML=list.map(o=>{const [sl,sc]=ST[o.status]||ST.aguardando;const dt=o.criadoEm?new Date(o.criadoEm).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
+    return `<article class="ord" style="--st:${sc}"><div class="oh"><span class="on">${esc(o.num||o.id)} · ${dt}</span><span class="pill">${o.pag==="cartao"?"Cartão":"Pix"} · ${o.modo==="entrega"?"Entrega":"Retirada"}${o.origem==="whatsapp"?" · WhatsApp":""}</span></div>
+    <div class="oh"><b>${esc(o.nome||"Sem nome")}</b><b class="ot">${brl(+o.total||0)}</b></div>
+    <ul>${(o.itens||[]).map(i=>`<li>${i.q}× ${esc(i.nome)}</li>`).join("")}</ul>
+    <div class="oc">WhatsApp: ${esc(o.tel||"—")}${o.end?" · "+esc(o.end):""}${o.obs?" · Obs.: "+esc(o.obs):""}</div>
+    <label style="font-weight:500">Status<select data-st="${esc(o._doc)}|${esc(o._key)}">${Object.entries(ST).map(([k,[t]])=>`<option value="${k}" ${o.status===k?"selected":""}>${t}</option>`).join("")}</select></label></article>`}).join("")||`<p class="note">Nada aqui por enquanto.</p>`;
+  const tot={}; act.filter(o=>o.status!=="comprado").forEach(o=>(o.itens||[]).forEach(i=>{const k=i.id||i.nome;tot[k]=tot[k]||{n:i.nome,q:0};tot[k].q+=+i.q||0}));
+  const rows=Object.values(tot).sort((a,b)=>a.n.localeCompare(b.n));
+  $("pnBuy").innerHTML=rows.length?rows.map(r=>`<div class="buy"><span>${esc(r.n)}</span><b>${r.q}</b></div>`).join(""):`<p class="note">Nada a comprar no momento.</p>`;
+}
+function parseWhats(t){
+  const num=(t.match(/DR\d{6,}/)||[])[0]||("DR"+Date.now().toString().slice(-9));
+  const itens=[];t.split("\n").forEach(l=>{const m=l.match(/(\d+)\s*[×x]\s*(\d{2})\s+(.+?)\s+[—-]\s+R\$\s*([\d.,]+)/);if(m){const p=byId(m[2]);itens.push({id:m[2],q:+m[1],nome:p?`${p.id} ${p.t1} ${p.t2}`:m[2]+" "+m[3],v:+m[4].replace(/\./g,"").replace(",",".")})}});
+  const g=re=>((t.match(re)||[])[1]||"").trim();
+  const total=+(g(/Total:\s*R\$\s*([\d.,]+)/).replace(/\./g,"").replace(",","."))||itens.reduce((s,i)=>s+i.v,0);
+  return {num,itens,total,nome:g(/Nome:\s*(.+)/),tel:g(/WhatsApp:\s*(.+)/),end:g(/Endereço:\s*(.+)/),obs:g(/Obs\.:\s*(.+)/),modo:/Entrega:/.test(t)?"entrega":"retirada",pag:/cart[ãa]o/i.test(t)?"cartao":"pix",status:"aguardando",origem:"whatsapp",criadoEm:new Date().toISOString()};
+}
+document.addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;
+  if(t.id==="openPanel")showPanel(true); if(t.id==="closePanel")showPanel(false);
+  if(t.dataset.pnf){pnFilter=t.dataset.pnf;renderPanel()}
+  if(t.id==="pnAdd"){const o=parseWhats($("pnPaste").value);if(!o.itens.length){$("pnMsg").textContent="Não encontrei itens. Cole a mensagem completa do pedido.";return}
+    try{const ref=DB.doc("pedidos/whatsapp");try{await ref.update({[o.num]:o})}catch(_){await ref.set({[o.num]:o})}$("pnPaste").value="";$("pnMsg").textContent=`Pedido ${o.num} registrado.`}catch(err){$("pnMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
+});
+document.addEventListener("change",async e=>{if(e.target.dataset.st){try{const [d,k]=e.target.dataset.st.split("|");const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;await DB.doc("pedidos/"+d).update({[k]:{...clean,status:e.target.value}})}catch(err){toast("Não foi possível mudar o status")}}});
 </script>
