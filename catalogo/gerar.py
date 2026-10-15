@@ -1,16 +1,16 @@
 # Gera catalogo.html e mensagens-whatsapp.txt a partir da lista de produtos.
 P = [
- ("2-per-day (Multivitamínico)","Life Extension","Importado","120 cápsulas","60 doses","231,77","3,86","15 dias úteis","Multivitamínico completo: 2 cápsulas por dia para energia, imunidade e bem-estar."),
- ("Gold C® Vitamina C 1.000 mg","California Gold Nutrition","Importado","240 cápsulas","240 doses","190,09","0,79","16 dias úteis","Vitamina C grau USP para reforçar a imunidade e ação antioxidante."),
- ("Metil B-12 1.000 mcg","NOW Foods","Importado","250 pastilhas","250 doses","209,21","0,84","17 dias úteis","Vitamina B12 na forma ativa (metilcobalamina) para energia e sistema nervoso."),
- ("NAC 600 mg","NOW Foods","Importado","250 cápsulas","250 doses","294,61","1,18","18 dias úteis","N-Acetil Cisteína: apoio antioxidante e saúde respiratória e do fígado."),
+ ("2-per-day (Multivitamínico)","Life Extension","Importado","120 cápsulas","60 doses","205,93","3,43","15 dias úteis","Multivitamínico completo: 2 cápsulas por dia para energia, imunidade e bem-estar."),
+ ("Gold C® Vitamina C 1.000 mg","California Gold Nutrition","Importado","240 cápsulas","240 doses","165,21","0,69","16 dias úteis","Vitamina C grau USP para reforçar a imunidade e ação antioxidante."),
+ ("Metil B-12 1.000 mcg","NOW Foods","Importado","250 pastilhas","250 doses","182,22","0,73","17 dias úteis","Vitamina B12 na forma ativa (metilcobalamina) para energia e sistema nervoso."),
+ ("NAC 600 mg","NOW Foods","Importado","250 cápsulas","250 doses","258,13","1,03","18 dias úteis","N-Acetil Cisteína: apoio antioxidante e saúde respiratória e do fígado."),
  ("Omegafor Plus","Vitafor","Nacional","240 cápsulas","120 doses","255,17","2,13","5 dias úteis","Ômega 3 de alta concentração para coração, cérebro e articulações."),
- ("Bio Synergy D3 2000 UI + K2 MK7 20 mcg (A, D, E e K) – Limão","Bigens","Nacional","20 ml (kit c/ 3)","150 doses","65,33","0,44","5 dias úteis","Vitaminas A, D, E e K em gotas, sabor limão: ossos, imunidade e saúde geral."),
- ("Ferro Quelato Plus com Vitamina C","Vitafor","Nacional","30 cápsulas","30 doses","40,25","1,34","10 dias úteis","Ferro quelato com vitamina C para melhor absorção e mais disposição."),
+ ("Bio Synergy D3 2000 UI + K2 MK7 20 mcg (A, D, E e K) – Limão","Bigens","Nacional","20 ml (kit c/ 3)","150 doses","61,07","0,41","5 dias úteis","Vitaminas A, D, E e K em gotas, sabor limão: ossos, imunidade e saúde geral."),
+ ("Ferro Quelato Plus com Vitamina C","Vitafor","Nacional","30 cápsulas","30 doses","39,96","1,33","10 dias úteis","Ferro quelato com vitamina C para melhor absorção e mais disposição."),
  ("Creatina Monohidratada 250 g","Growth Supplements","Nacional","250 g","83 doses","45,89","0,55","5 dias úteis","Creatina pura para força, desempenho e ganho de massa muscular."),
- ("Shampoo em Barra Aloe Vera – Antiqueda, Anticaspa e Hidratante 90 g","Senhor Saboeiro","Nacional","Barra 90 g","—","28,64","—","10 dias úteis","Shampoo sólido natural com aloe vera: limpa suavemente, controla a oleosidade e a caspa."),
- ("Condicionador em Barra Pitaia Rosa – Vegano","Senhor Saboeiro","Nacional","Barra 55 g","—","28,69","—","10 dias úteis","Condicionador sólido leve com extrato de pitaia: amacia e hidrata sem pesar."),
- ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,35","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
+ ("Shampoo em Barra Aloe Vera – Antiqueda, Anticaspa e Hidratante 90 g","Senhor Saboeiro","Nacional","Barra 90 g","—","27,77","—","10 dias úteis","Shampoo sólido natural com aloe vera: limpa suavemente, controla a oleosidade e a caspa."),
+ ("Condicionador em Barra Pitaia Rosa – Vegano","Senhor Saboeiro","Nacional","Barra 55 g","—","EM FALTA","—","10 dias úteis","Condicionador sólido leve com extrato de pitaia: amacia e hidrata sem pesar."),
+ ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,16","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
 ]
 import html as H
 GR=[("Suplementos Importados","Seleção internacional das marcas mais reconhecidas",[0,1,2,3]),
@@ -37,7 +37,7 @@ def prod(i,pg):
     rend=f"<div><span>Rendimento</span><b>{d}</b></div>" if d!="—" else ""
     return f"""<div class="page">{hdr(CAT[i])}
 <div class="ph">{foto(i)}<div class="phl"><div class="cod">PRODUTO {i+1:02d} · {o.upper()}</div><div class="marca">{m}</div><h2 class="pn">{H.escape(n)}</h2><p class="desc">{desc}</p></div>
-<div class="pbox"><div class="lbl">Preço</div><div class="big"><span class="rs">R$</span>{p}</div>{dose}</div></div>
+{"<div class=\"pbox falta\"><div class=\"lbl\">Disponibilidade</div><div class=\"big\">Em falta</div><div class=\"dose\">Consulte reposição</div></div>" if p=="EM FALTA" else f"<div class=\"pbox\"><div class=\"lbl\">Preço</div><div class=\"big\"><span class=\"rs\">R$</span>{p}</div>{dose}</div>"}</div>
 <div class="facts"><div><span>Embalagem</span><b>{e}</b></div>{rend}<div><span>Origem</span><b>{o}</b></div><div><span>Entrega</span><b>{pr}</b></div></div>
 <div class="cols"><div><h4>Benefícios</h4><ul class="ben">{li(x["ben"])}</ul>
 <h4>Modo de uso</h4><p class="uso">{x["uso"]}</p></div>
@@ -47,7 +47,7 @@ def prod(i,pg):
 secoes=""; pg=2
 for k,(t,sub,ids) in enumerate(GR):
     for i in ids: secoes+=prod(i,pg); pg+=1
-idx="".join(f'<tr><td class="c">{j+1:02d}</td><td><b>{H.escape(x[0])}</b><br><span>{x[1]}</span></td><td>{x[4] if x[4]!="—" else x[3]}</td><td>{x[7]}</td><td class="r">R$ {x[5]}</td></tr>' for j,x in enumerate(P))
+idx="".join(f'<tr><td class="c">{j+1:02d}</td><td><b>{H.escape(x[0])}</b><br><span>{x[1]}</span></td><td>{x[4] if x[4]!="—" else x[3]}</td><td>{x[7]}</td><td class="r">{"Em falta" if x[5]=="EM FALTA" else "R$ "+x[5]}</td></tr>' for j,x in enumerate(P))
 html=f"""<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálogo Do Rei</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -84,7 +84,7 @@ p{{font-size:10.5px;color:var(--m);line-height:1.5;margin:0 0 4mm}}
 .cod{{font-size:9px;letter-spacing:2.5px;color:#9aa69f;font-weight:600}} .ph .marca{{margin-top:4mm;font-size:10px}}
 .pn{{font-size:30px;line-height:1.15;margin:2mm 0 3mm}} .desc{{font-size:13px;color:var(--m);line-height:1.6;margin:0}}
 .pbox{{background:var(--g);color:#fff;border-radius:2mm;padding:6mm 7mm;min-width:55mm;align-self:flex-start}}
-.pbox .lbl{{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.8}} .big{{font-size:34px;font-weight:800;margin:1mm 0}} .pbox .dose{{color:#fff;opacity:.9}}
+.falta{{background:#9aa69f}} .pbox .lbl{{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.8}} .big{{font-size:34px;font-weight:800;margin:1mm 0}} .pbox .dose{{color:#fff;opacity:.9}}
 .facts{{display:flex;border:1px solid var(--b);border-radius:2mm;margin-bottom:5mm}} .facts div{{flex:1;padding:4mm 5mm;border-right:1px solid var(--b)}} .facts div:last-child{{border:0}}
 .facts span{{display:block;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:1mm}} .facts b{{font-size:12px}}
 .cols{{display:grid;grid-template-columns:1fr 1fr;gap:10mm}}
@@ -101,20 +101,21 @@ h4{{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g);ma
 .tab td{{padding:2.6mm 2mm;border-bottom:1px solid var(--b);vertical-align:middle}} .tab td span{{color:var(--m);font-size:9px}}
 .c{{color:#b7c2bc;font-weight:600}} .r{{text-align:right;font-weight:700;color:var(--gd);white-space:nowrap}}
 .cta{{margin-top:8mm;background:var(--g);color:#fff;border-radius:2mm;padding:8mm;display:flex;justify-content:space-between;align-items:center}}
-.cta h4{{margin:0;font-size:20px;font-weight:800}} .cta div{{font-size:11px;opacity:.9;line-height:1.6}}
+.cta h4{{margin:0;font-size:20px;font-weight:800;color:#fff;border:0;padding:0;letter-spacing:0;text-transform:none}} .cta div{{font-size:11px;opacity:.9;line-height:1.6}}
 .note{{font-size:8.5px;color:var(--m);margin-top:6mm;line-height:1.6}}
 </style><body>
 <div class="page cover"><div class="cl"><img class="logo" src="logo.png" onerror="this.outerHTML='<div class=mark>DO REI</div>'">
 <h1>Saúde &amp;<br><span>Suplementos</span></h1><div class="lead">Suplementos importados e nacionais selecionados, com qualidade garantida e atendimento personalizado.</div>
-<div class="bar"></div><div class="meta"><b>Catálogo de Produtos</b>Outubro 2026</div></div><div class="cr"></div></div>
+<div class="bar"></div><div class="meta"><b>Catálogo de Produtos</b>Preços de 15/10/2026</div></div><div class="cr"></div></div>
 {secoes}
 <div class="page">{hdr("Tabela de Preços")}<div class="sec"><div class="secn">RESUMO</div><h2>Tabela de Preços</h2><div class="secsub">Todos os produtos em uma visão rápida</div></div>
 <table class="tab"><tr><th>Cód.</th><th>Produto</th><th>Rend.</th><th>Entrega</th><th class="r">Preço</th></tr>{idx}</table>
 <div class="cta"><div><h4>Faça seu pedido</h4><div>Atendimento direto pelo WhatsApp.</div></div><div style="text-align:right">Informe o código do produto<br>e a quantidade desejada.</div></div>
-<div class="note">Preços válidos para outubro de 2026, sujeitos a alteração sem aviso prévio. Prazos de entrega contados em dias úteis após a confirmação do pedido. As informações nutricionais seguem os rótulos dos fabricantes e podem variar entre lotes. Suplementos alimentares não substituem uma alimentação equilibrada; consulte um profissional de saúde.</div>{ftr(pg)}</div>
+<div class="note">Preços atualizados em 15/10/2026, sujeitos a alteração sem aviso prévio. Prazos de entrega contados em dias úteis após a confirmação do pedido. As informações nutricionais seguem os rótulos dos fabricantes e podem variar entre lotes. Suplementos alimentares não substituem uma alimentação equilibrada; consulte um profissional de saúde.</div>{ftr(pg)}</div>
 </body></html>"""
 open("catalogo.html","w").write(html)
 msg = "MENSAGENS PARA AS FOTOS DOS PRODUTOS NO WHATSAPP\n(copie e cole como legenda de cada foto)\n\n"
 for n,m,o,e,d,p,pd,pr,desc in P:
+    if p=="EM FALTA": continue
     msg += f"━━━━━━━━━━━━━━━━\n👑 *Do Rei – Saúde e Suplementos*\n\n✨ *{n}*\n🏷️ {m} ({o.lower()})\n\n{desc}\n\n📦 {e}" + (f" – {d}" if d!="—" else "") + f"\n💰 *R$ {p}*" + (f" (apenas R$ {pd} por dose!)" if pd!="—" else "") + f"\n🚚 Entrega em {pr}\n\n📲 Peça já o seu! Responda esta mensagem.\n\n"
 open("mensagens-whatsapp.txt","w").write(msg)
