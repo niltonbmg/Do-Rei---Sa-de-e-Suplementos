@@ -67,7 +67,7 @@ pages.append(f'''<div class="page">{hdr("COMO COMPRAR","04")}
 <h2 class="big">Simples, <em>transparente</em><br>e seguro.</h2>
 <div class="steps">{"".join(f'<div class="st"><div class="stn">0{j+1}</div><b>{a}</b><p>{b}</p></div>' for j,(a,b) in enumerate(steps))}</div>
 <div class="kk" style="margin-top:14mm">NOSSOS COMPROMISSOS</div>
-<div class="cm"><div><b>Pagamento</b><p>Pix com o melhor preço, ou cartão de crédito (+5%, à vista ou parcelado). Pedidos fecham toda sexta, às 18 h.</p></div><div><b>Validade</b><p>Entregamos só produtos com no mínimo 6 meses de validade.</p></div><div><b>Originalidade</b><p>Produtos lacrados, comprados de fornecedores confiáveis.</p></div><div><b>Trocas</b><p>Defeito ou avaria: trocamos ou devolvemos o valor.</p></div></div>
+<div class="cm"><div><b>Pagamento</b><p>Pix com o melhor preço, ou cartão de crédito (+5%, à vista ou parcelado). Pedidos fecham toda sexta, às 12 h.</p></div><div><b>Validade</b><p>Entregamos só produtos com no mínimo 6 meses de validade.</p></div><div><b>Originalidade</b><p>Produtos lacrados, comprados de fornecedores confiáveis.</p></div><div><b>Trocas</b><p>Defeito ou avaria: trocamos ou devolvemos o valor.</p></div></div>
 <div class="sel-leg"><span class="selo g">Importado</span> chega em 15–18 dias úteis &nbsp; <span class="selo g">Pronta entrega</span> chega em 5–10 dias úteis</div>{ftr(4)}</div>'''); pg=5
 def product(i,n):
     nm,m,o,e,d,p,pd,pr,desc=P[i]; x=D[i]; dk=i in DARK
