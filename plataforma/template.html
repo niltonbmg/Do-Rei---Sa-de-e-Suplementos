@@ -145,12 +145,12 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
   <section class="intro">
     <div>
       <div class="lbl">Pedidos da semana · fecham sexta, 18 h</div>
-      <h1>Monte sua lista, <em>pague por Pix</em> e receba em casa.</h1>
+      <h1>Monte sua lista, <em>pague no Pix ou cartão</em> e receba em casa.</h1>
       <p>Suplementos importados e nacionais selecionados, com preço justo e atendimento de quem conhece você pelo nome. Cuidado com o corpo, feito com verdade e serviço.</p>
     </div>
     <div class="steps">
       <div><b>1</b><span>Escolha os produtos e as quantidades</span></div>
-      <div><b>2</b><span>Informe seus dados e gere o Pix</span></div>
+      <div><b>2</b><span>Informe seus dados e escolha Pix ou cartão</span></div>
       <div><b>3</b><span>Envie o pedido pelo WhatsApp</span></div>
     </div>
   </section>
@@ -182,7 +182,8 @@ const CONFIG={
   pixChave:"",            // chave Pix (CPF, CNPJ, e-mail, telefone +55... ou aleatória)
   pixNome:"DO REI",       // nome do recebedor (até 25 letras, sem acento)
   pixCidade:"SAO PAULO",  // cidade do recebedor (até 15 letras, sem acento)
-  freteGratisAcima:150, taxaEntrega:10, pedidoMinimoEntrega:50
+  freteGratisAcima:150, taxaEntrega:10, pedidoMinimoEntrega:50,
+  acrescimoCartao:0.05     // cartão de crédito: +5% sobre o total
 };
 const PRODUTOS=/*PRODUTOS*/;
 const CATS=["Importados","Nacionais","Cuidados naturais"];
@@ -252,6 +253,7 @@ function renderBag(){
       <label>Nome completo<input id="fNome" required autocomplete="name" value="${esc(d.nome||"")}"></label>
       <label>WhatsApp<input id="fTel" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" value="${esc(d.tel||"")}"></label>
       <div class="seg"><label><input type="radio" name="modo" id="mRet" value="retirada" ${d.modo!=="entrega"?"checked":""}>Retirar</label><label><input type="radio" name="modo" id="mEnt" value="entrega" ${d.modo==="entrega"?"checked":""}>Receber em casa</label></div>
+      <div class="lbl" style="margin-top:4px">Forma de pagamento</div><div class="seg"><label><input type="radio" name="pag" id="pPix" value="pix" ${d.pag!=="cartao"?"checked":""}>Pix (melhor preço)</label><label><input type="radio" name="pag" id="pCar" value="cartao" ${d.pag==="cartao"?"checked":""}>Cartão de crédito</label></div>
       <label id="endW" ${d.modo==="entrega"?"":"hidden"}>Endereço de entrega<textarea id="fEnd" autocomplete="street-address">${esc(d.end||"")}</textarea></label>
       <label>Observação (opcional)<textarea id="fObs">${esc(d.obs||"")}</textarea></label>
       <p class="note warn" id="fErr" hidden></p></form>`;
@@ -261,11 +263,11 @@ function renderBag(){
     const o=pedido;
     $("bagBody").innerHTML=`<div class="ordnum">PEDIDO ${o.num}</div>
       <div>${o.itens.map(i=>`<div class="tot"><span>${i.q}× ${esc(i.nome)}</span><span>${brl(i.v)}</span></div>`).join("")}
-      <div class="tot"><span>${o.modo==="entrega"?"Entrega":"Retirada"}</span><span>${o.frete?brl(o.frete):"grátis"}</span></div>
+      <div class="tot"><span>${o.modo==="entrega"?"Entrega":"Retirada"}</span><span>${o.frete?brl(o.frete):"grátis"}</span></div>${o.ac?`<div class="tot"><span>Cartão de crédito</span><span>${brl(o.ac)}</span></div>`:""}
       <div class="tot big" style="margin-top:6px"><span>Total</span><span>${brl(o.total)}</span></div></div>
-      <div class="pix">${CONFIG.pixChave?`<div class="lbl">Pague com Pix</div><div id="qr"></div><div class="code" id="pixCode">${esc(o.pix)}</div><button type="button" class="btn wide" id="copyPix">Copiar código Pix</button>`
+      <div class="pix">${o.pag==="cartao"?`<div class="lbl">Cartão de crédito</div><p class="note" style="text-align:center;margin:0">Envie o pedido pelo WhatsApp. Respondemos com o link de pagamento para você pagar com cartão, à vista ou parcelado.</p>`:CONFIG.pixChave?`<div class="lbl">Pague com Pix</div><div id="qr"></div><div class="code" id="pixCode">${esc(o.pix)}</div><button type="button" class="btn wide" id="copyPix">Copiar código Pix</button>`
         :`<div class="lbl">Pix</div><p class="note" style="text-align:center;margin:0">A chave Pix será enviada pelo WhatsApp junto com a confirmação do pedido.</p>`}</div>
-      <div><div class="lbl">Depois de pagar</div><p style="margin:6px 0 0">Envie o pedido pelo WhatsApp com o comprovante. Confirmamos e avisamos quando chegar.</p></div>
+      <div><div class="lbl">Depois de pagar</div><p style="margin:6px 0 0">${o.pag==="cartao"?"Pague pelo link que enviaremos. Confirmamos e avisamos quando chegar.":"Envie o pedido pelo WhatsApp com o comprovante. Confirmamos e avisamos quando chegar."}</p></div>
       ${CONFIG.whatsapp?"":`<p class="note">Copie o pedido e envie para a Do Rei no WhatsApp.</p>`}`;
     $("bagFoot").innerHTML=`${CONFIG.whatsapp?`<a class="btn wide gold" style="text-align:center;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(o.texto)}">Enviar pedido no WhatsApp</a>`:""}
       <button type="button" class="btn wide ${CONFIG.whatsapp?"ghost":"gold"}" id="copyTxt">Copiar texto do pedido</button>
@@ -273,13 +275,16 @@ function renderBag(){
     if(CONFIG.pixChave&&window.QRCode){try{new QRCode($("qr"),{text:o.pix,width:180,height:180,colorDark:"#0B2A5B",colorLight:"#ffffff"})}catch(e){}}
   }
 }
+function pag(){return document.querySelector('input[name="pag"]:checked')?.value||"pix"}
 function modo(){return document.querySelector('input[name="modo"]:checked')?.value||"retirada"}
 function updateFoot(){
-  const sub=subtotal(), m=modo(), fr=shipping(sub,m);
+  const sub=subtotal(), m=modo(), fr=shipping(sub,m), ac=pag()==="cartao"?Math.round((sub+fr)*CONFIG.acrescimoCartao*100)/100:0;
   $("bagFoot").innerHTML=`<div class="tot"><span>Subtotal</span><span>${brl(sub)}</span></div><div class="tot"><span>${m==="entrega"?"Entrega":"Retirada"}</span><span>${fr?brl(fr):"grátis"}</span></div>
-   <div class="tot big"><span>Total</span><span>${brl(sub+fr)}</span></div>
+   ${ac?`<div class="tot"><span>Cartão de crédito (+${CONFIG.acrescimoCartao*100}%)</span><span>${brl(ac)}</span></div>`:""}
+   <div class="tot big"><span>Total</span><span>${brl(sub+fr+ac)}</span></div>
+   ${pag()==="pix"?`<p class="note">Pague no Pix e economize ${CONFIG.acrescimoCartao*100}%.</p>`:`<p class="note">Parcelado: os juros da operadora são somados no link de pagamento.</p>`}
    ${m==="entrega"&&sub<CONFIG.pedidoMinimoEntrega?`<p class="note warn">Entrega a partir de ${brl(CONFIG.pedidoMinimoEntrega)}. Escolha retirada ou adicione itens.</p>`:""}
-   <div class="seg"><button class="btn ghost" type="button" id="back">Voltar</button><button class="btn gold" type="button" id="gen" ${m==="entrega"&&sub<CONFIG.pedidoMinimoEntrega?"disabled":""}>Gerar pedido e Pix</button></div>`;
+   <div class="seg"><button class="btn ghost" type="button" id="back">Voltar</button><button class="btn gold" type="button" id="gen" ${m==="entrega"&&sub<CONFIG.pedidoMinimoEntrega?"disabled":""}>Gerar pedido</button></div>`;
 }
 /* Pix BR Code (padrão EMV do Banco Central) */
 function tlv(id,v){return id+String(v.length).padStart(2,"0")+v}
@@ -293,12 +298,13 @@ function gerar(){
   const nome=$("fNome").value.trim(), tel=$("fTel").value.trim(), m=modo(), end=($("fEnd")||{}).value?.trim()||"", obs=$("fObs").value.trim();
   const err=[]; if(nome.length<3)err.push("informe seu nome"); if(tel.replace(/\D/g,"").length<10)err.push("informe o WhatsApp com DDD"); if(m==="entrega"&&end.length<8)err.push("informe o endereço de entrega");
   if(err.length){$("fErr").hidden=false;$("fErr").textContent="Para continuar, "+err.join(", ")+".";return}
-  try{localStorage.setItem("dorei-dados",JSON.stringify({nome,tel,modo:m,end,obs}))}catch(e){}
-  const it=items(), sub=subtotal(), fr=shipping(sub,m), total=sub+fr;
+  const pg=pag();
+  try{localStorage.setItem("dorei-dados",JSON.stringify({nome,tel,modo:m,end,obs,pag:pg}))}catch(e){}
+  const it=items(), sub=subtotal(), fr=shipping(sub,m), ac=pg==="cartao"?Math.round((sub+fr)*CONFIG.acrescimoCartao*100)/100:0, total=sub+fr+ac;
   const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
   const linhas=it.map(i=>`• ${i.q}× ${i.p.id} ${i.p.t1} ${i.p.t2} — ${brl(i.p.preco*i.q)}`).join("\n");
-  const texto=`👑 *Pedido Do Rei · ${num}*\n\n${linhas}\n\n${m==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada"}\n*Total: ${brl(total)}*\n\nNome: ${nome}\nWhatsApp: ${tel}${m==="entrega"?"\nEndereço: "+end:""}${obs?"\nObs.: "+obs:""}\n\nPagamento por Pix.`;
-  pedido={num,modo:m,frete:fr,total,itens:it.map(i=>({q:i.q,nome:`${i.p.id} ${i.p.t1} ${i.p.t2}`,v:i.p.preco*i.q})),texto,pix:CONFIG.pixChave?pixCode(total,num):""};
+  const texto=`👑 *Pedido Do Rei · ${num}*\n\n${linhas}\n\n${m==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada"}${ac?"\nAcréscimo cartão: "+brl(ac):""}\n*Total: ${brl(total)}*\n\nNome: ${nome}\nWhatsApp: ${tel}${m==="entrega"?"\nEndereço: "+end:""}${obs?"\nObs.: "+obs:""}\n\nPagamento: ${pg==="cartao"?"cartão de crédito (enviar link de pagamento)":"Pix"}.`;
+  pedido={num,modo:m,pag:pg,ac,frete:fr,total,itens:it.map(i=>({q:i.q,nome:`${i.p.id} ${i.p.t1} ${i.p.t2}`,v:i.p.preco*i.q})),texto,pix:(pg==="pix"&&CONFIG.pixChave)?pixCode(total,num):""};
   step="pagamento"; renderBag();
 }
 function toast(t){$("toast").textContent=t;$("toast").hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>$("toast").hidden=true,2200)}
@@ -320,7 +326,7 @@ document.addEventListener("click",e=>{
   if(t.id==="newOrder"){cart={};save();pedido=null;step="lista";renderGrid();renderTotals();renderBag();return}
 });
 $("scrim").addEventListener("click",closeAll);
-document.addEventListener("change",e=>{if(e.target.name==="modo"){$("endW").hidden=modo()!=="entrega";updateFoot()}});
+document.addEventListener("change",e=>{if(e.target.name==="modo"){$("endW").hidden=modo()!=="entrega";updateFoot()}if(e.target.name==="pag")updateFoot()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
 renderFilters();renderGrid();renderTotals();
 </script>
