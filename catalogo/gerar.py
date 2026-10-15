@@ -1,16 +1,16 @@
 # Gera catalogo.html e mensagens-whatsapp.txt a partir da lista de produtos.
 P = [
- ("2-per-day (Multivitamínico)","Life Extension","Importado","120 cápsulas","60 doses","205,93","3,43","15 dias úteis","Multivitamínico completo: 2 cápsulas por dia para energia, imunidade e bem-estar."),
- ("Gold C® Vitamina C 1.000 mg","California Gold Nutrition","Importado","240 cápsulas","240 doses","165,21","0,69","16 dias úteis","Vitamina C grau USP para reforçar a imunidade e ação antioxidante."),
- ("Metil B-12 1.000 mcg","NOW Foods","Importado","250 pastilhas","250 doses","182,22","0,73","17 dias úteis","Vitamina B12 na forma ativa (metilcobalamina) para energia e sistema nervoso."),
- ("NAC 600 mg","NOW Foods","Importado","250 cápsulas","250 doses","258,13","1,03","18 dias úteis","N-Acetil Cisteína: apoio antioxidante e saúde respiratória e do fígado."),
- ("Omegafor Plus","Vitafor","Nacional","240 cápsulas","120 doses","255,17","2,13","5 dias úteis","Ômega 3 de alta concentração para coração, cérebro e articulações."),
- ("Bio Synergy D3 2000 UI + K2 MK7 20 mcg (A, D, E e K) – Limão","Bigens","Nacional","20 ml (kit c/ 3)","150 doses","61,07","0,41","5 dias úteis","Vitaminas A, D, E e K em gotas, sabor limão: ossos, imunidade e saúde geral."),
- ("Ferro Quelato Plus com Vitamina C","Vitafor","Nacional","30 cápsulas","30 doses","39,96","1,33","10 dias úteis","Ferro quelato com vitamina C para melhor absorção e mais disposição."),
- ("Creatina Monohidratada 250 g","Growth Supplements","Nacional","250 g","83 doses","45,89","0,55","5 dias úteis","Creatina pura para força, desempenho e ganho de massa muscular."),
- ("Shampoo em Barra Aloe Vera – Antiqueda, Anticaspa e Hidratante 90 g","Senhor Saboeiro","Nacional","Barra 90 g","—","27,77","—","10 dias úteis","Shampoo sólido natural com aloe vera: limpa suavemente, controla a oleosidade e a caspa."),
+ ("2-per-day (Multivitamínico)","Life Extension","Importado","120 cápsulas","60 doses","207,90","3,47","15 dias úteis","Multivitamínico completo: 2 cápsulas por dia para energia, imunidade e bem-estar."),
+ ("Gold C® Vitamina C 1.000 mg","California Gold Nutrition","Importado","240 cápsulas","240 doses","142,90","0,60","16 dias úteis","Vitamina C grau USP para reforçar a imunidade e ação antioxidante."),
+ ("Metil B-12 1.000 mcg","NOW Foods","Importado","250 pastilhas","250 doses","169,90","0,68","17 dias úteis","Vitamina B12 na forma ativa (metilcobalamina) para energia e sistema nervoso."),
+ ("NAC 600 mg","NOW Foods","Importado","250 cápsulas","250 doses","291,90","1,17","18 dias úteis","N-Acetil Cisteína: apoio antioxidante e saúde respiratória e do fígado."),
+ ("Omegafor Plus","Vitafor","Nacional","240 cápsulas","120 doses","255,90","2,13","5 dias úteis","Ômega 3 de alta concentração para coração, cérebro e articulações."),
+ ("Bio Synergy D3 2000 UI + K2 MK7 20 mcg (A, D, E e K) – Limão","Bigens","Nacional","20 ml (kit c/ 3)","150 doses","61,90","0,41","5 dias úteis","Vitaminas A, D, E e K em gotas, sabor limão: ossos, imunidade e saúde geral."),
+ ("Ferro Quelato Plus com Vitamina C","Vitafor","Nacional","30 cápsulas","30 doses","39,90","1,33","10 dias úteis","Ferro quelato com vitamina C para melhor absorção e mais disposição."),
+ ("Creatina Monohidratada 250 g","Growth Supplements","Nacional","250 g","83 doses","45,90","0,55","5 dias úteis","Creatina pura para força, desempenho e ganho de massa muscular."),
+ ("Shampoo em Barra Aloe Vera – Antiqueda, Anticaspa e Hidratante 90 g","Senhor Saboeiro","Nacional","Barra 90 g","—","27,90","—","10 dias úteis","Shampoo sólido natural com aloe vera: limpa suavemente, controla a oleosidade e a caspa."),
  ("Condicionador em Barra Pitaia Rosa – Vegano","Senhor Saboeiro","Nacional","Barra 55 g","—","EM FALTA","—","10 dias úteis","Condicionador sólido leve com extrato de pitaia: amacia e hidrata sem pesar."),
- ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,16","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
+ ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,90","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
 ]
 import html as H
 GR=[("Suplementos Importados","Seleção internacional das marcas mais reconhecidas",[0,1,2,3]),
