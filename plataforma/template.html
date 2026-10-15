@@ -18,7 +18,7 @@
 [hidden]{display:none!important}
 body{margin:0}
 html,body{background:var(--bg);color:var(--ink)}
-body{font-family:var(--f-body);font-size:15px;line-height:1.5}
+body{font-family:var(--f-body);font-size:16px;line-height:1.55}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .lbl{font:600 11px/1.3 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--royal)}
 h1,h2,h3{text-wrap:balance;margin:0}
@@ -45,11 +45,11 @@ button{font:inherit;cursor:pointer}
 
 /* filtros */
 .filters{display:flex;gap:8px;flex-wrap:wrap;padding-block:8px 18px}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:10px 16px;min-height:44px;font-size:15px}
 .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
 
 /* vitrine */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;padding-bottom:120px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;padding-bottom:120px;align-items:start}
 .card{background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
 .ph{position:relative;background:#fff;aspect-ratio:1/1;max-width:100%;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
 .ph img{width:82%;height:82%;object-fit:contain}
@@ -58,18 +58,22 @@ button{font:inherit;cursor:pointer}
 .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
 .body h3{font:500 25px/1.05 var(--f-display);color:var(--ink)}
 .body h3 em{color:var(--royal)}
-.meta{font-size:12.5px;color:var(--muted)}
+.meta{font-size:13px;color:var(--muted)}
+.serve{margin:2px 0 0;font-size:15px;color:var(--ink);display:flex;flex-direction:column;gap:3px}
+.spec{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line);padding-top:12px;margin-top:4px;font-size:14.5px}
+.spec p{margin:4px 0 0}.spec ul{margin:4px 0 0;padding-left:18px}.spec li{margin-bottom:3px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:0}.kv dt{font:600 10.5px var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.kv dd{margin:2px 0 0;font-size:14px}
 .price{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:8px;font-variant-numeric:tabular-nums}
 .price b{font-size:22px;font-weight:700;color:var(--ink)}
 .price small{color:var(--muted);font-size:12px}
 .row{display:flex;gap:8px;align-items:center}
-.btn{border:1px solid var(--navy);background:var(--navy);color:#fff;padding:10px 14px;font-weight:600;font-size:14px}
+.btn{border:1px solid var(--navy);background:var(--navy);color:#fff;padding:11px 16px;min-height:44px;font-weight:600;font-size:15px}
 .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
 .btn.gold{background:var(--gold);border-color:var(--gold);color:#0B2A5B}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .btn.wide{width:100%}
 .qty{display:flex;align-items:center;border:1px solid var(--line)}
-.qty button{background:transparent;border:0;color:var(--ink);width:38px;height:40px;font-size:18px}
+.qty button{background:transparent;border:0;color:var(--ink);width:44px;height:44px;font-size:20px}
 .qty span{min-width:28px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
 .out{font:600 11px var(--f-label);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
 
@@ -113,6 +117,7 @@ textarea{min-height:64px;resize:vertical}
 #qr{background:#fff;padding:10px;line-height:0}
 .code{width:100%;font:500 11px var(--f-label);word-break:break-all;background:var(--surface);border:1px solid var(--line);padding:8px;max-height:84px;overflow:auto}
 .ordnum{font:600 12px var(--f-label);letter-spacing:.14em;color:var(--gold-ink)}
+.skip{position:absolute;left:-999px}.skip:focus{left:16px;top:80px;z-index:50;background:var(--surface);padding:10px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -124,15 +129,16 @@ footer{border-top:1px solid var(--line);padding-block:24px 110px;color:var(--mut
 footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
 
 @media (max-width:760px){
+  .kv{grid-template-columns:1fr}
   .intro{grid-template-columns:1fr;gap:20px;padding-block:24px 12px}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .body{padding:10px 12px 12px}.body h3{font-size:20px}.price b{font-size:18px}
+  .grid{grid-template-columns:1fr;gap:12px}
+  .body{padding:12px 14px 14px}.body h3{font-size:24px}
   .row{flex-wrap:wrap}.row .btn{flex:1}
   .mbar{display:flex}
   .bagbtn .lbltxt{display:none}
   .panel{top:auto;height:92%;width:100%}
 }
-@media (max-width:380px){.grid{grid-template-columns:1fr}}
+
 @media (prefers-reduced-motion:no-preference){.panel{animation:in .22s ease-out}@keyframes in{from{transform:translateY(12px);opacity:.6}}}
 </style>
 
@@ -141,6 +147,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
   <button class="bagbtn" id="openBag" type="button"><span class="lbltxt">Sua lista</span><b id="bagCount">0</b><span id="bagTotal">R$ 0,00</span></button>
 </div></header>
 
+<a href="#grid" class="skip">Pular para os produtos</a>
 <main class="wrap">
   <section class="intro">
     <div>
@@ -172,7 +179,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
   <div class="pbody det" id="detBody"></div>
   <div class="pfoot" id="detFoot"></div>
 </aside>
-<div class="toast" id="toast" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
@@ -206,11 +213,21 @@ function card(p){
   const ctrl=p.preco==null?`<span class="out">Em falta · consulte a reposição</span>`:
     q?`<div class="qty"><button type="button" data-dec="${p.id}" aria-label="Diminuir">−</button><span>${q}</span><button type="button" data-inc="${p.id}" aria-label="Aumentar">+</button></div>`
      :`<button type="button" class="btn" data-inc="${p.id}">Adicionar</button>`;
-  return `<article class="card"><div class="ph"><span class="num">${p.id}</span><span class="tag">${p.origem==="Importado"?"Importado":"Pronta entrega"}</span><img src="fotos/${p.id}.jpg" alt="${esc(p.t1+" "+p.t2)}" loading="lazy"></div>
-  <div class="body"><h3><span style="white-space:nowrap">${esc(p.t1)}</span> <em>${esc(p.t2)}</em></h3><div class="meta">${esc(p.marca)} · ${esc(p.emb)}</div><div class="meta">Entrega em ${esc(p.prazo)}</div>
-  <div class="price">${p.preco==null?"":`<b>${brl(p.preco)}</b>${p.dose!=="—"?`<small>R$ ${p.dose}/dose</small>`:""}`}</div>
-  <div class="row">${ctrl}<button type="button" class="btn ghost" data-det="${p.id}">Detalhes</button></div></div></article>`;
+  const open=openSet.has(p.id);
+  return `<article class="card"><div class="ph"><span class="num" aria-hidden="true">${p.id}</span><span class="tag">${p.origem==="Importado"?"Importado":"Pronta entrega"}</span><img src="fotos/${p.id}.jpg" alt="Embalagem de ${esc(p.t1+" "+p.t2)}, ${esc(p.marca)}" loading="lazy"></div>
+  <div class="body"><h3>${esc(p.t1)} <em>${esc(p.t2)}</em></h3>
+  <p class="serve"><span class="lbl">Para que serve</span>${esc(p.serve)}</p>
+  <div class="price">${p.preco==null?"":`<b>${brl(p.preco)}</b>${p.dose!=="—"?`<small>R$ ${p.dose} por dose</small>`:""}`}</div>
+  <div class="row">${ctrl}<button type="button" class="btn ghost" data-more="${p.id}" aria-expanded="${open}" aria-controls="spec${p.id}">${open?"Ver menos":"Ver mais"}</button></div>
+  <div class="spec" id="spec${p.id}" ${open?"":"hidden"}>${specs(p)}</div></div></article>`;
 }
+const openSet=new Set();
+function specs(p){return `<dl class="kv"><div><dt>Marca</dt><dd>${esc(p.marca)}</dd></div><div><dt>Embalagem</dt><dd>${esc(p.emb)}${p.doses!=="—"?" · "+esc(p.doses):""}</dd></div><div><dt>Origem</dt><dd>${esc(p.origem)}</dd></div><div><dt>Entrega</dt><dd>${esc(p.prazo)}</dd></div></dl>
+ <div><div class="lbl">Para quem é</div><p>${esc(p.para)}</p></div>
+ <div><div class="lbl">Benefícios</div><ul>${p.ben.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>
+ <div><div class="lbl">Como usar</div><p>${esc(p.uso)}</p></div>
+ <div class="comp"><div class="lbl">${p.porcao?"Composição · "+esc(p.porcao):"Características"}</div>${p.nut.map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("")}</div>
+ <div class="con"><div class="lbl">Cuidados e contraindicações</div><ul>${p.con.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>`}
 function renderGrid(){$("grid").innerHTML=PRODUTOS.filter(p=>cat<0||p.cat===cat).map(card).join("")}
 function renderTotals(){
   const n=items().reduce((s,i)=>s+i.q,0), t=subtotal();
@@ -315,7 +332,7 @@ document.addEventListener("click",e=>{
   if(t.dataset.cat!==undefined){cat=+t.dataset.cat;renderFilters();renderGrid();return}
   if(t.dataset.inc){change(t.dataset.inc,1);if(t.hasAttribute("data-close")){closeAll();toast("Adicionado à lista")}return}
   if(t.dataset.dec){change(t.dataset.dec,-1);return}
-  if(t.dataset.det){showDet(t.dataset.det);return}
+  if(t.dataset.more){const id=t.dataset.more;openSet.has(id)?openSet.delete(id):openSet.add(id);renderGrid();const b=document.querySelector(`[data-more="${id}"]`);if(b)b.focus();return}
   if(t.hasAttribute("data-close")||t.id==="scrim"){closeAll();return}
   if(t.id==="openBag"||t.id==="mOpen"){if(step==="pagamento"&&!pedido)step="lista";renderBag();open("bag");return}
   if(t.id==="toForm"){step="dados";renderBag();return}
