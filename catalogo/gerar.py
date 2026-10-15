@@ -52,18 +52,18 @@ html=f"""<!doctype html><html lang="pt-br"><meta charset="utf-8"><title>Catálog
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 @page{{size:A4;margin:0}} *{{box-sizing:border-box}}
-:root{{--g:#0f7a4a;--gd:#0b5c38;--gl:#e8f4ee;--t:#1b1f1d;--m:#6b756f;--b:#e3e8e5}}
+:root{{--g:#0B2A5B;--gd:#0B2A5B;--gl:#EAF1FB;--t:#14213D;--m:#5B6B82;--b:#E1E7F0;--a:#D4A72C;--r:#1F4FA3}}
 body{{margin:0;background:#fff;font-family:Inter,Arial,sans-serif;color:var(--t);-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .page{{width:210mm;height:297mm;padding:14mm 16mm;position:relative;overflow:hidden;page-break-after:always}}
 .cover{{padding:0;display:flex}}
-.cl{{width:62%;padding:22mm 16mm;display:flex;flex-direction:column}} .cr{{width:38%;background:var(--g)}}
+.cl{{width:62%;padding:22mm 16mm;display:flex;flex-direction:column}} .cr{{width:38%;background:var(--g);border-left:4px solid var(--a)}}
 .mark{{font-size:11px;font-weight:700;letter-spacing:4px;color:var(--g)}}
 .cover h1{{font-size:54px;line-height:1;font-weight:800;margin:auto 0 6mm;letter-spacing:-2px}}
-.cover h1 span{{color:var(--g)}} .cover .lead{{font-size:15px;color:var(--m);font-weight:300;line-height:1.6;max-width:110mm}}
-.cover .bar{{width:18mm;height:3px;background:var(--g);margin:10mm 0}}
+.cover h1 span{{color:var(--r)}} .cover .lead{{font-size:15px;color:var(--m);font-weight:300;line-height:1.6;max-width:110mm}}
+.cover .bar{{width:18mm;height:3px;background:var(--a);margin:10mm 0}}
 .cover .meta{{font-size:11px;color:var(--m);letter-spacing:2px;text-transform:uppercase;margin-top:auto}}
 .cover .meta b{{display:block;color:var(--t);font-size:13px;letter-spacing:1px;margin-bottom:1mm}}
-.logo{{width:95mm}} .hlogo{{height:7mm;vertical-align:middle;margin-right:2mm}} .hdr{{align-items:center}}
+.logo{{width:105mm}} .hlogo{{height:7mm;vertical-align:middle;margin-right:2mm}} .hdr{{align-items:center}}
 .hdr{{display:flex;justify-content:space-between;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);padding-bottom:4mm;border-bottom:1px solid var(--b)}}
 .brand{{color:var(--g);font-weight:800}} .brand i{{font-style:normal;font-weight:400;color:var(--m);margin-left:2mm}}
 .ftr{{position:absolute;left:16mm;right:16mm;bottom:10mm;display:flex;justify-content:space-between;font-size:9px;color:var(--m);letter-spacing:1px;border-top:1px solid var(--b);padding-top:3mm}}
@@ -71,7 +71,7 @@ body{{margin:0;background:#fff;font-family:Inter,Arial,sans-serif;color:var(--t)
 h2{{font-size:28px;font-weight:800;margin:1mm 0 1mm;letter-spacing:-.5px}} .secsub{{font-size:12px;color:var(--m)}}
 .grid{{display:grid;grid-template-columns:1fr 1fr;gap:6mm}}
 .card{{border:1px solid var(--b);border-top:3px solid var(--g);border-radius:2mm;padding:6mm;display:flex;flex-direction:column;position:relative;min-height:98mm}}
-.cod{{position:absolute;top:5mm;right:6mm;font-size:10px;color:#b7c2bc;font-weight:600}}
+.cod{{position:absolute;top:5mm;right:6mm;font-size:10px;color:#B5C0D0;font-weight:600}}
 .marca{{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--g)}}
 h3{{font-size:15px;line-height:1.3;font-weight:700;margin:2mm 0 2mm}}
 p{{font-size:10.5px;color:var(--m);line-height:1.5;margin:0 0 4mm}}
@@ -81,25 +81,25 @@ p{{font-size:10.5px;color:var(--m);line-height:1.5;margin:0 0 4mm}}
 .price>div:first-child{{font-size:22px;font-weight:800;color:var(--gd)}} .rs{{font-size:11px;font-weight:600;margin-right:1mm}}
 .dose{{font-size:9.5px;color:var(--gd);font-weight:500}}
 .ph .cod{{position:static}} .foto{{width:45mm;height:45mm;object-fit:contain;border:1px solid var(--b);border-radius:2mm;background:#fff}} .ph{{display:flex;justify-content:space-between;gap:8mm;margin:6mm 0 5mm}} .phl{{flex:1}}
-.cod{{font-size:9px;letter-spacing:2.5px;color:#9aa69f;font-weight:600}} .ph .marca{{margin-top:4mm;font-size:10px}}
+.cod{{font-size:9px;letter-spacing:2.5px;color:#8A97AD;font-weight:600}} .ph .marca{{margin-top:4mm;font-size:10px}}
 .pn{{font-size:30px;line-height:1.15;margin:2mm 0 3mm}} .desc{{font-size:13px;color:var(--m);line-height:1.6;margin:0}}
-.pbox{{background:var(--g);color:#fff;border-radius:2mm;padding:6mm 7mm;min-width:55mm;align-self:flex-start}}
-.falta{{background:#9aa69f}} .pbox .lbl{{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.8}} .big{{font-size:34px;font-weight:800;margin:1mm 0}} .pbox .dose{{color:#fff;opacity:.9}}
+.pbox{{background:var(--g);border-bottom:3px solid var(--a);color:#fff;border-radius:2mm;padding:6mm 7mm;min-width:55mm;align-self:flex-start}}
+.falta{{background:#8A97AD}} .pbox .lbl{{color:var(--a);opacity:1 !important;font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.8}} .big{{font-size:34px;font-weight:800;margin:1mm 0}} .pbox .dose{{color:#fff;opacity:.9}}
 .facts{{display:flex;border:1px solid var(--b);border-radius:2mm;margin-bottom:5mm}} .facts div{{flex:1;padding:4mm 5mm;border-right:1px solid var(--b)}} .facts div:last-child{{border:0}}
 .facts span{{display:block;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);margin-bottom:1mm}} .facts b{{font-size:12px}}
 .cols{{display:grid;grid-template-columns:1fr 1fr;gap:10mm}}
-h4{{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin:0 0 3mm;padding-bottom:2mm;border-bottom:2px solid var(--g)}}
+h4{{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin:0 0 3mm;padding-bottom:2mm;border-bottom:2px solid var(--a)}}
 .ben{{list-style:none;padding:0;margin:0 0 7mm}} .ben li{{font-size:11.5px;padding:2mm 0 2mm 6mm;position:relative;line-height:1.45;border-bottom:1px solid var(--b)}}
-.ben li:before{{content:"";position:absolute;left:0;top:3.4mm;width:2.2mm;height:2.2mm;border-radius:50%;background:var(--g)}}
+.ben li:before{{content:"";position:absolute;left:0;top:3.4mm;width:2.2mm;height:2.2mm;border-radius:50%;background:var(--a)}}
 .uso{{font-size:11.5px;line-height:1.6;margin:0}}
 .nut{{width:100%;border-collapse:collapse;font-size:10.5px;border:1.5px solid var(--t)}} .nut th{{text-align:left;background:var(--t);color:#fff;padding:2.2mm 3mm;font-size:10px}}
-.nut td{{padding:1.4mm 3mm;border-bottom:1px solid #d4d9d6}} .nut .r{{text-align:right;font-weight:600}} .obs{{font-size:8.5px;color:var(--m);margin-top:2mm}}
+.nut td{{padding:1.4mm 3mm;border-bottom:1px solid #D6DEE9}} .nut .r{{text-align:right;font-weight:600}} .obs{{font-size:8.5px;color:var(--m);margin-top:2mm}}
 .con{{margin-top:5mm;background:#fff7f5;border-left:3px solid #c0392b;border-radius:1.5mm;padding:5mm 6mm}} .con h4{{color:#c0392b;border-color:#f0c9c2}}
 .con ul{{margin:0;padding-left:5mm}} .con li{{font-size:11px;line-height:1.5;margin-bottom:1mm}}
 .tab{{width:100%;border-collapse:collapse;font-size:10px;margin-top:2mm}}
-.tab th{{text-align:left;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);font-weight:600;padding:2.5mm 2mm;border-bottom:2px solid var(--g)}}
+.tab th{{text-align:left;font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--m);font-weight:600;padding:2.5mm 2mm;border-bottom:2px solid var(--a)}}
 .tab td{{padding:2.6mm 2mm;border-bottom:1px solid var(--b);vertical-align:middle}} .tab td span{{color:var(--m);font-size:9px}}
-.c{{color:#b7c2bc;font-weight:600}} .r{{text-align:right;font-weight:700;color:var(--gd);white-space:nowrap}}
+.c{{color:#B5C0D0;font-weight:600}} .r{{text-align:right;font-weight:700;color:var(--gd);white-space:nowrap}}
 .cta{{margin-top:8mm;background:var(--g);color:#fff;border-radius:2mm;padding:8mm;display:flex;justify-content:space-between;align-items:center}}
 .cta h4{{margin:0;font-size:20px;font-weight:800;color:#fff;border:0;padding:0;letter-spacing:0;text-transform:none}} .cta div{{font-size:11px;opacity:.9;line-height:1.6}}
 .note{{font-size:8.5px;color:var(--m);margin-top:6mm;line-height:1.6}}
