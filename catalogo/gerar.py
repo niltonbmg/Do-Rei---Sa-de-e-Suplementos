@@ -8,8 +8,8 @@ P = [
  ("Bio Synergy D3 2000 UI + K2 MK7 20 mcg (A, D, E e K) – Limão","Bigens","Nacional","20 ml (kit c/ 3)","150 doses","65,33","0,44","5 dias úteis","Vitaminas A, D, E e K em gotas, sabor limão: ossos, imunidade e saúde geral."),
  ("Ferro Quelato Plus com Vitamina C","Vitafor","Nacional","30 cápsulas","30 doses","40,25","1,34","10 dias úteis","Ferro quelato com vitamina C para melhor absorção e mais disposição."),
  ("Creatina Monohidratada 250 g","Growth Supplements","Nacional","250 g","83 doses","45,89","0,55","5 dias úteis","Creatina pura para força, desempenho e ganho de massa muscular."),
- ("Shampoo Natural Antiqueda Hidratante 90 g – Linha Capilar","Senhor Saboeiro","Nacional","90 g","—","28,64","—","10 dias úteis","Shampoo natural que ajuda a reduzir a queda e hidrata os fios."),
- ("Condicionador Natural Hidratação Capilar Pitaia Vegano","Senhor Saboeiro","Nacional","90 g","—","28,69","—","10 dias úteis","Condicionador vegano com pitaia para fios macios e hidratados."),
+ ("Shampoo em Barra Aloe Vera – Antiqueda, Anticaspa e Hidratante 90 g","Senhor Saboeiro","Nacional","Barra 90 g","—","28,64","—","10 dias úteis","Shampoo sólido natural com aloe vera: limpa suavemente, controla a oleosidade e a caspa."),
+ ("Condicionador em Barra Pitaia Rosa – Vegano","Senhor Saboeiro","Nacional","Barra 55 g","—","28,69","—","10 dias úteis","Condicionador sólido leve com extrato de pitaia: amacia e hidrata sem pesar."),
  ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,35","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
 ]
 import html as H
