@@ -10,7 +10,7 @@ P = [
  ("Creatina Monohidratada 250 g","Growth Supplements","Nacional","250 g","83 doses","45,90","0,55","5 dias úteis","Creatina pura para força, desempenho e ganho de massa muscular."),
  ("Shampoo em Barra Aloe Vera – Antiqueda, Anticaspa e Hidratante 90 g","Senhor Saboeiro","Nacional","Barra 90 g","—","27,90","—","10 dias úteis","Shampoo sólido natural com aloe vera: limpa suavemente, controla a oleosidade e a caspa."),
  ("Condicionador em Barra Pitaia Rosa – Vegano","Senhor Saboeiro","Nacional","Barra 55 g","—","EM FALTA","—","10 dias úteis","Condicionador sólido leve com extrato de pitaia: amacia e hidrata sem pesar."),
- ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","3,90","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
+ ("Creme Dental Ultra Mint Xilitol Vegano s/ Flúor","Dentil","Nacional","70 g","—","4,90","—","10 dias úteis","Creme dental vegano com xilitol, sem flúor, hálito fresco ultra mint."),
 ]
 import html as H
 GR=[("Suplementos Importados","Seleção internacional das marcas mais reconhecidas",[0,1,2,3]),
