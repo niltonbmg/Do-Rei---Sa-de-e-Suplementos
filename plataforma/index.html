@@ -1,0 +1,326 @@
+<title>Loja Do Rei</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: faixa azul da marca no topo, vitrine em grade de fichas, sacola como painel lateral (folha inferior no celular). */
+:root{
+  --navy:#0B2A5B; --gold:#D4A72C; --royal:#1F4FA3;
+  --bg:#F5F7FB; --surface:#FFFFFF; --ink:#14213D; --muted:#5B6B82; --line:#E1E7F0; --tint:#EAF1FB;
+  --gold-ink:#8A6610; --ok:#1E7A4C; --warn:#B4483C;
+  --f-display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --f-body:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-label:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#081428; --surface:#0E2142; --ink:#E8EDF5; --muted:#9FB0CC; --line:#1F3A66; --tint:#12305E; --royal:#8FB0E6; --gold-ink:#E2BC55; --ok:#5CC48F; --warn:#E59A8F; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#081428; --surface:#0E2142; --ink:#E8EDF5; --muted:#9FB0CC; --line:#1F3A66; --tint:#12305E; --royal:#8FB0E6; --gold-ink:#E2BC55; --ok:#5CC48F; --warn:#E59A8F; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lbl{font:600 11px/1.3 var(--f-label);letter-spacing:.16em;text-transform:uppercase;color:var(--royal)}
+h1,h2,h3{text-wrap:balance;margin:0}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* topo */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:#0B2A5B;color:#fff;border-bottom:2px solid var(--gold)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
+.top img{height:50px;width:auto;display:block}
+.bagbtn{display:flex;align-items:center;gap:10px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:8px 14px}
+.bagbtn b{background:var(--gold);color:#0B2A5B;border-radius:999px;min-width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;padding:0 6px}
+.bagbtn span{font-variant-numeric:tabular-nums}
+
+/* abertura */
+.intro{padding-block:36px 20px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;align-items:end}
+.intro h1{font:500 clamp(34px,5vw,54px)/1.05 var(--f-display);color:var(--ink)}
+.intro h1 em{color:var(--royal)}
+.intro p{color:var(--muted);max-width:60ch;margin:12px 0 0}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.steps div{border-top:2px solid var(--gold);padding-top:8px}
+.steps b{display:block;font:500 26px var(--f-display);color:var(--gold-ink)}
+.steps span{font-size:13px;color:var(--muted)}
+
+/* filtros */
+.filters{display:flex;gap:8px;flex-wrap:wrap;padding-block:8px 18px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 14px;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+
+/* vitrine */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;padding-bottom:120px}
+.card{background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.ph{position:relative;background:#fff;aspect-ratio:1/1;max-width:100%;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--line)}
+.ph img{width:82%;height:82%;object-fit:contain}
+.num{position:absolute;top:10px;left:12px;font:500 30px/1 var(--f-display);color:#B8913A}
+.tag{position:absolute;top:12px;right:12px;font:600 10px var(--f-label);letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border:1px solid #D4A72C;color:#8A6610;background:#FBF5E4}
+.body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.body h3{font:500 25px/1.05 var(--f-display);color:var(--ink)}
+.body h3 em{color:var(--royal)}
+.meta{font-size:12.5px;color:var(--muted)}
+.price{display:flex;align-items:baseline;gap:8px;margin-top:auto;padding-top:8px;font-variant-numeric:tabular-nums}
+.price b{font-size:22px;font-weight:700;color:var(--ink)}
+.price small{color:var(--muted);font-size:12px}
+.row{display:flex;gap:8px;align-items:center}
+.btn{border:1px solid var(--navy);background:var(--navy);color:#fff;padding:10px 14px;font-weight:600;font-size:14px}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#0B2A5B}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.wide{width:100%}
+.qty{display:flex;align-items:center;border:1px solid var(--line)}
+.qty button{background:transparent;border:0;color:var(--ink);width:38px;height:40px;font-size:18px}
+.qty span{min-width:28px;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.out{font:600 11px var(--f-label);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+
+/* painéis */
+.scrim{position:fixed;inset:0;background:rgba(5,14,30,.55);z-index:30}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:var(--surface);z-index:31;display:flex;flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.ph-h{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.ph-h h2{font:500 28px var(--f-display)}
+.x{background:transparent;border:1px solid var(--line);color:var(--ink);width:36px;height:36px}
+.pbody{overflow:auto;padding:16px 20px;display:flex;flex-direction:column;gap:14px;flex:1;min-height:0}
+.pfoot{border-top:1px solid var(--line);padding:14px 20px;display:flex;flex-direction:column;gap:10px}
+.li{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:12px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px}
+.li img{width:56px;height:56px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+.li b{font-weight:600;font-size:14px}
+.li small{display:block;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.tot{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.tot.big{font-size:20px;font-weight:700}
+.note{font-size:12.5px;color:var(--muted)}
+.note.warn{color:var(--warn)}
+form{display:flex;flex-direction:column;gap:12px}
+label{font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:5px}
+input,textarea,select{font:inherit;padding:10px 12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:0}
+textarea{min-height:64px;resize:vertical}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg label{flex-direction:row;align-items:center;gap:8px;border:1px solid var(--line);padding:10px;font-weight:500}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.empty p{font:500 24px var(--f-display);color:var(--ink);margin:0 0 6px}
+
+/* detalhes */
+.det h3{font:500 34px/1.05 var(--f-display)}
+.det h3 em{color:var(--royal)}
+.det ul{margin:0;padding-left:18px}.det li{margin-bottom:4px}
+.comp{background:var(--tint);padding:10px 14px;font:500 12.5px var(--f-label)}
+.comp div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dotted var(--line);padding:5px 0}
+.con{border-left:2px solid var(--warn);padding-left:12px}
+.con .lbl{color:var(--warn)}
+
+/* pagamento */
+.pix{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--tint);padding:16px}
+#qr{background:#fff;padding:10px;line-height:0}
+.code{width:100%;font:500 11px var(--f-label);word-break:break-all;background:var(--surface);border:1px solid var(--line);padding:8px;max-height:84px;overflow:auto}
+.ordnum{font:600 12px var(--f-label);letter-spacing:.14em;color:var(--gold-ink)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
+
+/* barra fixa no celular */
+.mbar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:#0B2A5B;color:#fff;display:none;
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));align-items:center;justify-content:space-between;gap:12px}
+.mbar b{font-variant-numeric:tabular-nums}
+
+footer{border-top:1px solid var(--line);padding-block:24px 110px;color:var(--muted);font-size:12.5px}
+footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
+
+@media (max-width:760px){
+  .intro{grid-template-columns:1fr;gap:20px;padding-block:24px 12px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .body{padding:10px 12px 12px}.body h3{font-size:20px}.price b{font-size:18px}
+  .row{flex-wrap:wrap}.row .btn{flex:1}
+  .mbar{display:flex}
+  .bagbtn .lbltxt{display:none}
+  .panel{top:auto;height:92%;width:100%}
+}
+@media (max-width:380px){.grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:no-preference){.panel{animation:in .22s ease-out}@keyframes in{from{transform:translateY(12px);opacity:.6}}}
+</style>
+
+<header class="top"><div class="wrap">
+  <img src="logo-horizontal-branca.svg" alt="Do Rei · Saúde &amp; Suplementos">
+  <button class="bagbtn" id="openBag" type="button"><span class="lbltxt">Sua lista</span><b id="bagCount">0</b><span id="bagTotal">R$ 0,00</span></button>
+</div></header>
+
+<main class="wrap">
+  <section class="intro">
+    <div>
+      <div class="lbl">Pedidos da semana · fecham sexta, 18 h</div>
+      <h1>Monte sua lista, <em>pague por Pix</em> e receba em casa.</h1>
+      <p>Suplementos importados e nacionais selecionados, com preço justo e atendimento de quem conhece você pelo nome. Cuidado com o corpo, feito com verdade e serviço.</p>
+    </div>
+    <div class="steps">
+      <div><b>1</b><span>Escolha os produtos e as quantidades</span></div>
+      <div><b>2</b><span>Informe seus dados e gere o Pix</span></div>
+      <div><b>3</b><span>Envie o pedido pelo WhatsApp</span></div>
+    </div>
+  </section>
+  <div class="filters" role="group" aria-label="Categorias" id="filters"></div>
+  <section class="grid" id="grid" aria-live="polite"></section>
+</main>
+<footer><div class="wrap"><em>Cuidado com o corpo, feito com verdade e serviço.</em><br>Preços de 15/10/2026, sujeitos a alteração. Prazos em dias úteis após a confirmação do Pix. Suplementos não substituem uma alimentação equilibrada; consulte um profissional de saúde.</div></footer>
+
+<div class="mbar" id="mbar"><span><b id="mCount">0 itens</b> · <b id="mTotal">R$ 0,00</b></span><button class="btn gold" type="button" id="mOpen">Ver lista</button></div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="panel" id="bag" hidden aria-label="Sua lista de compras">
+  <div class="ph-h"><h2 id="bagTitle">Sua lista</h2><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+  <div class="pbody" id="bagBody"></div>
+  <div class="pfoot" id="bagFoot"></div>
+</aside>
+<aside class="panel" id="det" hidden aria-label="Detalhes do produto">
+  <div class="ph-h"><span class="lbl" id="detK"></span><button class="x" type="button" data-close aria-label="Fechar">✕</button></div>
+  <div class="pbody det" id="detBody"></div>
+  <div class="pfoot" id="detFoot"></div>
+</aside>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* ===== CONFIGURAÇÃO DA LOJA ===== */
+const CONFIG={
+  whatsapp:"",            // ex.: "5511999998888" (DDI + DDD + número, só dígitos)
+  pixChave:"",            // chave Pix (CPF, CNPJ, e-mail, telefone +55... ou aleatória)
+  pixNome:"DO REI",       // nome do recebedor (até 25 letras, sem acento)
+  pixCidade:"SAO PAULO",  // cidade do recebedor (até 15 letras, sem acento)
+  freteGratisAcima:150, taxaEntrega:10, pedidoMinimoEntrega:50
+};
+const PRODUTOS=[{"id": "01", "t1": "Two-Per-Day", "t2": "Multivitamínico", "kick": "Multivitamínico + multimineral", "marca": "Life Extension", "origem": "Importado", "emb": "120 tabletes", "doses": "60 doses", "preco": 207.9, "dose": "3,47", "prazo": "15 dias úteis", "para": "Para adultos que querem uma base nutricional completa no dia a dia, com a praticidade de apenas 2 tabletes.", "ben": ["Auxilia no metabolismo energético (vitaminas do complexo B)", "Auxilia no funcionamento do sistema imune (vitaminas C, D e zinco)", "Antioxidante: vitaminas C e E e selênio auxiliam na proteção contra os radicais livres"], "uso": "2 cápsulas ao dia, junto às refeições.", "porcao": "2 cápsulas", "nut": [["Vitamina A", "1.500 mcg"], ["Vitamina C", "500 mg"], ["Vitamina D3", "50 mcg (2.000 UI)"], ["Vitamina E", "67 mg"], ["Tiamina (B1)", "75 mg"], ["Riboflavina (B2)", "50 mg"], ["Niacina (B3)", "50 mg"], ["Vitamina B6", "75 mg"], ["Folato", "680 mcg DFE"], ["Vitamina B12", "300 mcg"], ["Biotina", "300 mcg"], ["Ácido pantotênico", "100 mg"], ["Zinco", "15 mg"], ["Selênio", "55 mcg"]], "con": ["Gestantes e lactantes: usar somente com orientação médica", "Pessoas em uso de anticoagulantes (ex.: varfarina)", "Não exceder a dose recomendada (vitaminas lipossolúveis)", "Pode deixar a urina amarelada (vitamina B2), efeito normal"], "cat": 0}, {"id": "02", "t1": "Gold C", "t2": "Vitamina C", "kick": "Vitamina C · 1.000 mg", "marca": "California Gold Nutrition", "origem": "Importado", "emb": "240 cápsulas", "doses": "240 doses", "preco": 142.9, "dose": "0,60", "prazo": "16 dias úteis", "para": "Para quem quer reforçar a ingestão de vitamina C com uma fonte pura, de padrão farmacêutico.", "ben": ["Auxilia no funcionamento do sistema imune", "Auxilia na formação do colágeno", "Antioxidante que auxilia na proteção contra os radicais livres"], "uso": "1 cápsula ao dia, com ou sem alimento.", "porcao": "1 cápsula", "nut": [["Vitamina C (ácido ascórbico)", "1.000 mg"]], "con": ["Histórico de cálculo renal (pedra nos rins)", "Hemocromatose ou excesso de ferro no organismo", "Deficiência de G6PD", "Doses altas podem causar desconforto gástrico"], "cat": 0}, {"id": "03", "t1": "Methyl", "t2": "B-12", "kick": "Vitamina B12 · 1.000 mcg", "marca": "NOW Foods", "origem": "Importado", "emb": "250 pastilhas", "doses": "250 doses", "preco": 169.9, "dose": "0,68", "prazo": "17 dias úteis", "para": "Para vegetarianos, veganos, pessoas acima de 50 anos e quem busca B12 na forma ativa.", "ben": ["Auxilia na formação das células vermelhas do sangue", "Auxilia no funcionamento do sistema nervoso", "Auxilia no metabolismo energético"], "uso": "1 pastilha ao dia, dissolver na boca.", "porcao": "1 pastilha", "nut": [["Vitamina B12 (metilcobalamina)", "1.000 mcg"]], "con": ["Alergia a cobalto ou cobalamina", "Doença de Leber (atrofia do nervo óptico)", "Contém polióis: excesso pode ter efeito laxativo"], "cat": 0}, {"id": "04", "t1": "NAC", "t2": "600 mg", "kick": "N-acetil L-cisteína · 600 mg", "marca": "NOW Foods", "origem": "Importado", "emb": "250 cápsulas", "doses": "250 doses", "preco": 291.9, "dose": "1,17", "prazo": "18 dias úteis", "para": "Para adultos que buscam suplementação de NAC, com orientação de um profissional de saúde.", "ben": ["Fonte de N-Acetil L-Cisteína", "Cápsula vegetal", "Produto importado da NOW Foods"], "uso": "1 cápsula ao dia, preferencialmente com as refeições.", "porcao": "1 cápsula", "nut": [["N-Acetil L-Cisteína (NAC)", "600 mg"]], "con": ["Asma: pode causar broncoespasmo em pessoas sensíveis", "Úlcera gástrica ativa", "Uso de nitroglicerina ou carvão ativado", "Gestantes e lactantes: somente com orientação médica"], "cat": 0}, {"id": "05", "t1": "Omegafor", "t2": "Plus", "kick": "Ômega 3 · EPA + DHA", "marca": "Vitafor", "origem": "Nacional", "emb": "240 cápsulas", "doses": "120 doses", "preco": 255.9, "dose": "2,13", "prazo": "5 dias úteis", "para": "Para quem consome pouco peixe e quer um ômega 3 concentrado e certificado em pureza.", "ben": ["EPA e DHA auxiliam na manutenção de níveis saudáveis de triglicerídeos (com alimentação equilibrada)", "Ômega 3 na forma de triglicerídeo, certificado IFOS", "Sem odor de peixe e sem glúten"], "uso": "2 cápsulas ao dia, junto às refeições.", "porcao": "2 cápsulas", "nut": [["EPA", "990 mg"], ["DHA", "660 mg"], ["Forma", "Triglicerídeo (TG)"]], "con": ["Alergia a peixes ou frutos do mar", "Uso de anticoagulantes ou antiagregantes (ex.: AAS, varfarina)", "Suspender antes de cirurgias (risco de sangramento)", "Gestantes: somente com orientação médica"], "cat": 1}, {"id": "06", "t1": "Bio Synergy", "t2": "D3 + K2", "kick": "Vitaminas A, D3, E e K2 · gotas", "marca": "Bigens", "origem": "Nacional", "emb": "20 ml", "doses": "150 doses", "preco": 61.9, "dose": "0,41", "prazo": "5 dias úteis", "para": "Para quem toma pouco sol ou quer vitamina D3 com K2 em gotas fáceis de dosar.", "ben": ["A vitamina D auxilia na formação e manutenção de ossos e dentes", "A vitamina K auxilia na manutenção dos ossos", "Em gotas, sabor limão, zero açúcares"], "uso": "1 gota ao dia, via oral, de preferência com uma refeição.", "porcao": "1 gota", "nut": [["Vitamina D3", "50 mcg (2.000 UI)"], ["Vitamina K2 (MK7)", "20 mcg"], ["Vitamina A", "conforme rótulo"], ["Vitamina E", "conforme rótulo"]], "con": ["Uso de anticoagulantes (varfarina): a vitamina K interfere", "Hipercalcemia ou cálculo renal", "Gestantes: excesso de vitamina A deve ser evitado", "Não usar junto com outros suplementos de vitamina D sem orientação"], "cat": 1}, {"id": "07", "t1": "Ferro", "t2": "Plus", "kick": "Ferro quelato + vitamina C", "marca": "Vitafor", "origem": "Nacional", "emb": "30 cápsulas", "doses": "30 doses", "preco": 39.9, "dose": "1,33", "prazo": "10 dias úteis", "para": "Para quem precisa complementar o ferro da alimentação, com orientação profissional.", "ben": ["O ferro auxilia na formação das células vermelhas do sangue", "Auxilia no transporte de oxigênio no organismo", "Vitamina C que auxilia na absorção do ferro"], "uso": "1 cápsula ao dia, longe de leite e café.", "porcao": "1 cápsula", "nut": [["Ferro (bisglicinato)", "14 mg"], ["Vitamina C", "45 mg"]], "con": ["Hemocromatose ou excesso de ferro", "Talassemia e anemias que não são por falta de ferro", "Não tomar junto com cálcio, leite, café ou chá", "Manter fora do alcance de crianças"], "cat": 1}, {"id": "08", "t1": "Creatina", "t2": "Monohidratada", "kick": "Creatina · 3 g por dose", "marca": "Growth Supplements", "origem": "Nacional", "emb": "250 g", "doses": "83 doses", "preco": 45.9, "dose": "0,55", "prazo": "5 dias úteis", "para": "Para quem treina e busca mais desempenho em exercícios intensos e repetidos.", "ben": ["Auxilia no aumento do desempenho físico em exercícios repetidos de curta duração e alta intensidade", "Creatina monohidratada pura", "Sem sabor: mistura em qualquer bebida"], "uso": "3 g (1 medida) ao dia, diluídos em água ou suco.", "porcao": "3 g (1 medida)", "nut": [["Valor energético", "0 kcal"], ["Creatina monohidratada", "3 g"]], "con": ["Doença renal ou função renal reduzida", "Gestantes, lactantes e menores de 18 anos sem orientação", "Manter boa hidratação durante o uso"], "cat": 1}, {"id": "09", "t1": "Shampoo", "t2": "Aloe Vera", "kick": "Shampoo sólido em barra", "marca": "Senhor Saboeiro", "origem": "Nacional", "emb": "Barra 90 g", "doses": "—", "preco": 27.9, "dose": "—", "prazo": "10 dias úteis", "para": "Para cabelos normais e oleosos, e para quem prefere cosméticos naturais e sem plástico.", "ben": ["Limpa suavemente e auxilia no controle da oleosidade", "Ação refrescante para o couro cabeludo", "Em barra: rende mais e sem embalagem plástica"], "uso": "Molhar a barra e o cabelo, esfregar a barra no couro cabeludo até formar espuma, massagear e enxaguar. Guardar a barra seca.", "porcao": null, "nut": [["Tipo", "Shampoo em barra"], ["Conteúdo", "90 g"], ["Ativo", "Aloe vera"], ["Indicação", "Cabelos normais e oleosos"]], "con": ["Uso externo", "Evitar contato com os olhos; se ocorrer, enxaguar com água", "Suspender o uso em caso de irritação", "Fazer teste de sensibilidade se tiver pele sensível"], "cat": 2}, {"id": "10", "t1": "Condicionador", "t2": "Pitaia Rosa", "kick": "Condicionador sólido em barra", "marca": "Senhor Saboeiro", "origem": "Nacional", "emb": "Barra 55 g", "doses": "—", "preco": null, "dose": "—", "prazo": "10 dias úteis", "para": "Para cabelos finos ou frágeis que precisam de hidratação leve.", "ben": ["Amacia e hidrata sem pesar", "Indicado para fios finos ou frágeis", "Vegano, em barra e sem plástico"], "uso": "Após o shampoo, deslizar a barra no comprimento dos fios molhados, espalhar com os dedos e enxaguar.", "porcao": null, "nut": [["Tipo", "Condicionador em barra"], ["Conteúdo", "55 g"], ["Ativo", "Extrato de pitaia"], ["Indicação", "Cabelos normais, finos ou frágeis"]], "con": ["Uso externo", "Evitar contato com os olhos", "Suspender o uso em caso de irritação"], "cat": 2}, {"id": "11", "t1": "Creme Dental", "t2": "Ultra Mint", "kick": "Creme dental com xilitol", "marca": "Dentil", "origem": "Nacional", "emb": "70 g", "doses": "—", "preco": 4.9, "dose": "—", "prazo": "10 dias úteis", "para": "Para quem prefere um creme dental sem flúor, com xilitol e fórmula vegana.", "ben": ["Com xilitol", "Sem flúor", "Sabor menta refrescante"], "uso": "Escovar os dentes após as refeições.", "porcao": null, "nut": [["Tipo", "Creme dental sem flúor"], ["Conteúdo", "70 g"], ["Ativo", "Xilitol"], ["Fórmula", "Vegana"]], "con": ["Não engolir", "Crianças: uso com supervisão de um adulto", "Suspender o uso em caso de irritação"], "cat": 2}];
+const CATS=["Importados","Nacionais","Cuidados naturais"];
+const brl=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const $=id=>document.getElementById(id);
+let cart={}, cat=-1;
+try{cart=JSON.parse(localStorage.getItem("dorei-lista")||"{}")}catch(e){}
+function save(){try{localStorage.setItem("dorei-lista",JSON.stringify(cart))}catch(e){}}
+const byId=id=>PRODUTOS.find(p=>p.id===id);
+function items(){return Object.entries(cart).filter(([id,q])=>q>0&&byId(id)&&byId(id).preco!=null).map(([id,q])=>({p:byId(id),q}))}
+function subtotal(){return items().reduce((s,i)=>s+i.p.preco*i.q,0)}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function renderFilters(){
+  const opts=[["Todos",-1],...CATS.map((c,i)=>[c,i])];
+  $("filters").innerHTML=opts.map(([t,i])=>`<button type="button" class="chip" aria-pressed="${cat===i}" data-cat="${i}">${t}</button>`).join("");
+}
+function card(p){
+  const q=cart[p.id]||0;
+  const ctrl=p.preco==null?`<span class="out">Em falta · consulte a reposição</span>`:
+    q?`<div class="qty"><button type="button" data-dec="${p.id}" aria-label="Diminuir">−</button><span>${q}</span><button type="button" data-inc="${p.id}" aria-label="Aumentar">+</button></div>`
+     :`<button type="button" class="btn" data-inc="${p.id}">Adicionar</button>`;
+  return `<article class="card"><div class="ph"><span class="num">${p.id}</span><span class="tag">${p.origem==="Importado"?"Importado":"Pronta entrega"}</span><img src="fotos/${p.id}.jpg" alt="${esc(p.t1+" "+p.t2)}" loading="lazy"></div>
+  <div class="body"><h3><span style="white-space:nowrap">${esc(p.t1)}</span> <em>${esc(p.t2)}</em></h3><div class="meta">${esc(p.marca)} · ${esc(p.emb)}</div><div class="meta">Entrega em ${esc(p.prazo)}</div>
+  <div class="price">${p.preco==null?"":`<b>${brl(p.preco)}</b>${p.dose!=="—"?`<small>R$ ${p.dose}/dose</small>`:""}`}</div>
+  <div class="row">${ctrl}<button type="button" class="btn ghost" data-det="${p.id}">Detalhes</button></div></div></article>`;
+}
+function renderGrid(){$("grid").innerHTML=PRODUTOS.filter(p=>cat<0||p.cat===cat).map(card).join("")}
+function renderTotals(){
+  const n=items().reduce((s,i)=>s+i.q,0), t=subtotal();
+  $("bagCount").textContent=n; $("bagTotal").textContent=brl(t);
+  $("mCount").textContent=n===1?"1 item":n+" itens"; $("mTotal").textContent=brl(t);
+}
+function change(id,d){const p=byId(id);if(!p||p.preco==null)return;cart[id]=Math.max(0,(cart[id]||0)+d);if(!cart[id])delete cart[id];save();renderGrid();renderTotals();if(!$("bag").hidden&&step==="lista")renderBag()}
+
+/* painéis */
+let step="lista", pedido=null;
+function open(id){$("scrim").hidden=false;$(id).hidden=false}
+function closeAll(){$("scrim").hidden=true;$("bag").hidden=true;$("det").hidden=true}
+function showDet(id){
+  const p=byId(id);
+  $("detK").textContent=`Ficha ${p.id} · ${p.origem}`;
+  $("detBody").innerHTML=`<img src="fotos/${p.id}.jpg" alt="" style="background:#fff;border:1px solid var(--line);aspect-ratio:1/1;object-fit:contain;width:100%;max-width:280px;align-self:center">
+   <div class="lbl">${esc(p.kick)}</div><h3>${esc(p.t1)} <em>${esc(p.t2)}</em></h3><div class="meta">${esc(p.marca)} · ${esc(p.emb)}${p.doses!=="—"?" · "+esc(p.doses):""}</div>
+   <div><div class="lbl">Para quem é</div><p style="margin:6px 0 0">${esc(p.para)}</p></div>
+   <div><div class="lbl">Benefícios</div><ul style="margin-top:6px">${p.ben.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>
+   <div><div class="lbl">Modo de uso</div><p style="margin:6px 0 0">${esc(p.uso)}</p></div>
+   <div class="comp"><div class="lbl" style="margin-bottom:4px">${p.porcao?"Composição · "+esc(p.porcao):"Características"}</div>${p.nut.map(([a,b])=>`<div><span>${esc(a)}</span><b>${esc(b)}</b></div>`).join("")}</div>
+   <div class="con"><div class="lbl">Contraindicações e precauções</div><ul style="margin-top:6px">${p.con.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>`;
+  $("detFoot").innerHTML=p.preco==null?`<span class="out">Em falta · consulte a reposição</span>`:`<div class="tot big"><span>${brl(p.preco)}</span><span class="note">Entrega em ${esc(p.prazo)}</span></div><button class="btn wide" type="button" data-inc="${p.id}" data-close>Adicionar à lista</button>`;
+  open("det");
+}
+function shipping(sub,modo){if(modo!=="entrega")return 0;return sub>=CONFIG.freteGratisAcima?0:CONFIG.taxaEntrega}
+function renderBag(){
+  const it=items();
+  if(step==="lista"){
+    $("bagTitle").textContent="Sua lista";
+    if(!it.length){$("bagBody").innerHTML=`<div class="empty"><p>Sua lista está vazia.</p>Toque em “Adicionar” nos produtos para montar o pedido.</div>`;$("bagFoot").innerHTML=`<button class="btn wide" type="button" data-close>Ver produtos</button>`;return}
+    $("bagBody").innerHTML=it.map(({p,q})=>`<div class="li"><img src="fotos/${p.id}.jpg" alt=""><div><b>${p.id} · ${esc(p.t1)} ${esc(p.t2)}</b><small>${brl(p.preco)} cada · entrega em ${esc(p.prazo)}</small></div>
+      <div class="qty"><button type="button" data-dec="${p.id}" aria-label="Diminuir">−</button><span>${q}</span><button type="button" data-inc="${p.id}" aria-label="Aumentar">+</button></div></div>`).join("")+
+      (it.some(i=>i.p.origem==="Importado")?`<p class="note">Seu pedido tem importados: o prazo total segue o item mais demorado (até 18 dias úteis).</p>`:"");
+    $("bagFoot").innerHTML=`<div class="tot big"><span>Subtotal</span><span>${brl(subtotal())}</span></div><p class="note">Entrega grátis acima de ${brl(CONFIG.freteGratisAcima)}. Retirada sempre grátis.</p><button class="btn wide gold" type="button" id="toForm">Continuar para os dados</button>`;
+  } else if(step==="dados"){
+    $("bagTitle").textContent="Seus dados";
+    let d={};try{d=JSON.parse(localStorage.getItem("dorei-dados")||"{}")}catch(e){}
+    $("bagBody").innerHTML=`<form id="f" novalidate>
+      <label>Nome completo<input id="fNome" required autocomplete="name" value="${esc(d.nome||"")}"></label>
+      <label>WhatsApp<input id="fTel" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" value="${esc(d.tel||"")}"></label>
+      <div class="seg"><label><input type="radio" name="modo" id="mRet" value="retirada" ${d.modo!=="entrega"?"checked":""}>Retirar</label><label><input type="radio" name="modo" id="mEnt" value="entrega" ${d.modo==="entrega"?"checked":""}>Receber em casa</label></div>
+      <label id="endW" ${d.modo==="entrega"?"":"hidden"}>Endereço de entrega<textarea id="fEnd" autocomplete="street-address">${esc(d.end||"")}</textarea></label>
+      <label>Observação (opcional)<textarea id="fObs">${esc(d.obs||"")}</textarea></label>
+      <p class="note warn" id="fErr" hidden></p></form>`;
+    updateFoot();
+  } else {
+    $("bagTitle").textContent="Pagamento";
+    const o=pedido;
+    $("bagBody").innerHTML=`<div class="ordnum">PEDIDO ${o.num}</div>
+      <div>${o.itens.map(i=>`<div class="tot"><span>${i.q}× ${esc(i.nome)}</span><span>${brl(i.v)}</span></div>`).join("")}
+      <div class="tot"><span>${o.modo==="entrega"?"Entrega":"Retirada"}</span><span>${o.frete?brl(o.frete):"grátis"}</span></div>
+      <div class="tot big" style="margin-top:6px"><span>Total</span><span>${brl(o.total)}</span></div></div>
+      <div class="pix">${CONFIG.pixChave?`<div class="lbl">Pague com Pix</div><div id="qr"></div><div class="code" id="pixCode">${esc(o.pix)}</div><button type="button" class="btn wide" id="copyPix">Copiar código Pix</button>`
+        :`<div class="lbl">Pix</div><p class="note" style="text-align:center;margin:0">A chave Pix será enviada pelo WhatsApp junto com a confirmação do pedido.</p>`}</div>
+      <div><div class="lbl">Depois de pagar</div><p style="margin:6px 0 0">Envie o pedido pelo WhatsApp com o comprovante. Confirmamos e avisamos quando chegar.</p></div>
+      ${CONFIG.whatsapp?"":`<p class="note">Copie o pedido e envie para a Do Rei no WhatsApp.</p>`}`;
+    $("bagFoot").innerHTML=`${CONFIG.whatsapp?`<a class="btn wide gold" style="text-align:center;text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(o.texto)}">Enviar pedido no WhatsApp</a>`:""}
+      <button type="button" class="btn wide ${CONFIG.whatsapp?"ghost":"gold"}" id="copyTxt">Copiar texto do pedido</button>
+      <button type="button" class="btn wide ghost" id="newOrder">Fazer novo pedido</button>`;
+    if(CONFIG.pixChave&&window.QRCode){try{new QRCode($("qr"),{text:o.pix,width:180,height:180,colorDark:"#0B2A5B",colorLight:"#ffffff"})}catch(e){}}
+  }
+}
+function modo(){return document.querySelector('input[name="modo"]:checked')?.value||"retirada"}
+function updateFoot(){
+  const sub=subtotal(), m=modo(), fr=shipping(sub,m);
+  $("bagFoot").innerHTML=`<div class="tot"><span>Subtotal</span><span>${brl(sub)}</span></div><div class="tot"><span>${m==="entrega"?"Entrega":"Retirada"}</span><span>${fr?brl(fr):"grátis"}</span></div>
+   <div class="tot big"><span>Total</span><span>${brl(sub+fr)}</span></div>
+   ${m==="entrega"&&sub<CONFIG.pedidoMinimoEntrega?`<p class="note warn">Entrega a partir de ${brl(CONFIG.pedidoMinimoEntrega)}. Escolha retirada ou adicione itens.</p>`:""}
+   <div class="seg"><button class="btn ghost" type="button" id="back">Voltar</button><button class="btn gold" type="button" id="gen" ${m==="entrega"&&sub<CONFIG.pedidoMinimoEntrega?"disabled":""}>Gerar pedido e Pix</button></div>`;
+}
+/* Pix BR Code (padrão EMV do Banco Central) */
+function tlv(id,v){return id+String(v.length).padStart(2,"0")+v}
+function crc16(s){let c=0xFFFF;for(let i=0;i<s.length;i++){c^=s.charCodeAt(i)<<8;for(let j=0;j<8;j++)c=(c&0x8000)?((c<<1)^0x1021)&0xFFFF:(c<<1)&0xFFFF}return c.toString(16).toUpperCase().padStart(4,"0")}
+function clean(s,n){return s.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9 ]/g,"").toUpperCase().slice(0,n)}
+function pixCode(valor,txid){
+  const p=tlv("00","01")+tlv("26",tlv("00","br.gov.bcb.pix")+tlv("01",CONFIG.pixChave))+tlv("52","0000")+tlv("53","986")+tlv("54",valor.toFixed(2))+tlv("58","BR")+tlv("59",clean(CONFIG.pixNome,25))+tlv("60",clean(CONFIG.pixCidade,15))+tlv("62",tlv("05",txid))+"6304";
+  return p+crc16(p);
+}
+function gerar(){
+  const nome=$("fNome").value.trim(), tel=$("fTel").value.trim(), m=modo(), end=($("fEnd")||{}).value?.trim()||"", obs=$("fObs").value.trim();
+  const err=[]; if(nome.length<3)err.push("informe seu nome"); if(tel.replace(/\D/g,"").length<10)err.push("informe o WhatsApp com DDD"); if(m==="entrega"&&end.length<8)err.push("informe o endereço de entrega");
+  if(err.length){$("fErr").hidden=false;$("fErr").textContent="Para continuar, "+err.join(", ")+".";return}
+  try{localStorage.setItem("dorei-dados",JSON.stringify({nome,tel,modo:m,end,obs}))}catch(e){}
+  const it=items(), sub=subtotal(), fr=shipping(sub,m), total=sub+fr;
+  const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
+  const linhas=it.map(i=>`• ${i.q}× ${i.p.id} ${i.p.t1} ${i.p.t2} — ${brl(i.p.preco*i.q)}`).join("\n");
+  const texto=`👑 *Pedido Do Rei · ${num}*\n\n${linhas}\n\n${m==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada"}\n*Total: ${brl(total)}*\n\nNome: ${nome}\nWhatsApp: ${tel}${m==="entrega"?"\nEndereço: "+end:""}${obs?"\nObs.: "+obs:""}\n\nPagamento por Pix.`;
+  pedido={num,modo:m,frete:fr,total,itens:it.map(i=>({q:i.q,nome:`${i.p.id} ${i.p.t1} ${i.p.t2}`,v:i.p.preco*i.q})),texto,pix:CONFIG.pixChave?pixCode(total,num):""};
+  step="pagamento"; renderBag();
+}
+function toast(t){$("toast").textContent=t;$("toast").hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>$("toast").hidden=true,2200)}
+function copy(text,ok,sel){navigator.clipboard.writeText(text).then(()=>toast(ok),()=>{if(sel){const r=document.createRange();r.selectNodeContents(sel);const s=getSelection();s.removeAllRanges();s.addRange(r)}toast("Selecione o texto e copie")})}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button,a,.scrim"); if(!t)return;
+  if(t.dataset.cat!==undefined){cat=+t.dataset.cat;renderFilters();renderGrid();return}
+  if(t.dataset.inc){change(t.dataset.inc,1);if(t.hasAttribute("data-close")){closeAll();toast("Adicionado à lista")}return}
+  if(t.dataset.dec){change(t.dataset.dec,-1);return}
+  if(t.dataset.det){showDet(t.dataset.det);return}
+  if(t.hasAttribute("data-close")||t.id==="scrim"){closeAll();return}
+  if(t.id==="openBag"||t.id==="mOpen"){if(step==="pagamento"&&!pedido)step="lista";renderBag();open("bag");return}
+  if(t.id==="toForm"){step="dados";renderBag();return}
+  if(t.id==="back"){step="lista";renderBag();return}
+  if(t.id==="gen"){gerar();return}
+  if(t.id==="copyPix"){copy(pedido.pix,"Código Pix copiado",$("pixCode"));return}
+  if(t.id==="copyTxt"){copy(pedido.texto,"Pedido copiado",null);return}
+  if(t.id==="newOrder"){cart={};save();pedido=null;step="lista";renderGrid();renderTotals();renderBag();return}
+});
+$("scrim").addEventListener("click",closeAll);
+document.addEventListener("change",e=>{if(e.target.name==="modo"){$("endW").hidden=modo()!=="entrega";updateFoot()}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
+renderFilters();renderGrid();renderTotals();
+</script>
