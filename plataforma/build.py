@@ -10,5 +10,15 @@ for i,(nm,m,o,e,d,p,pd,pr,desc) in enumerate(P):
       preco=None if p=="EM FALTA" else float(p.replace(".","").replace(",",".")),dose=pd,prazo=pr,para=ns2["Q"][i],
       ben=D[i]["ben"],uso=D[i]["uso"],porcao=D[i]["porcao"],nut=D[i]["nut"],con=D[i]["con"],cat=0 if i<4 else (1 if i<8 else 2)))
 html=open("template.html").read().replace("/*PRODUTOS*/",json.dumps(prods,ensure_ascii=False))
+import base64
+from PIL import Image
+import io
+def uri(path,fmt=None):
+    if path.endswith(".svg"): return "data:image/svg+xml;base64,"+base64.b64encode(open(path,"rb").read()).decode()
+    im=Image.open(path).convert("RGB"); im.thumbnail((600,600)); b=io.BytesIO(); im.save(b,"JPEG",quality=82); return "data:image/jpeg;base64,"+base64.b64encode(b.getvalue()).decode()
+html=html.replace('src="logo-horizontal-branca.svg"','src="'+uri("logo-horizontal-branca.svg")+'"')
+fotos={p["id"]:uri(f"fotos/{p['id']}.jpg") for p in prods}
+html=html.replace("const PRODUTOS=","const FOTOS="+json.dumps(fotos)+";\nconst PRODUTOS=")
+html=html.replace('src="fotos/${p.id}.jpg"','src="${FOTOS[p.id]}"')
 open("index.html","w").write(html)
 print(len(prods))
