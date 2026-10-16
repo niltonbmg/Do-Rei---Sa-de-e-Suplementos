@@ -47,7 +47,7 @@ def feature():
 <p class="fp">Fabricado pela <b>Life Extension</b> (EUA), referência mundial em suplementação baseada em ciência desde 1980. A base de tudo. Vitaminas e minerais essenciais em apenas 2 tabletes por dia, com doses generosas e formas de alta qualidade. Se você vai começar por um produto, comece por este.</p>
 <ul class="fb">{li(D[0]["ben"])}</ul>
 <div class="fpr"><small>R$</small>{a[5]}<span>R$ {a[6]} por dose · {a[4]}</span></div></div>
-<div class="fph"><img src="fotos_std/01.jpg"></div></div>
+<div class="fph"><img src="fotos/01.png"></div></div>
 <div class="rec"><div class="rk">INDICAMOS TAMBÉM</div><div class="rg"><img src="fotos_std/04.jpg"><div><h4>{T[3][0]} <em>{T[3][1]}</em></h4><p>{SV[3]}. {Q[3]}</p></div><div class="rp"><small>R$</small>{b[5]}<span>Ficha 04</span></div></div></div>
 {ftr(2,True)}</div>'''
 pages.append(feature()); pg+=1
@@ -165,11 +165,11 @@ h3{font:500 46px/1.02 'Cormorant Garamond',serif;color:var(--n);margin:2mm 0 3mm
 .opener .ft{color:#9FB0CC}
 .feat{background:var(--nn);color:#E8EDF5}.feat .hd{border-color:#22406F;color:var(--a)}
 .fk{font:600 9px 'JetBrains Mono',monospace;letter-spacing:3px;color:var(--a);margin:12mm 0 4mm}
-.fg{display:grid;grid-template-columns:minmax(0,1fr) 72mm;gap:8mm;align-items:center}
+.fg{display:grid;grid-template-columns:minmax(0,1fr) 74mm;gap:8mm;align-items:center}
 .feat h2{font:400 58px/1.0 'Cormorant Garamond',serif;color:#fff;margin:0 0 4mm}.feat h2 em{color:var(--a)}
 .fm{font-size:11px;color:#9FB0CC}.fp{font-size:13px;line-height:1.7;margin:6mm 0}.fb{margin:0;padding-left:5mm}.fb li{font-size:12px;line-height:1.55;margin-bottom:2mm}.fb li::marker{color:var(--a)}
 .fpr{font:600 40px Montserrat,sans-serif;color:#fff;margin-top:6mm}.fpr small{font-size:16px;margin-right:2mm}.fpr span{display:block;font:400 11px Inter,sans-serif;color:#9FB0CC;margin-top:1mm}
-.fph{background:#fff;height:90mm;display:flex;align-items:center;justify-content:center}.fph img{width:66mm;height:80mm;object-fit:contain}
+.fph{background:#fff;height:128mm;display:flex;align-items:center;justify-content:center}.fph img{width:72mm;height:124mm;object-fit:contain}
 .rec{position:absolute;left:16mm;right:16mm;bottom:22mm;border-top:1px solid #2A4777;padding-top:6mm}.rk{font:600 8.5px 'JetBrains Mono',monospace;letter-spacing:2.5px;color:var(--a);margin-bottom:4mm}
 .rg{display:grid;grid-template-columns:30mm 1fr auto;gap:6mm;align-items:center}.rg img{width:30mm;height:30mm;object-fit:contain;background:#fff}
 .rg h4{font:400 26px 'Cormorant Garamond',serif;color:#fff;margin:0 0 2mm}.rg h4 em{color:var(--a)}.rg p{font-size:11px;color:#B9C6DD;margin:0;line-height:1.55}
