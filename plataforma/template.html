@@ -286,8 +286,8 @@ function renderFeat(){
    <p>Da <b style="color:#D4A72C">Life Extension</b> (EUA), referência mundial em suplementação baseada em ciência desde 1980. A base de tudo: vitaminas e minerais essenciais em apenas 2 tabletes por dia.</p>
    <div class="pr">${brl(a.preco)}<small>R$ ${a.dose} por dose</small></div>
    <div class="row" style="margin-top:12px">${qa?`<div class="qty" style="border-color:rgba(255,255,255,.4)"><button type="button" data-dec="01" aria-label="Diminuir" style="color:#fff">−</button><span>${qa}</span><button type="button" data-inc="01" aria-label="Aumentar" style="color:#fff">+</button></div>`:`<button type="button" class="btn" data-inc="01">Adicionar</button>`}<a class="btn ghost" href="#c01" style="text-decoration:none">Ver detalhes</a></div></div>
-   <div class="im"><img src="fotos/01.jpg" alt="Embalagem do ${esc(a.t1)} ${esc(a.t2)}"></div></article>
-   <article class="reco"><div class="lbl">Indicamos também</div><div class="rr"><img src="fotos/04.jpg" alt="Embalagem da ${esc(b.t1)}"><div><h3>${esc(b.t1)} <em>${esc(b.t2)}</em></h3><b class="pr">${brl(b.preco)}</b></div></div>
+   <div class="im"><img src="${FOTOS["01"]}" alt="Embalagem do ${esc(a.t1)} ${esc(a.t2)}"></div></article>
+   <article class="reco"><div class="lbl">Indicamos também</div><div class="rr"><img src="${FOTOS["04"]}" alt="Embalagem da ${esc(b.t1)}"><div><h3>${esc(b.t1)} <em>${esc(b.t2)}</em></h3><b class="pr">${brl(b.preco)}</b></div></div>
    <p class="note" style="font-size:14px;margin:0">${esc(b.serve)}. ${esc(b.para)}</p>
    ${qb?`<div class="qty"><button type="button" data-dec="04" aria-label="Diminuir">−</button><span>${qb}</span><button type="button" data-inc="04" aria-label="Aumentar">+</button></div>`:`<button type="button" class="btn" data-inc="04">Adicionar</button>`}</article>`;
 }
