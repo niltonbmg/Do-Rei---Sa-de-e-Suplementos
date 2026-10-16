@@ -139,6 +139,14 @@ textarea{min-height:64px;resize:vertical}
 .pn-side{display:flex;flex-direction:column;gap:14px}.pn-box{background:var(--surface);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:8px}
 .buy{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:6px 0;font-size:14px}.buy b{font-variant-numeric:tabular-nums}
 @media (max-width:760px){.pn-grid{grid-template-columns:1fr}}
+.guia{background:var(--surface);border:1px solid var(--line);padding:20px;margin-bottom:22px;display:flex;flex-direction:column;gap:12px}
+.guia h2{font:500 clamp(28px,3.4vw,38px)/1.05 var(--f-display)}.guia h2 em{color:var(--royal)}
+.gchips{display:flex;flex-wrap:wrap;gap:8px}
+.gres{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}.gres>p{margin:0;font-size:15px}
+.gi{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:center}.gi img{width:72px;height:72px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+.gi b{display:block;font:500 22px/1.1 var(--f-display)}.gi b em{color:var(--royal)}.gi small{color:var(--muted);font-size:13.5px}
+.gres .btn{align-self:flex-start}
+.labx{background:var(--tint);padding:10px 12px;font-size:13px}.labx p{margin:4px 0 0;color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -198,6 +206,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
     </div>
   </section>
   <section class="feat" id="feat" aria-label="Destaques"></section>
+  <section class="guia" id="guia" aria-label="Guia por objetivo"></section>
   <div class="filters" role="group" aria-label="Categorias" id="filters"></div>
   <section class="grid" id="grid" aria-live="polite"></section>
 </main>
@@ -231,6 +240,9 @@ const CONFIG={
   acrescimoCartao:0.05     // cartão de crédito: +5% sobre o total
 };
 const PRODUTOS=/*PRODUTOS*/;
+const LABS=/*LABS*/;
+const GUIA=/*GUIA*/;
+let gsel=-1;
 const CATS=["Importados","Nacionais","Cuidados naturais"];
 const brl=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const $=id=>document.getElementById(id);
@@ -260,7 +272,7 @@ function card(p){
   <div class="spec" id="spec${p.id}" ${open?"":"hidden"}>${specs(p)}</div></div></article>`;
 }
 const openSet=new Set();
-function specs(p){return `<dl class="kv"><div><dt>Marca</dt><dd>${esc(p.marca)}</dd></div><div><dt>Embalagem</dt><dd>${esc(p.emb)}${p.doses!=="—"?" · "+esc(p.doses):""}</dd></div><div><dt>Origem</dt><dd>${esc(p.origem)}</dd></div><div><dt>Entrega</dt><dd>${esc(p.prazo)}</dd></div></dl>
+function specs(p){return `<div class="labx"><b>${esc(p.marca)}</b> · ${esc((LABS[p.marca]||[""])[0])}<p>${esc((LABS[p.marca]||["",""])[1])}</p></div><dl class="kv"><div><dt>Marca</dt><dd>${esc(p.marca)}</dd></div><div><dt>Embalagem</dt><dd>${esc(p.emb)}${p.doses!=="—"?" · "+esc(p.doses):""}</dd></div><div><dt>Origem</dt><dd>${esc(p.origem)}</dd></div><div><dt>Entrega</dt><dd>${esc(p.prazo)}</dd></div></dl>
  <div><div class="lbl">Para quem é</div><p>${esc(p.para)}</p></div>
  <div><div class="lbl">Benefícios</div><ul>${p.ben.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>
  <div><div class="lbl">Como usar</div><p>${esc(p.uso)}</p></div>
@@ -271,7 +283,7 @@ function renderFeat(){
   if(cat>=0){$("feat").hidden=true;return} $("feat").hidden=false;
   const qa=cart["01"]||0, qb=cart["04"]||0;
   $("feat").innerHTML=`<article class="hero"><div><div class="lbl">Nosso carro-chefe</div><h2>${esc(a.t1)} <em>${esc(a.t2)}</em></h2>
-   <p>A base de tudo: vitaminas e minerais essenciais em apenas 2 tabletes por dia. Se você vai começar por um produto, comece por este.</p>
+   <p>Da <b style="color:#D4A72C">Life Extension</b> (EUA), referência mundial em suplementação baseada em ciência desde 1980. A base de tudo: vitaminas e minerais essenciais em apenas 2 tabletes por dia.</p>
    <div class="pr">${brl(a.preco)}<small>R$ ${a.dose} por dose</small></div>
    <div class="row" style="margin-top:12px">${qa?`<div class="qty" style="border-color:rgba(255,255,255,.4)"><button type="button" data-dec="01" aria-label="Diminuir" style="color:#fff">−</button><span>${qa}</span><button type="button" data-inc="01" aria-label="Aumentar" style="color:#fff">+</button></div>`:`<button type="button" class="btn" data-inc="01">Adicionar</button>`}<a class="btn ghost" href="#c01" style="text-decoration:none">Ver detalhes</a></div></div>
    <div class="im"><img src="fotos/01.jpg" alt="Embalagem do ${esc(a.t1)} ${esc(a.t2)}"></div></article>
@@ -279,7 +291,18 @@ function renderFeat(){
    <p class="note" style="font-size:14px;margin:0">${esc(b.serve)}. ${esc(b.para)}</p>
    ${qb?`<div class="qty"><button type="button" data-dec="04" aria-label="Diminuir">−</button><span>${qb}</span><button type="button" data-inc="04" aria-label="Aumentar">+</button></div>`:`<button type="button" class="btn" data-inc="04">Adicionar</button>`}</article>`;
 }
-function renderGrid(){renderFeat();$("grid").innerHTML=PRODUTOS.filter(p=>cat<0||p.cat===cat).map(card).join("")}
+function renderGuia(){
+  if(cat>=0){$("guia").hidden=true;return} $("guia").hidden=false;
+  let h=`<div class="lbl">Guia rápido</div><h2>O que você <em>procura?</em></h2><div class="gchips" role="group" aria-label="Objetivos">${GUIA.map((g,i)=>`<button type="button" class="chip" aria-pressed="${gsel===i}" data-g="${i}">${esc(g[0])}</button>`).join("")}</div>`;
+  if(gsel>=0){const [q,a,b,w]=GUIA[gsel],A=byId(a),B=byId(b);
+    const it=(p,t)=>`<div class="gi"><img src="fotos/${p.id}.jpg" alt=""><div><span class="lbl">${t}</span><b>${p.id} · ${esc(p.t1)} <em>${esc(p.t2)}</em></b><small>${esc(p.serve)}${p.preco!=null?" · "+brl(p.preco):""}</small></div></div>`;
+    const ok=[A,B].filter(p=>p.preco!=null&&p.id!=="07");
+    h+=`<div class="gres" aria-live="polite"><p>${esc(w)}</p>${it(A,"Indicação principal")}${it(B,"Pode complementar com")}
+    ${ok.length?`<button type="button" class="btn gold" data-addg="${ok.map(p=>p.id).join(",")}">${ok.length>1?"Adicionar os dois à lista":"Adicionar à lista"}</button>`:""}
+    <p class="note">Orientação geral, não substitui avaliação profissional. Gestantes, lactantes e pessoas em tratamento devem consultar um profissional de saúde.${[A.id,B.id].includes("07")?" Ferro: use apenas com orientação profissional.":""}</p></div>`}
+  $("guia").innerHTML=h;
+}
+function renderGrid(){renderFeat();renderGuia();$("grid").innerHTML=PRODUTOS.filter(p=>cat<0||p.cat===cat).map(card).join("")}
 function renderTotals(){
   const n=items().reduce((s,i)=>s+i.q,0), t=subtotal();
   $("bagCount").textContent=n; $("bagTotal").textContent=brl(t);
@@ -384,6 +407,8 @@ document.addEventListener("click",e=>{
   if(t.dataset.cat!==undefined){cat=+t.dataset.cat;renderFilters();renderGrid();return}
   if(t.dataset.inc){change(t.dataset.inc,1);if(t.hasAttribute("data-close")){closeAll();toast("Adicionado à lista")}return}
   if(t.dataset.dec){change(t.dataset.dec,-1);return}
+  if(t.dataset.g!==undefined){const i=+t.dataset.g;gsel=gsel===i?-1:i;renderGuia();return}
+  if(t.dataset.addg){t.dataset.addg.split(",").forEach(id=>{cart[id]=(cart[id]||0)+1});save();renderGrid();renderTotals();toast("Adicionado à lista");return}
   if(t.dataset.more){const id=t.dataset.more;openSet.has(id)?openSet.delete(id):openSet.add(id);renderGrid();const b=document.querySelector(`[data-more="${id}"]`);if(b)b.focus();return}
   if(t.hasAttribute("data-close")||t.id==="scrim"){closeAll();return}
   if(t.id==="openBag"||t.id==="mOpen"){if(step==="pagamento"&&!pedido)step="lista";renderBag();open("bag");return}

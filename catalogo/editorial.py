@@ -3,6 +3,8 @@ import html as H, os
 src=open("gerar.py").read(); ns={}
 exec(src[:src.index("import html as H")],ns); P=ns["P"]
 from dados import D
+from labs import LABS
+from guia import GUIA
 T=[("Multivitamínico","2 por dia"),("Vitamina C","1.000 mg"),("Vitamina B12","metilcobalamina"),("N-acetilcisteína","600 mg"),("Ômega 3","concentrado"),("Vitamina D3 + K2","em gotas"),("Ferro quelato","+ vitamina C"),("Creatina","monohidratada"),("Shampoo em barra","aloe vera"),("Condicionador em barra","pitaia rosa"),("Creme dental","menta, sem flúor")]
 PN=["Two-Per-Day","Gold C®","Methyl B-12","NAC 600 mg","Omegafor Plus","Bio Synergy D3 + K2 MK-7","Ferro Plus","Creatina Monohidratada","Shampoo Sólido Aloe Vera","Condicionador Sólido Pitaia Rosa","Ultra Mint Flex"]
 SV=["Completa as vitaminas e minerais do dia a dia","Auxilia na imunidade e na formação do colágeno","Auxilia na energia e no sistema nervoso","Antioxidante que auxilia na proteção das células","Auxilia na manutenção de triglicerídeos saudáveis","Auxilia na saúde dos ossos, dentes e na imunidade","Auxilia na formação das células vermelhas do sangue","Auxilia no desempenho em treinos intensos","Limpa com suavidade e controla a oleosidade","Hidrata e amacia sem pesar os fios","Higiene bucal com xilitol, sem flúor"]
@@ -42,7 +44,7 @@ def feature():
     return f'''<div class="page feat">{hdr("DESTAQUE DA CASA","02",True)}
 <div class="fk">NOSSO CARRO-CHEFE</div>
 <div class="fg"><div><h2>{T[0][0]}<br><em>{T[0][1]}</em></h2><div class="fm">{a[1]} · {PN[0]} · {a[3]}</div>
-<p class="fp">A base de tudo. Vitaminas e minerais essenciais em apenas 2 tabletes por dia, com doses generosas e formas de alta qualidade. Se você vai começar por um produto, comece por este.</p>
+<p class="fp">Fabricado pela <b>Life Extension</b> (EUA), referência mundial em suplementação baseada em ciência desde 1980. A base de tudo. Vitaminas e minerais essenciais em apenas 2 tabletes por dia, com doses generosas e formas de alta qualidade. Se você vai começar por um produto, comece por este.</p>
 <ul class="fb">{li(D[0]["ben"])}</ul>
 <div class="fpr"><small>R$</small>{a[5]}<span>R$ {a[6]} por dose · {a[4]}</span></div></div>
 <div class="fph"><img src="fotos_std/01.jpg"></div></div>
@@ -50,7 +52,7 @@ def feature():
 {ftr(2,True)}</div>'''
 pages.append(feature()); pg+=1
 # manifesto + sumario
-pstart=5; idx=""; p=pstart
+pstart=7; idx=""; p=pstart
 for k,(a,b,d,ids) in enumerate(GR):
     p+=1
     items="".join(f'<div class="ii"><span>{i+1:02d}</span>{T[i][0]} <em>{T[i][1]}</em><b>p. {p+n:02d}</b></div>' for n,i in enumerate(ids))
@@ -68,7 +70,13 @@ pages.append(f'''<div class="page">{hdr("COMO COMPRAR","04")}
 <div class="steps">{"".join(f'<div class="st"><div class="stn">0{j+1}</div><b>{a}</b><p>{b}</p></div>' for j,(a,b) in enumerate(steps))}</div>
 <div class="kk" style="margin-top:14mm">NOSSOS COMPROMISSOS</div>
 <div class="cm"><div><b>Pagamento</b><p>Pix com o melhor preço, ou cartão de crédito (+5%, à vista ou parcelado). Pedidos fecham toda sexta, às 12 h.</p></div><div><b>Validade</b><p>Entregamos só produtos com no mínimo 6 meses de validade.</p></div><div><b>Originalidade</b><p>Produtos lacrados, comprados de fornecedores confiáveis.</p></div><div><b>Trocas</b><p>Defeito ou avaria: trocamos ou devolvemos o valor.</p></div></div>
-<div class="sel-leg"><span class="selo g">Importado</span> chega em 15–18 dias úteis &nbsp; <span class="selo g">Pronta entrega</span> chega em 5–10 dias úteis</div>{ftr(4)}</div>'''); pg=5
+<div class="sel-leg"><span class="selo g">Importado</span> chega em 15–18 dias úteis &nbsp; <span class="selo g">Pronta entrega</span> chega em 5–10 dias úteis</div>{ftr(4)}</div>''')
+labp=f'''<div class="page">{hdr("LABORATÓRIOS","05")}<h2 class="big">Laboratórios <em>de confiança.</em></h2>
+<div class="labhero"><div class="lk">DESTAQUE</div><h3>Life Extension</h3><div class="lo">{LABS["Life Extension"][0]}</div><p>{LABS["Life Extension"][1]}</p><p class="lp">Na Do Rei: <b>Multivitamínico 2 por dia</b> (Two-Per-Day), nosso carro-chefe.</p></div>
+<div class="labs">{"".join(f'<div><b>{k}</b><span>{v[0]}</span><p>{v[1]}</p></div>' for k,v in LABS.items() if not v[2])}</div>{ftr(5)}</div>'''
+pages.append(labp)
+rows_g="".join(f'<div class="gr"><div class="gq">{q}</div><div class="gp"><b>{int(a):02d}</b> {T[int(a)-1][0]} <em>{T[int(a)-1][1]}</em><span>+ {int(b):02d} {T[int(b)-1][0]} {T[int(b)-1][1]}</span></div><p>{w}</p></div>' for q,a,b,w in GUIA)
+pages.append(f'''<div class="page">{hdr("GUIA RÁPIDO","06")}<h2 class="big">Qual é o seu <em>objetivo?</em></h2><p class="gi">Encontre seu objetivo, veja a indicação principal e o complemento. Os números levam às fichas.</p><div class="guia">{rows_g}</div><p class="note">Orientação geral, não substitui avaliação profissional. Gestantes, lactantes, crianças e pessoas em tratamento devem consultar um profissional de saúde. Ferro: use apenas com orientação.</p>{ftr(6)}</div>'''); pg=7
 def product(i,n):
     nm,m,o,e,d,p,pd,pr,desc=P[i]; x=D[i]; dk=i in DARK
     sup=x["porcao"] is not None
@@ -82,7 +90,7 @@ def product(i,n):
     info=e+(f" · {d}" if d!="—" else "")
     CT=f'<div class="ct"><div class="kk r">CONTRAINDICAÇÕES E PRECAUÇÕES</div><ul>{li(x["con"])}</ul></div>'
     return f'''<div class="page{" dark" if dk else ""}">{hdr(f"FICHA {i+1:02d} · "+TAG.get(i,o.upper()),K[i].upper(),dk)}
-<div class="top"><div class="num">{i+1:02d}</div><div class="tt"><div class="kc">{K[i].upper()}</div><h3>{T[i][0]}<br><em>{T[i][1]}</em></h3><div class="mk">{m} · {PN[i]} · {info}</div><div class="sv"><span>PARA QUE SERVE</span>{SV[i]}</div></div><div class="phb">{foto(i)}</div></div>
+<div class="top"><div class="num">{i+1:02d}</div><div class="tt"><div class="kc">{K[i].upper()}</div><h3>{T[i][0]}<br><em>{T[i][1]}</em></h3><div class="mk"><b class="lab">{m}</b> · {LABS[m][0]}<br>{PN[i]} · {info}</div><div class="sv"><span>PARA QUE SERVE</span>{SV[i]}</div></div><div class="phb">{foto(i)}</div></div>
 <div class="bar">{price}<div class="bi"><div>{sels}</div><div class="en">Entrega em <b>{pr}</b></div></div></div>
 <div class="cols"><div><div class="kk">PARA QUEM É</div><p class="pq">{Q[i]}</p>
 <div class="kk">BENEFÍCIOS</div><ul class="bn">{li(x["ben"])}</ul>
@@ -131,6 +139,9 @@ em{font-style:italic}
 .kc{font:500 8px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--m)}
 h3{font:500 46px/1.02 'Cormorant Garamond',serif;color:var(--n);margin:2mm 0 3mm} h3 em{color:var(--r);font-weight:400}
 .sv{margin-top:4mm;font-size:13px;color:var(--ink);line-height:1.45}.sv span{display:block;font:600 8px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--a);margin-bottom:1mm}.dark .sv{color:#fff}
+.lab{color:var(--n);font-weight:600}.dark .lab{color:#fff}
+.labhero{background:var(--n);color:#fff;padding:9mm 10mm;border-left:4px solid var(--a);margin-bottom:8mm}.labhero h3{color:#fff;font-size:44px;margin:1mm 0}.lk{font:600 8.5px 'JetBrains Mono',monospace;letter-spacing:3px;color:var(--a)}.lo{font:500 9px 'JetBrains Mono',monospace;letter-spacing:2px;color:#B9C6DD;text-transform:uppercase}.labhero p{font-size:12.5px;line-height:1.7;color:#E8EDF5;margin:4mm 0 0}.lp b{color:var(--a)}
+.labs{display:grid;grid-template-columns:1fr 1fr;gap:6mm 9mm}.labs b{font:500 20px 'Cormorant Garamond',serif;color:var(--n)}.labs span{display:block;font:500 8px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--a);text-transform:uppercase;margin:1mm 0}.labs p{font-size:10.5px;color:var(--m);line-height:1.55;margin:0}
 .mk{font-size:11.5px;color:var(--m)}
 .phb{border:1px solid var(--b);background:#fff;height:62mm;display:flex;align-items:center;justify-content:center} .ph{width:61mm;height:61mm;object-fit:contain}
 .bar{display:flex;gap:8mm;align-items:center;margin:10mm 0 2mm;padding:4mm 6mm;background:var(--l);border-left:3px solid var(--a)}
@@ -164,6 +175,7 @@ h3{font:500 46px/1.02 'Cormorant Garamond',serif;color:var(--n);margin:2mm 0 3mm
 .rg h4{font:400 26px 'Cormorant Garamond',serif;color:#fff;margin:0 0 2mm}.rg h4 em{color:var(--a)}.rg p{font-size:11px;color:#B9C6DD;margin:0;line-height:1.55}
 .rp{font:600 24px Montserrat,sans-serif;color:#fff;text-align:right}.rp small{font-size:12px;margin-right:1mm}.rp span{display:block;font:500 8px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--a)}
 .fale{display:flex;gap:4mm;align-items:center;margin-top:8mm;background:var(--n);color:#fff;text-decoration:none;padding:5mm 6mm;border-left:3px solid var(--a)}.fale span{font-size:22px}.fale b{display:block;font-size:14px;color:var(--a)}.fale div{font-size:11px}
+.gi{font-size:12px;color:var(--m);margin:-6mm 0 6mm}.guia{border-top:1.5px solid var(--n)}.gr{display:grid;grid-template-columns:52mm 1fr;gap:1mm 6mm;padding:3.2mm 0;border-bottom:1px solid var(--b)}.gq{font:500 17px/1.2 'Cormorant Garamond',serif;color:var(--n);grid-row:span 2}.gp{font-size:12px}.gp b{font:600 9px 'JetBrains Mono',monospace;color:var(--a)}.gp em{color:var(--r)}.gp span{display:block;font-size:10.5px;color:var(--m);margin-top:0.5mm}.gr p{font-size:10px;color:var(--m);margin:0}
 .tp{width:100%;border-collapse:collapse;font-size:10px} .tp th{text-align:left;font:600 7.5px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--r);padding:2mm;border-bottom:1.5px solid var(--n)}
 .tp td{padding:2.2mm 2mm;border-bottom:1px solid var(--b)} .tp td span{color:var(--m);font-size:9px} .tp .n{font:500 9px 'JetBrains Mono',monospace;color:var(--a)} .tp .p{text-align:right;font-weight:700;color:var(--n);white-space:nowrap}
 .note{font-size:8.5px;color:var(--m);margin-top:6mm;line-height:1.6}'''
