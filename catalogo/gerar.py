@@ -4,7 +4,7 @@ P = [
  ("Gold C® Vitamina C 1.000 mg · 240 cápsulas","California Gold Nutrition","Importado","240 cápsulas","240 doses","142,90","0,60","16 dias úteis","Vitamina C grau USP em cápsula vegetal."),
  ("Methyl B-12 1.000 mcg · 250 pastilhas","NOW Foods","Importado","250 pastilhas","250 doses","169,90","0,68","17 dias úteis","Vitamina B12 na forma metilcobalamina, em pastilha."),
  ("NAC 600 mg · 250 cápsulas","NOW Foods","Importado","250 cápsulas","250 doses","291,90","1,17","18 dias úteis","N-Acetil L-Cisteína em cápsula vegetal."),
- ("Omegafor Plus · 240 cápsulas","Vitafor","Nacional","240 cápsulas","120 doses","255,90","2,13","5 dias úteis","Ômega 3 ultraconcentrado em EPA e DHA, certificado IFOS."),
+ ("Omegafor Plus · 240 cápsulas","Vitafor","Nacional","240 cápsulas","80 doses","255,90","3,20","5 dias úteis","Ômega 3 ultraconcentrado em EPA e DHA, certificado IFOS."),
  ("Bio Synergy D3 + K2 MK-7 · 20 ml","Bigens","Nacional","20 ml","150 doses","61,90","0,41","5 dias úteis","Vitaminas A, D3, E e K2 em gotas, sabor limão, zero açúcares."),
  ("Ferro Plus · 30 cápsulas","Vitafor","Nacional","30 cápsulas","30 doses","39,90","1,33","10 dias úteis","Ferro quelato com vitamina C."),
  ("Creatina Monohidratada · 250 g","Growth Supplements","Nacional","250 g","83 doses","45,90","0,55","5 dias úteis","Creatina monohidratada pura, sem sabor."),

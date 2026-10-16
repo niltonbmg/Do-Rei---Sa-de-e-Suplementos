@@ -80,14 +80,15 @@ def product(i,n):
     if p=="EM FALTA": price='<div class="pr"><div class="pv out">Em falta</div><div class="pd">Consulte a reposição</div></div>'
     else: price=f'<div class="pr"><div class="pl">PREÇO</div><div class="pv"><small>R$</small>{p}</div>{f"<div class=pd>R$ {pd} por dose</div>" if pd!="—" else ""}</div>'
     info=e+(f" · {d}" if d!="—" else "")
+    CT=f'<div class="ct"><div class="kk r">CONTRAINDICAÇÕES E PRECAUÇÕES</div><ul>{li(x["con"])}</ul></div>'
     return f'''<div class="page{" dark" if dk else ""}">{hdr(f"FICHA {i+1:02d} · "+TAG.get(i,o.upper()),K[i].upper(),dk)}
 <div class="top"><div class="num">{i+1:02d}</div><div class="tt"><div class="kc">{K[i].upper()}</div><h3>{T[i][0]}<br><em>{T[i][1]}</em></h3><div class="mk">{m} · {PN[i]} · {info}</div><div class="sv"><span>PARA QUE SERVE</span>{SV[i]}</div></div><div class="phb">{foto(i)}</div></div>
 <div class="bar">{price}<div class="bi"><div>{sels}</div><div class="en">Entrega em <b>{pr}</b></div></div></div>
 <div class="cols"><div><div class="kk">PARA QUEM É</div><p class="pq">{Q[i]}</p>
 <div class="kk">BENEFÍCIOS</div><ul class="bn">{li(x["ben"])}</ul>
-<div class="kk">MODO DE USO</div><p class="pq">{x["uso"]}</p></div>
-<div><div class="cb{" dense" if len(x["nut"])>8 else ""}"><div class="kk m">{comp}</div><table>{rows}</table>{'<div class=ob>Valores conforme rótulo do fabricante.</div>' if sup else ''}</div>
-<div class="ct"><div class="kk r">CONTRAINDICAÇÕES E PRECAUÇÕES</div><ul>{li(x["con"])}</ul></div></div></div>{ftr(n,dk)}</div>'''
+<div class="kk">MODO DE USO</div><p class="pq">{x["uso"]}</p>{CT if len(x["nut"])>16 else ""}</div>
+<div><div class="cb{" dense" if len(x["nut"])>8 else ""}"><div class="kk m">{comp}</div>{"<div class=nut2>"+"".join(f"<div><span>{a}</span><b>{b}</b></div>" for a,b in x["nut"])+"</div>" if len(x["nut"])>16 else "<table>"+rows+"</table>"}{'<div class=ob>Valores conforme rótulo do fabricante.</div>' if sup else ''}</div>
+{"" if len(x["nut"])>16 else CT}</div></div>{ftr(n,dk)}</div>'''
 for k,(a,b,d,ids) in enumerate(GR):
     lst="".join(f'<div class="oi"><span>{i+1:02d}</span>{T[i][0]} <em>{T[i][1]}</em></div>' for i in ids)
     pages.append(f'''<div class="page opener"><div class="op-l"><div class="op-k">PARTE 0{k+1}</div><h2>{a}<br><em>{b}</em></h2><p>{d}</p><div class="ol">{lst}</div></div><div class="op-r"><img src="icone-do-rei.svg"></div><div class="ft"><span>Do Rei · Saúde &amp; Suplementos</span><span></span><span>{pg:02d}</span></div></div>'''); pg+=1
@@ -131,7 +132,7 @@ em{font-style:italic}
 h3{font:500 46px/1.02 'Cormorant Garamond',serif;color:var(--n);margin:2mm 0 3mm} h3 em{color:var(--r);font-weight:400}
 .sv{margin-top:4mm;font-size:13px;color:var(--ink);line-height:1.45}.sv span{display:block;font:600 8px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--a);margin-bottom:1mm}.dark .sv{color:#fff}
 .mk{font-size:11.5px;color:var(--m)}
-.phb{border:1px solid var(--b);background:#fff;height:62mm;display:flex;align-items:center;justify-content:center} .ph{width:60mm;height:60mm;object-fit:contain}
+.phb{border:1px solid var(--b);background:#fff;height:62mm;display:flex;align-items:center;justify-content:center} .ph{width:61mm;height:61mm;object-fit:contain}
 .bar{display:flex;gap:8mm;align-items:center;margin:10mm 0 2mm;padding:4mm 6mm;background:var(--l);border-left:3px solid var(--a)}
 .pl{font:600 7.5px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--m)} .pv{font:600 30px 'Montserrat',sans-serif;color:var(--n);line-height:1.1} .pv small{font-size:13px;margin-right:1mm} .pv.out{font-size:22px;color:var(--m)}
 .pd{font-size:9.5px;color:var(--m)} .bi{flex:1;display:flex;flex-direction:column;align-items:flex-end;gap:1mm} .en{font-size:10px;color:var(--m)} .en b{color:var(--n)}
@@ -139,7 +140,8 @@ h3{font:500 46px/1.02 'Cormorant Garamond',serif;color:var(--n);margin:2mm 0 3mm
 .pq{font-size:12.5px;line-height:1.65;margin:0} .bn{margin:0;padding-left:4.5mm} .bn li{font-size:12.5px;line-height:1.55;margin-bottom:2.5mm} .bn li::marker{color:var(--a)}
 .cb{background:var(--g);padding:1mm 5mm 4mm;margin-top:4mm} .kk.m{margin-top:4mm}
 .cb table{width:100%;border-collapse:collapse;font:400 10.5px 'JetBrains Mono',monospace} .cb td{padding:1.8mm 0;border-bottom:1px dotted #C5CEDB} .cb td:last-child{text-align:right;font-weight:600}
-.dense table{font-size:9px} .dense td{padding:0.7mm 0 !important} .ob{font-size:8px;color:var(--m);margin-top:2mm}
+.dense table{font-size:9px} .dense td{padding:0.7mm 0 !important} .nut2{display:grid;grid-template-columns:1fr;font:400 8.6px 'JetBrains Mono',monospace}.nut2 div{display:flex;justify-content:space-between;gap:2mm;padding:0.55mm 0;border-bottom:1px dotted #2A4777}.nut2 b{font-weight:600;white-space:nowrap}
+.ob{font-size:8px;color:var(--m);margin-top:2mm}
 .ct{margin-top:5mm;border-left:2px solid #B4483C;padding:0 0 0 4mm} .kk.r{color:#B4483C;margin-top:1mm} .ct ul{margin:0;padding-left:4mm} .ct li{font-size:11px;line-height:1.5;color:var(--t);margin-bottom:1mm}
 .dark{background:var(--nn);color:#E8EDF5} .dark .hd{border-color:#22406F;color:var(--a)} .dark h3{color:#fff} .dark h3 em{color:var(--a)} .dark .kk{color:var(--a)} .dark .mk,.dark .kc,.dark .pd,.dark .en,.dark .ft,.dark .ob{color:#9FB0CC}
 .dark .bar{background:#0F2A55} .dark .pv{color:#fff} .dark .en b{color:#fff} .dark .cb{background:#0F2A55} .dark .cb td{border-color:#2A4777} .dark .ct li,.dark .pq,.dark .bn li{color:#E8EDF5} .dark .kk.r{color:#E59A8F} .dark .ct{border-color:#E59A8F}
