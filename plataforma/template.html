@@ -214,7 +214,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
         <label>Status inicial<select id="mSt"><option value="aguardando">Aguardando pagamento</option><option value="pago">Pago</option></select></label>
         <label>Observação<input id="mObs" autocomplete="off"></label>
         <div class="tot big"><span>Total</span><span id="mTot">R$ 0,00</span></div>
-        <div class="seg"><button class="btn gold" type="button" id="mSave">Salvar pedido</button><button class="btn" type="button" id="mOrc">Gerar orçamento</button></div><p class="note" id="mMsg"></p>
+        <div class="seg"><button class="btn gold" type="button" id="mSave">Salvar pedido</button><button class="btn" type="button" id="mOrc">Gerar orçamento</button></div><p class="note" id="mEditTag" hidden style="color:var(--gold-ink)"></p><p class="note" id="mMsg"></p>
         <div id="orcBox" hidden><div class="lbl">Orçamento · válido por 1 dia</div>
           <label style="font-weight:500">Link de pagamento no cartão (opcional)<input id="orcLink" placeholder="Cole o link da InfinitePay" inputmode="url" autocomplete="off"></label>
           <label style="font-weight:500">Simulação do parcelado (opcional)<input id="orcParc" placeholder="Ex.: 3x de R$ 76,90 · 6x de R$ 39,80" autocomplete="off"></label>
@@ -524,20 +524,20 @@ async function mSave(){const c=mCalc(), nome=$("mNome").value.trim();
     upsertCli(o).catch(()=>{});
     mq={};["mNome","mTel","mEnd","mObs"].forEach(id=>$(id).value="");renderManual();$("mMsg").textContent=`Pedido ${num} salvo · ${brl(o.total)}.`}
   catch(err){$("mMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
-let ORC=null;
+let ORC=null, ORC_EDIT=null;
 function orcText(){const o=ORC;if(!o)return"";const link=($("orcLink").value||"").trim(), px=$("orcPix").checked&&CONFIG.pixChave;
   return o.base+(px?`\n\n💠 *Pix copia e cola* (${brl(o.pix)}):\n${pixCode(o.pix,o.cod)}`:"")+((""+($("orcParc").value||"")).trim()?`\n\n💳 *Parcelado (simulação):* ${$("orcParc").value.trim()}`:"")+(link?`\n\n💳 *Pagar no cartão* (à vista ${brl(o.car)} ou parcelado):\n${link}`:"")+o.fim}
 function orcRender(){const t=orcText();$("orcTxt").textContent=t;$("orcWa").href="https://wa.me/"+(ORC.tel?"55"+ORC.tel:"")+"?text="+encodeURIComponent(t)}
 async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
   if(!c.it.length){$("mMsg").textContent="Escolha ao menos um produto para o orçamento.";return}
   const agora=new Date(), val=new Date(agora.getTime()+24*3600*1000);
-  const cod="ORC"+agora.toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
+  const cod=ORC_EDIT||("ORC"+agora.toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100)));
   const fmt=d=>d.toLocaleDateString("pt-BR")+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   const sub=c.sub, fr=c.fr, pix=sub+fr, car=Math.round(pix*(1+CONFIG.acrescimoCartao)*100)/100;
   const txt=`👑 *Orçamento Do Rei · ${cod}*${nome?"\nPara: "+nome:""}\n\n${c.it.map(i=>`• ${i.q}× ${i.nome} — ${brl(i.v)}`).join("\n")}\n\n${c.modo==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada: grátis"}\n*Total no Pix: ${brl(pix)}*\nNo cartão de crédito à vista: ${brl(car)}\nParcelado: os juros variam conforme o número de parcelas e aparecem no link de pagamento antes de você confirmar.\n\n⏳ *Válido até ${fmt(val)}* (1 dia). Depois desse prazo, preços e disponibilidade podem mudar.\n\nPara confirmar, é só responder esta mensagem.\n_Cuidado com o corpo, feito com verdade e serviço._`;
   const cut=txt.indexOf("\n\n⏳");ORC={cod,pix,car,tel:dig($("mTel").value),base:txt.slice(0,cut),fim:txt.slice(cut)};$("orcLink").value="";$("orcParc").value="";$("orcBox").hidden=false;orcRender();
   try{const ref=DB.doc("pedidos/orcamentos");const o={cod,nome,tel:$("mTel").value.trim(),end:c.modo==="entrega"?$("mEnd").value.trim():"",obs:$("mObs").value.trim(),modo:c.modo,frete:fr,itens:c.it,total:pix,totalCartao:car,status:"aberto",criadoEm:agora.toISOString(),validoAte:val.toISOString()};try{await ref.update({[cod]:o})}catch(_){await ref.set({[cod]:o})}}catch(e){}
-  $("mMsg").textContent=`Orçamento ${cod} gerado, válido até ${fmt(val)}.`;
+  $("mMsg").textContent=`Orçamento ${cod} ${ORC_EDIT?"atualizado":"gerado"}, válido até ${fmt(val)}.`;ORC_EDIT=null;$("mOrc").textContent="Gerar orçamento";$("mEditTag").hidden=true;
 }
 function linkMsg(o){const prim=(o.nome||"").split(" ")[0];const val=new Date(Date.now()+24*3600*1000).toLocaleDateString("pt-BR");
   return `Olá${prim?", "+prim:""}! 👑 Segue o link para pagar seu pedido ${o.num} (${brl(+o.total||0)}) no cartão de crédito, à vista ou parcelado:\n${o.link}\n\nO link vale até ${val}. Assim que o pagamento for aprovado, confirmamos seu pedido.\n_Do Rei · Saúde & Suplementos_`}
@@ -548,7 +548,7 @@ function renderOrcs(){const now=Date.now();const l=ORCS.filter(o=>o.status==="ab
   $("oList").innerHTML=l.map(o=>{const venc=new Date(o.validoAte).getTime()<now;
     return `<div class="cli" style="grid-template-columns:1fr"><div><b>${esc(o.cod)} · ${esc(o.nome||"Sem nome")}</b><small>${o.itens.map(i=>i.q+"× "+esc(i.nome)).join(", ")}</small>
     <small>Pix ${brl(+o.total||0)} · Cartão à vista ${brl(+o.totalCartao||0)} · ${venc?`<b style="color:var(--warn)">vencido em ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</b>`:`válido até ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`}</small></div>
-    <div class="row"><button type="button" class="btn gold" data-oc="${esc(o._key)}|pix">Confirmar · Pix</button><button type="button" class="btn" data-oc="${esc(o._key)}|cartao">Confirmar · Cartão</button><button type="button" class="btn ghost" data-od="${esc(o._key)}">Descartar</button></div></div>`}).join("")||`<p class="note">Nenhum orçamento em aberto. Gere um no quadro "Pedido manual ou orçamento".</p>`}
+    <div class="row"><button type="button" class="btn gold" data-oc="${esc(o._key)}|pix">Confirmar · Pix</button><button type="button" class="btn" data-oc="${esc(o._key)}|cartao">Confirmar · Cartão</button><button type="button" class="btn ghost" data-oe="${esc(o._key)}">Editar</button><button type="button" class="btn ghost" data-od="${esc(o._key)}">Descartar</button></div></div>`}).join("")||`<p class="note">Nenhum orçamento em aberto. Gere um no quadro "Pedido manual ou orçamento".</p>`}
 async function orcConfirm(key,pag){const o=ORCS.find(x=>x._key===key);if(!o)return;
   const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
   const total=pag==="cartao"?+o.totalCartao:+o.total;
@@ -556,6 +556,12 @@ async function orcConfirm(key,pag){const o=ORCS.find(x=>x._key===key);if(!o)retu
   try{const ref=DB.doc("pedidos/manual");try{await ref.update({[num]:ped})}catch(_){await ref.set({[num]:ped})}
     await DB.doc("pedidos/orcamentos").update({[key]:{...Object.fromEntries(Object.entries(o).filter(([k])=>k!=="_key")),status:"confirmado",pedido:num}});
     upsertCli(ped).catch(()=>{});toast(`Pedido ${num} criado a partir do ${o.cod}`)}catch(err){toast("Não foi possível confirmar")}}
+function orcEdit(key){const o=ORCS.find(x=>x._key===key);if(!o)return;ORC_EDIT=o.cod;
+  $("mNome").value=o.nome||"";$("mTel").value=o.tel||"";$("mEnd").value=o.end||"";$("mObs").value=o.obs||"";
+  document.querySelector(`input[name="mModo"][value="${o.modo==="entrega"?"entrega":"retirada"}"]`).checked=true;
+  mq={};(o.itens||[]).forEach(i=>{if(i.id)mq[i.id]=i.q});renderManual();
+  $("mOrc").textContent="Salvar alterações no orçamento";$("mEditTag").hidden=false;$("mEditTag").textContent=`Editando ${o.cod}. Ajuste os produtos e toque em "Salvar alterações no orçamento". A validade é renovada por mais 1 dia.`;
+  $("orcBox").hidden=true;$("manualBox").scrollIntoView({behavior:"smooth",block:"start"})}
 async function orcDiscard(key){const o=ORCS.find(x=>x._key===key);if(!o)return;try{await DB.doc("pedidos/orcamentos").update({[key]:{...Object.fromEntries(Object.entries(o).filter(([k])=>k!=="_key")),status:"descartado"}});toast("Orçamento descartado")}catch(err){toast("Não foi possível descartar")}}
 function parseWhats(t){
   const num=(t.match(/DR\d{6,}/)||[])[0]||("DR"+Date.now().toString().slice(-9));
@@ -572,6 +578,7 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
     const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;try{await DB.doc("pedidos/"+d).update({[k]:{...clean,link:v}});toast(v?"Link salvo":"Link removido")}catch(err){toast("Não foi possível salvar o link")}return}
   if(t.dataset.oc){const [k,p]=t.dataset.oc.split("|");orcConfirm(k,p);return}
   if(t.dataset.od){orcDiscard(t.dataset.od);return}
+  if(t.dataset.oe){orcEdit(t.dataset.oe);return}
   if(t.id==="mSave"){mSave();return}
   if(t.id==="mOrc"){mOrc();return}
   if(t.id==="orcCopy"){copy($("orcTxt").textContent,"Orçamento copiado",$("orcTxt"));return}
