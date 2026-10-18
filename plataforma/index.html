@@ -150,6 +150,7 @@ textarea{min-height:64px;resize:vertical}
 .mprods{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto;border:1px solid var(--line);padding:8px}.mp{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;font-size:13.5px}.mp small{display:block;color:var(--muted)}
 .clis{display:flex;flex-direction:column;max-height:300px;overflow:auto;border-top:1px solid var(--line)}.cli{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;border-bottom:1px solid var(--line);padding:8px 0;font-size:13.5px}.cli small{display:block;color:var(--muted);font-size:12px}.cli .btn{min-height:36px;padding:6px 10px;font-size:13px}
 .orc{white-space:pre-wrap;font:500 12.5px/1.5 var(--f-body);background:var(--tint);padding:12px;margin:6px 0;max-height:320px;overflow:auto}
+.lkb{background:var(--tint);padding:10px 12px;display:flex;flex-direction:column;gap:8px}.lkb input{background:var(--surface)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -476,6 +477,7 @@ function renderPanel(){
     <div class="oh"><b>${esc(o.nome||"Sem nome")}</b><b class="ot">${brl(+o.total||0)}</b></div>
     <ul>${(o.itens||[]).map(i=>`<li>${i.q}× ${esc(i.nome)}</li>`).join("")}</ul>
     <div class="oc">WhatsApp: ${esc(o.tel||"—")}${o.end?" · "+esc(o.end):""}${o.obs?" · Obs.: "+esc(o.obs):""}</div>
+    ${o.pag==="cartao"?linkBox(o):""}
     <label style="font-weight:500">Status<select data-st="${esc(o._doc)}|${esc(o._key)}">${Object.entries(ST).map(([k,[t]])=>`<option value="${k}" ${o.status===k?"selected":""}>${t}</option>`).join("")}</select></label></article>`}).join("")||`<p class="note">Nada aqui por enquanto.</p>`;
   const tot={}; act.filter(o=>o.status!=="comprado").forEach(o=>(o.itens||[]).forEach(i=>{const k=i.id||i.nome;tot[k]=tot[k]||{n:i.nome,q:0};tot[k].q+=+i.q||0}));
   const rows=Object.values(tot).sort((a,b)=>a.n.localeCompare(b.n));
@@ -523,6 +525,11 @@ async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
   try{const ref=DB.doc("pedidos/orcamentos");const o={cod,nome,tel:$("mTel").value.trim(),itens:c.it,total:pix,totalCartao:car,criadoEm:agora.toISOString(),validoAte:val.toISOString()};try{await ref.update({[cod]:o})}catch(_){await ref.set({[cod]:o})}}catch(e){}
   $("mMsg").textContent=`Orçamento ${cod} gerado, válido até ${fmt(val)}.`;
 }
+function linkMsg(o){const prim=(o.nome||"").split(" ")[0];const val=new Date(Date.now()+24*3600*1000).toLocaleDateString("pt-BR");
+  return `Olá${prim?", "+prim:""}! 👑 Segue o link para pagar seu pedido ${o.num} (${brl(+o.total||0)}) no cartão de crédito, à vista ou parcelado:\n${o.link}\n\nO link vale até ${val}. Assim que o pagamento for aprovado, confirmamos seu pedido.\n_Do Rei · Saúde & Suplementos_`}
+function linkBox(o){const id=`${esc(o._doc)}|${esc(o._key)}`, tel=dig(o.tel);
+  return `<div class="lkb"><label style="font-weight:500">Link de pagamento (cartão)<input data-lk="${id}" value="${esc(o.link||"")}" placeholder="Cole aqui o link gerado no app" inputmode="url" autocomplete="off"></label>
+  <div class="row"><button type="button" class="btn ghost" data-lks="${id}">Salvar link</button>${o.link?`<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${tel?"55"+tel:""}?text=${encodeURIComponent(linkMsg(o))}">Enviar link no WhatsApp</a>`:`<span class="note">Salve o link para liberar o envio.</span>`}</div></div>`}
 function parseWhats(t){
   const num=(t.match(/DR\d{6,}/)||[])[0]||("DR"+Date.now().toString().slice(-9));
   const itens=[];t.split("\n").forEach(l=>{const m=l.match(/(\d+)\s*[×x]\s*(\d{2})\s+(.+?)\s+[—-]\s+R\$\s*([\d.,]+)/);if(m){const p=byId(m[2]);itens.push({id:m[2],q:+m[1],nome:p?`${p.id} ${p.t1} ${p.t2}`:m[2]+" "+m[3],v:+m[4].replace(/\./g,"").replace(",",".")})}});
@@ -533,6 +540,9 @@ function parseWhats(t){
 document.addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;
   if(t.dataset.minc){mq[t.dataset.minc]=(mq[t.dataset.minc]||0)+1;renderManual();return}
   if(t.dataset.mdec){mq[t.dataset.mdec]=Math.max(0,(mq[t.dataset.mdec]||0)-1);renderManual();return}
+  if(t.dataset.lks){const [d,k]=t.dataset.lks.split("|");const inp=document.querySelector(`[data-lk="${t.dataset.lks}"]`);const v=(inp.value||"").trim();
+    if(v&&!/^https?:\/\//i.test(v)){toast("Cole um link que comece com https://");return}
+    const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;try{await DB.doc("pedidos/"+d).update({[k]:{...clean,link:v}});toast(v?"Link salvo":"Link removido")}catch(err){toast("Não foi possível salvar o link")}return}
   if(t.id==="mSave"){mSave();return}
   if(t.id==="mOrc"){mOrc();return}
   if(t.id==="orcCopy"){copy($("orcTxt").textContent,"Orçamento copiado",$("orcTxt"));return}
