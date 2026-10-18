@@ -322,7 +322,7 @@ function card(p){
   <div class="spec" id="spec${p.id}" ${open?"":"hidden"}>${specs(p)}</div></div></article>`;
 }
 const openSet=new Set();
-function specs(p){return `<div class="labx"><b>${esc(p.marca)}</b> · ${esc((LABS[p.marca]||[""])[0])}<p>${esc((LABS[p.marca]||["",""])[1])}</p></div><dl class="kv"><div><dt>Marca</dt><dd>${esc(p.marca)}</dd></div><div><dt>Embalagem</dt><dd>${esc(p.emb)}${p.doses!=="—"?" · "+esc(p.doses):""}</dd></div><div><dt>Origem</dt><dd>${esc(p.origem)}</dd></div><div><dt>Entrega</dt><dd>${esc(p.prazo)}</dd></div></dl>
+function specs(p){return `<div class="labx"><b>${esc(p.marca)}</b> · ${esc((LABS[p.marca]||[""])[0])}<p>${esc((LABS[p.marca]||["",""])[1])}</p></div><dl class="kv"><div><dt>Marca</dt><dd>${esc(p.marca)}</dd></div><div><dt>Embalagem</dt><dd>${esc(p.emb)}${p.doses!=="—"?" · "+esc(p.doses):""}</dd></div><div><dt>Origem</dt><dd>${esc(p.origem)}</dd></div><div><dt>Entrega</dt><dd>${esc(p.prazo)}</dd></div><div style="grid-column:1/-1"><dt>Dieta</dt><dd>${esc(p.dieta||"")}</dd></div></dl>
  <div><div class="lbl">Para quem é</div><p>${esc(p.para)}</p></div>
  <div><div class="lbl">Benefícios</div><ul>${p.ben.map(b=>`<li>${esc(b)}</li>`).join("")}</ul></div>
  <div><div class="lbl">Como usar</div><p>${esc(p.uso)}</p></div>

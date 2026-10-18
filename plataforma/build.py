@@ -21,6 +21,8 @@ PT=[("Multivitamínico","2 por dia","Completa as vitaminas e minerais do dia a d
 ("Condicionador em barra","pitaia rosa","Hidrata e amacia sem pesar os fios"),
 ("Creme dental","menta, sem flúor","Higiene bucal com xilitol, sem flúor")]
 for p,(a,c,s) in zip(prods,PT): p["t1"],p["t2"],p["serve"]=a,c,s
+from dieta import DIETA
+for p,dd in zip(prods,DIETA): p["dieta"]=dd
 from labs import LABS
 from guia import GUIA
 from icones import ICO

@@ -7,6 +7,7 @@ from labs import LABS
 from guia import GUIA
 from icones import ICO
 from kits import KITS
+from dieta import DIETA
 T=[("Multivitamínico","2 por dia"),("Vitamina C","1.000 mg"),("Vitamina B12","metilcobalamina"),("N-acetilcisteína","600 mg"),("Ômega 3","concentrado"),("Vitamina D3 + K2","em gotas"),("Ferro quelato","+ vitamina C"),("Creatina","monohidratada"),("Shampoo em barra","aloe vera"),("Condicionador em barra","pitaia rosa"),("Creme dental","menta, sem flúor")]
 PN=["Two-Per-Day","Gold C®","Methyl B-12","NAC 600 mg","Omegafor Plus","Bio Synergy D3 + K2 MK-7","Ferro Plus","Creatina Monohidratada","Shampoo Sólido Aloe Vera","Condicionador Sólido Pitaia Rosa","Ultra Mint Flex"]
 SV=["Completa as vitaminas e minerais do dia a dia","Auxilia na imunidade e na formação do colágeno","Auxilia na energia e no sistema nervoso","Antioxidante que auxilia na proteção das células","Auxilia na manutenção de triglicerídeos saudáveis","Auxilia na saúde dos ossos, dentes e na imunidade","Auxilia na formação das células vermelhas do sangue","Auxilia no desempenho em treinos intensos","Limpa com suavidade e controla a oleosidade","Hidrata e amacia sem pesar os fios","Higiene bucal com xilitol, sem flúor"]
@@ -24,7 +25,7 @@ Q=["Para adultos que querem uma base nutricional completa no dia a dia, com a pr
 "Para quem prefere um creme dental sem flúor, com xilitol e fórmula vegana."]
 DARK={0,3}
 TAG={0:"CARRO-CHEFE",3:"RECOMENDADO"}
-EXTRA={0:["Sem glúten"],2:["Vegano"],4:["Sem glúten","IFOS"],5:["Zero açúcar"],8:["Vegano"],9:["Vegano"],10:["Vegano"]}
+EXTRA={0:["Sem glúten"],1:["Vegetariano"],2:["Vegano"],3:["Cápsula vegetal"],4:["Sem glúten","IFOS"],5:["Zero açúcar"],6:["Vegano"],8:["Vegano"],9:["Vegano"],10:["Vegano"]}
 GR=[("Suplementos","importados.","Seleção internacional das marcas mais reconhecidas do mundo, sem que você precise importar.",[0,1,2,3]),
     ("Suplementos","nacionais.","Marcas brasileiras de confiança, com pronta entrega.",[4,5,6,7]),
     ("Cuidados","naturais.","Higiene e beleza com ingredientes naturais e veganos.",[8,9,10])]
@@ -96,10 +97,11 @@ def product(i,n):
     info=e+(f" · {d}" if d!="—" else "")
     CT=f'<div class="ct"><div class="kk r">CONTRAINDICAÇÕES E PRECAUÇÕES</div><ul>{li(x["con"])}</ul></div>'
     return f'''<div class="page{" dark" if dk else ""}">{hdr(f"FICHA {i+1:02d} · "+TAG.get(i,o.upper()),K[i].upper(),dk)}
-<div class="top"><div class="num">{i+1:02d}</div><div class="tt"><div class="kc">{K[i].upper()}</div><h3>{T[i][0]}<br><em>{T[i][1]}</em></h3><div class="mk"><b class="lab">{m}</b> · {LABS[m][0]}<br>{PN[i]} · {info}</div><div class="sv"><span>PARA QUE SERVE</span>{SV[i]}</div></div><div class="phb">{foto(i)}</div></div>
+<div class="top"><div class="num">{i+1:02d}</div><div class="tt"><div class="kc">{K[i].upper()}</div><h3>{T[i][0]}<br><em>{T[i][1]}</em></h3><div class="mk"><b class="lab">{m}</b> · {LABS[m][0]}<br>{PN[i]} · {info}</div><div class="sv"><span>PARA QUE SERVE</span>{SV[i]}</div>{f'<div class="mk" style="margin-top:2mm">Dieta: {DIETA[i]}</div>' if len(x["nut"])>16 else ""}</div><div class="phb">{foto(i)}</div></div>
 <div class="bar">{price}<div class="bi"><div>{sels}</div><div class="en">Entrega em <b>{pr}</b></div></div></div>
 <div class="cols"><div><div class="kk">PARA QUEM É</div><p class="pq">{Q[i]}</p>
 <div class="kk">BENEFÍCIOS</div><ul class="bn">{li(x["ben"])}</ul>
+{"" if len(x["nut"])>16 else f'<div class="kk">DIETA</div><p class="pq">{DIETA[i]}</p>'}
 <div class="kk">MODO DE USO</div><p class="pq">{x["uso"]}</p>{CT if len(x["nut"])>16 else ""}</div>
 <div><div class="cb{" dense" if len(x["nut"])>8 else ""}"><div class="kk m">{comp}</div>{"<div class=nut2>"+"".join(f"<div><span>{a}</span><b>{b}</b></div>" for a,b in x["nut"])+"</div>" if len(x["nut"])>16 else "<table>"+rows+"</table>"}{'<div class=ob>Valores conforme rótulo do fabricante.</div>' if sup else ''}</div>
 {"" if len(x["nut"])>16 else CT}</div></div>{ftr(n,dk)}</div>'''
