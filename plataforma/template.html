@@ -189,9 +189,9 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
 
 <a href="#grid" class="skip">Pular para os produtos</a>
 <section class="wrap painel" id="painel" hidden aria-label="Painel de pedidos">
-  <div class="pn-h"><div><div class="lbl">Só você vê esta área</div><h1>Painel de <em>pedidos</em></h1></div><button class="btn ghost" type="button" id="closePanel">Voltar para a loja</button></div>
+  <div class="pn-h"><div><div class="lbl">Só você vê esta área</div><h1>Painel de <em>pedidos</em></h1></div><button class="btn gold" type="button" id="closePanel">✕ Sair do painel</button></div>
   <p class="note" id="pnState">Carregando pedidos…</p>
-  <div class="pn-grid">
+  <div class="pn-grid" id="pnGrid">
     <div class="pn-col"><div class="pn-filters" id="pnFilters"></div><div id="pnList"></div></div>
     <aside class="pn-side">
       <div class="pn-box"><div class="lbl">Comprar nesta semana</div><p class="note">Soma dos pedidos aguardando pagamento e pagos.</p><div id="pnBuy"></div></div>
@@ -226,6 +226,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
         <textarea id="pnPaste" rows="7" aria-label="Mensagem do pedido"></textarea><button class="btn wide" type="button" id="pnAdd">Registrar pedido</button><p class="note" id="pnMsg"></p></div>
     </aside>
   </div>
+  <div style="margin-top:20px"><button class="btn wide" type="button" id="closePanel2">✕ Sair do painel e voltar para a loja</button></div>
 </section>
 <main class="wrap" id="loja">
   <section class="intro">
@@ -468,7 +469,7 @@ async function salvarPedido(o){try{const db=DB||await window.claude?.use?.("db")
   USER=await window.claude?.use?.("user"); if(!USER||!(await USER.isOwner()))return;
   $("openPanel").hidden=false;
 }catch(e){}})();
-function showPanel(on){$("painel").hidden=!on;$("loja").hidden=on;document.querySelector("footer").hidden=on;$("mbar").style.visibility=on?"hidden":"";$("fale").hidden=on;if(on)startPanel();window.scrollTo(0,0)}
+function showPanel(on){$("openPanel").textContent=on?"✕ Sair do painel":"Painel de pedidos";$("openPanel").dataset.on=on?"1":"";$("painel").hidden=!on;$("loja").hidden=on;document.querySelector("footer").hidden=on;$("mbar").style.visibility=on?"hidden":"";$("fale").hidden=on;if(on)startPanel();window.scrollTo(0,0)}
 let started=false;
 async function startPanel(){if(started)return;started=true;
   try{DB=DB||await window.claude.use("db")}catch(e){}
@@ -578,7 +579,7 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
   if(t.id==="cSave"){const c={nome:$("cNome").value.trim(),tel:$("cTel").value.trim(),end:$("cEnd").value.trim(),obs:$("cObs").value.trim()};if(!c.nome||dig(c.tel).length<10){$("cMsg").textContent="Informe nome e WhatsApp com DDD.";return}
     try{await upsertCli(c);["cNome","cTel","cEnd","cObs"].forEach(id=>$(id).value="");$("cMsg").textContent="Cliente salvo."}catch(err){$("cMsg").textContent="Não foi possível salvar."}return}
   if(t.dataset.cnew){const c=clientes().find(x=>x.k===t.dataset.cnew);if(c){$("mNome").value=c.nome||"";$("mTel").value=c.tel||"";$("mEnd").value=c.end||"";if(c.end){document.querySelector('input[name="mModo"][value="entrega"]').checked=true;mTotal()}$("manualBox").scrollIntoView({behavior:"smooth",block:"start"});$("mMsg").textContent="Escolha os produtos para "+(c.nome||"o cliente")+"."}return}
-  if(t.id==="openPanel"){showPanel(true);renderManual()} if(t.id==="closePanel")showPanel(false);
+  if(t.id==="openPanel"){if(t.dataset.on){showPanel(false)}else{showPanel(true);renderManual()}} if(t.id==="closePanel"||t.id==="closePanel2")showPanel(false);
   if(t.dataset.pnf){pnFilter=t.dataset.pnf;renderPanel()}
   if(t.id==="pnAdd"){const o=parseWhats($("pnPaste").value);if(!o.itens.length){$("pnMsg").textContent="Não encontrei itens. Cole a mensagem completa do pedido.";return}
     try{const ref=DB.doc("pedidos/whatsapp");try{await ref.update({[o.num]:o})}catch(_){await ref.set({[o.num]:o})}upsertCli(o).catch(()=>{});$("pnPaste").value="";$("pnMsg").textContent=`Pedido ${o.num} registrado.`}catch(err){$("pnMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
