@@ -191,6 +191,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
     <div class="pn-col"><div class="pn-filters" id="pnFilters"></div><div id="pnList"></div></div>
     <aside class="pn-side">
       <div class="pn-box"><div class="lbl">Comprar nesta semana</div><p class="note">Soma dos pedidos aguardando pagamento e pagos.</p><div id="pnBuy"></div></div>
+      <div class="pn-box"><div class="lbl">Orçamentos em aberto</div><div id="oList"></div></div>
       <div class="pn-box"><div class="lbl">Clientes</div>
         <input id="cBusca" placeholder="Buscar por nome ou telefone" aria-label="Buscar cliente" autocomplete="off">
         <div class="clis" id="cList"></div>
@@ -466,7 +467,7 @@ let started=false;
 async function startPanel(){if(started)return;started=true;
   try{DB=DB||await window.claude.use("db")}catch(e){}
   if(!DB){$("pnState").textContent="Não foi possível abrir os pedidos agora. Recarregue a página.";return}
-  DB.collection("pedidos").onSnapshot(s=>{ORDERS=[];CLI={};s.docs.forEach(d=>{const x=d.data()||{};if(d.id==="clientes"){Object.values(x).forEach(c=>{if(c&&c.tel)CLI[dig(c.tel)]=c});return}Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==="object"&&v.num)ORDERS.push({...v,_doc:d.id,_key:k})})});ORDERS.sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));renderPanel()},e=>{$("pnState").textContent="Erro ao carregar pedidos: "+e.message});
+  DB.collection("pedidos").onSnapshot(s=>{ORDERS=[];CLI={};s.docs.forEach(d=>{const x=d.data()||{};if(d.id==="clientes"){Object.values(x).forEach(c=>{if(c&&c.tel)CLI[dig(c.tel)]=c});return}if(d.id==="orcamentos"){ORCS=Object.entries(x).filter(([k,v])=>v&&v.cod).map(([k,v])=>({...v,_key:k})).sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));return}Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==="object"&&v.num)ORDERS.push({...v,_doc:d.id,_key:k})})});ORDERS.sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));renderPanel()},e=>{$("pnState").textContent="Erro ao carregar pedidos: "+e.message});
 }
 function renderPanel(){
   const act=ORDERS.filter(o=>o.status==="aguardando"||o.status==="pago"||o.status==="comprado");
@@ -476,7 +477,7 @@ function renderPanel(){
   const soma=act.reduce((s,o)=>s+(+o.total||0),0);
   $("pnState").textContent=ORDERS.length?`${act.length} pedido(s) em andamento · ${brl(soma)}`:"Nenhum pedido ainda. Os pedidos feitos na loja aparecem aqui sozinhos; os que chegarem só pelo WhatsApp, cole ao lado para registrar.";
   $("pnList").innerHTML=list.map(o=>{const [sl,sc]=ST[o.status]||ST.aguardando;const dt=o.criadoEm?new Date(o.criadoEm).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
-    return `<article class="ord" style="--st:${sc}"><div class="oh"><span class="on">${esc(o.num||o.id)} · ${dt}</span><span class="pill">${o.pag==="cartao"?"Cartão":"Pix"} · ${o.modo==="entrega"?"Entrega":"Retirada"}${o.origem==="whatsapp"?" · WhatsApp":o.origem==="manual"?" · Manual":""}</span></div>
+    return `<article class="ord" style="--st:${sc}"><div class="oh"><span class="on">${esc(o.num||o.id)} · ${dt}</span><span class="pill">${o.pag==="cartao"?"Cartão":"Pix"} · ${o.modo==="entrega"?"Entrega":"Retirada"}${o.origem==="whatsapp"?" · WhatsApp":o.origem==="manual"?" · Manual":o.origem==="orcamento"?" · Orçamento":""}</span></div>
     <div class="oh"><b>${esc(o.nome||"Sem nome")}</b><b class="ot">${brl(+o.total||0)}</b></div>
     <ul>${(o.itens||[]).map(i=>`<li>${i.q}× ${esc(i.nome)}</li>`).join("")}</ul>
     <div class="oc">WhatsApp: ${esc(o.tel||"—")}${o.end?" · "+esc(o.end):""}${o.obs?" · Obs.: "+esc(o.obs):""}</div>
@@ -484,10 +485,10 @@ function renderPanel(){
     <label style="font-weight:500">Status<select data-st="${esc(o._doc)}|${esc(o._key)}">${Object.entries(ST).map(([k,[t]])=>`<option value="${k}" ${o.status===k?"selected":""}>${t}</option>`).join("")}</select></label></article>`}).join("")||`<p class="note">Nada aqui por enquanto.</p>`;
   const tot={}; act.filter(o=>o.status!=="comprado").forEach(o=>(o.itens||[]).forEach(i=>{const k=i.id||i.nome;tot[k]=tot[k]||{n:i.nome,q:0};tot[k].q+=+i.q||0}));
   const rows=Object.values(tot).sort((a,b)=>a.n.localeCompare(b.n));
-  renderCli();
+  renderCli();renderOrcs();
   $("pnBuy").innerHTML=rows.length?rows.map(r=>`<div class="buy"><span>${esc(r.n)}</span><b>${r.q}</b></div>`).join(""):`<p class="note">Nada a comprar no momento.</p>`;
 }
-let CLI={}, cq="";
+let CLI={}, cq="", ORCS=[];
 const dig=t=>String(t||"").replace(/\D/g,"").replace(/^55(?=\d{10,11}$)/,"");
 async function upsertCli(c){const k=dig(c.tel);if(!k||!DB)return;const prev=CLI[k]||{};const v={nome:c.nome||prev.nome||"",tel:c.tel||prev.tel||"",end:c.end||prev.end||"",obs:c.obs??prev.obs??""};
   const ref=DB.doc("pedidos/clientes");try{await ref.update({["c"+k]:v})}catch(_){await ref.set({["c"+k]:v})}}
@@ -528,7 +529,7 @@ async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
   const sub=c.sub, fr=c.fr, pix=sub+fr, car=Math.round(pix*(1+CONFIG.acrescimoCartao)*100)/100;
   const txt=`👑 *Orçamento Do Rei · ${cod}*${nome?"\nPara: "+nome:""}\n\n${c.it.map(i=>`• ${i.q}× ${i.nome} — ${brl(i.v)}`).join("\n")}\n\n${c.modo==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada: grátis"}\n*Total no Pix: ${brl(pix)}*\nNo cartão de crédito: ${brl(car)} (à vista ou parcelado)\n\n⏳ *Válido até ${fmt(val)}* (1 dia). Depois desse prazo, preços e disponibilidade podem mudar.\n\nPara confirmar, é só responder esta mensagem.\n_Cuidado com o corpo, feito com verdade e serviço._`;
   const cut=txt.indexOf("\n\n⏳");ORC={cod,pix,car,tel:dig($("mTel").value),base:txt.slice(0,cut),fim:txt.slice(cut)};$("orcLink").value="";$("orcBox").hidden=false;orcRender();
-  try{const ref=DB.doc("pedidos/orcamentos");const o={cod,nome,tel:$("mTel").value.trim(),itens:c.it,total:pix,totalCartao:car,criadoEm:agora.toISOString(),validoAte:val.toISOString()};try{await ref.update({[cod]:o})}catch(_){await ref.set({[cod]:o})}}catch(e){}
+  try{const ref=DB.doc("pedidos/orcamentos");const o={cod,nome,tel:$("mTel").value.trim(),end:c.modo==="entrega"?$("mEnd").value.trim():"",obs:$("mObs").value.trim(),modo:c.modo,frete:fr,itens:c.it,total:pix,totalCartao:car,status:"aberto",criadoEm:agora.toISOString(),validoAte:val.toISOString()};try{await ref.update({[cod]:o})}catch(_){await ref.set({[cod]:o})}}catch(e){}
   $("mMsg").textContent=`Orçamento ${cod} gerado, válido até ${fmt(val)}.`;
 }
 function linkMsg(o){const prim=(o.nome||"").split(" ")[0];const val=new Date(Date.now()+24*3600*1000).toLocaleDateString("pt-BR");
@@ -536,6 +537,19 @@ function linkMsg(o){const prim=(o.nome||"").split(" ")[0];const val=new Date(Dat
 function linkBox(o){const id=`${esc(o._doc)}|${esc(o._key)}`, tel=dig(o.tel);
   return `<div class="lkb"><label style="font-weight:500">Link de pagamento (cartão)<input data-lk="${id}" value="${esc(o.link||"")}" placeholder="Cole aqui o link gerado no app" inputmode="url" autocomplete="off"></label>
   <div class="row"><button type="button" class="btn ghost" data-lks="${id}">Salvar link</button>${o.link?`<a class="btn gold" style="text-decoration:none" target="_blank" rel="noopener" href="https://wa.me/${tel?"55"+tel:""}?text=${encodeURIComponent(linkMsg(o))}">Enviar link no WhatsApp</a>`:`<span class="note">Salve o link para liberar o envio.</span>`}</div></div>`}
+function renderOrcs(){const now=Date.now();const l=ORCS.filter(o=>o.status==="aberto");
+  $("oList").innerHTML=l.map(o=>{const venc=new Date(o.validoAte).getTime()<now;
+    return `<div class="cli" style="grid-template-columns:1fr"><div><b>${esc(o.cod)} · ${esc(o.nome||"Sem nome")}</b><small>${o.itens.map(i=>i.q+"× "+esc(i.nome)).join(", ")}</small>
+    <small>Pix ${brl(+o.total||0)} · Cartão ${brl(+o.totalCartao||0)} · ${venc?`<b style="color:var(--warn)">vencido em ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</b>`:`válido até ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`}</small></div>
+    <div class="row"><button type="button" class="btn gold" data-oc="${esc(o._key)}|pix">Confirmar · Pix</button><button type="button" class="btn" data-oc="${esc(o._key)}|cartao">Confirmar · Cartão</button><button type="button" class="btn ghost" data-od="${esc(o._key)}">Descartar</button></div></div>`}).join("")||`<p class="note">Nenhum orçamento em aberto. Gere um no quadro "Pedido manual ou orçamento".</p>`}
+async function orcConfirm(key,pag){const o=ORCS.find(x=>x._key===key);if(!o)return;
+  const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
+  const total=pag==="cartao"?+o.totalCartao:+o.total;
+  const ped={num,nome:o.nome||"",tel:o.tel||"",end:o.end||"",obs:(o.obs?o.obs+" · ":"")+"Orçamento "+o.cod,modo:o.modo||"retirada",pag,frete:+o.frete||0,acrescimo:pag==="cartao"?Math.round((total-(+o.total))*100)/100:0,total,itens:o.itens,status:"aguardando",origem:"orcamento",criadoEm:new Date().toISOString()};
+  try{const ref=DB.doc("pedidos/manual");try{await ref.update({[num]:ped})}catch(_){await ref.set({[num]:ped})}
+    await DB.doc("pedidos/orcamentos").update({[key]:{...Object.fromEntries(Object.entries(o).filter(([k])=>k!=="_key")),status:"confirmado",pedido:num}});
+    upsertCli(ped).catch(()=>{});toast(`Pedido ${num} criado a partir do ${o.cod}`)}catch(err){toast("Não foi possível confirmar")}}
+async function orcDiscard(key){const o=ORCS.find(x=>x._key===key);if(!o)return;try{await DB.doc("pedidos/orcamentos").update({[key]:{...Object.fromEntries(Object.entries(o).filter(([k])=>k!=="_key")),status:"descartado"}});toast("Orçamento descartado")}catch(err){toast("Não foi possível descartar")}}
 function parseWhats(t){
   const num=(t.match(/DR\d{6,}/)||[])[0]||("DR"+Date.now().toString().slice(-9));
   const itens=[];t.split("\n").forEach(l=>{const m=l.match(/(\d+)\s*[×x]\s*(\d{2})\s+(.+?)\s+[—-]\s+R\$\s*([\d.,]+)/);if(m){const p=byId(m[2]);itens.push({id:m[2],q:+m[1],nome:p?`${p.id} ${p.t1} ${p.t2}`:m[2]+" "+m[3],v:+m[4].replace(/\./g,"").replace(",",".")})}});
@@ -549,6 +563,8 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
   if(t.dataset.lks){const [d,k]=t.dataset.lks.split("|");const inp=document.querySelector(`[data-lk="${t.dataset.lks}"]`);const v=(inp.value||"").trim();
     if(v&&!/^https?:\/\//i.test(v)){toast("Cole um link que comece com https://");return}
     const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;try{await DB.doc("pedidos/"+d).update({[k]:{...clean,link:v}});toast(v?"Link salvo":"Link removido")}catch(err){toast("Não foi possível salvar o link")}return}
+  if(t.dataset.oc){const [k,p]=t.dataset.oc.split("|");orcConfirm(k,p);return}
+  if(t.dataset.od){orcDiscard(t.dataset.od);return}
   if(t.id==="mSave"){mSave();return}
   if(t.id==="mOrc"){mOrc();return}
   if(t.id==="orcCopy"){copy($("orcTxt").textContent,"Orçamento copiado",$("orcTxt"));return}
