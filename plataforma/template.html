@@ -217,6 +217,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
         <div class="seg"><button class="btn gold" type="button" id="mSave">Salvar pedido</button><button class="btn" type="button" id="mOrc">Gerar orçamento</button></div><p class="note" id="mMsg"></p>
         <div id="orcBox" hidden><div class="lbl">Orçamento · válido por 1 dia</div>
           <label style="font-weight:500">Link de pagamento no cartão (opcional)<input id="orcLink" placeholder="Cole o link da InfinitePay" inputmode="url" autocomplete="off"></label>
+          <label style="font-weight:500">Simulação do parcelado (opcional)<input id="orcParc" placeholder="Ex.: 3x de R$ 76,90 · 6x de R$ 39,80" autocomplete="off"></label>
           <label style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="orcPix" checked>Incluir Pix copia e cola</label>
           <button class="btn ghost" type="button" id="orcUpd">Atualizar orçamento</button>
           <pre class="orc" id="orcTxt"></pre>
@@ -455,7 +456,7 @@ document.addEventListener("click",e=>{
   if(t.id==="newOrder"){cart={};save();pedido=null;step="lista";renderGrid();renderTotals();renderBag();return}
 });
 $("scrim").addEventListener("click",closeAll);
-document.addEventListener("input",e=>{if(e.target.id==="cBusca"){cq=e.target.value;renderCli()}if(e.target.id==="orcLink"&&ORC)orcRender();});
+document.addEventListener("input",e=>{if(e.target.id==="cBusca"){cq=e.target.value;renderCli()}if((e.target.id==="orcLink"||e.target.id==="orcParc")&&ORC)orcRender();});
 document.addEventListener("change",e=>{if(e.target.name==="modo"){$("endW").hidden=modo()!=="entrega";updateFoot()}if(e.target.name==="pag")updateFoot()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
 renderFilters();renderGrid();renderTotals();
@@ -524,7 +525,7 @@ async function mSave(){const c=mCalc(), nome=$("mNome").value.trim();
   catch(err){$("mMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
 let ORC=null;
 function orcText(){const o=ORC;if(!o)return"";const link=($("orcLink").value||"").trim(), px=$("orcPix").checked&&CONFIG.pixChave;
-  return o.base+(px?`\n\n💠 *Pix copia e cola* (${brl(o.pix)}):\n${pixCode(o.pix,o.cod)}`:"")+(link?`\n\n💳 *Pagar no cartão* (${brl(o.car)}):\n${link}`:"")+o.fim}
+  return o.base+(px?`\n\n💠 *Pix copia e cola* (${brl(o.pix)}):\n${pixCode(o.pix,o.cod)}`:"")+((""+($("orcParc").value||"")).trim()?`\n\n💳 *Parcelado (simulação):* ${$("orcParc").value.trim()}`:"")+(link?`\n\n💳 *Pagar no cartão* (à vista ${brl(o.car)} ou parcelado):\n${link}`:"")+o.fim}
 function orcRender(){const t=orcText();$("orcTxt").textContent=t;$("orcWa").href="https://wa.me/"+(ORC.tel?"55"+ORC.tel:"")+"?text="+encodeURIComponent(t)}
 async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
   if(!c.it.length){$("mMsg").textContent="Escolha ao menos um produto para o orçamento.";return}
@@ -532,8 +533,8 @@ async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
   const cod="ORC"+agora.toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
   const fmt=d=>d.toLocaleDateString("pt-BR")+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   const sub=c.sub, fr=c.fr, pix=sub+fr, car=Math.round(pix*(1+CONFIG.acrescimoCartao)*100)/100;
-  const txt=`👑 *Orçamento Do Rei · ${cod}*${nome?"\nPara: "+nome:""}\n\n${c.it.map(i=>`• ${i.q}× ${i.nome} — ${brl(i.v)}`).join("\n")}\n\n${c.modo==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada: grátis"}\n*Total no Pix: ${brl(pix)}*\nNo cartão de crédito: ${brl(car)} (à vista ou parcelado)\n\n⏳ *Válido até ${fmt(val)}* (1 dia). Depois desse prazo, preços e disponibilidade podem mudar.\n\nPara confirmar, é só responder esta mensagem.\n_Cuidado com o corpo, feito com verdade e serviço._`;
-  const cut=txt.indexOf("\n\n⏳");ORC={cod,pix,car,tel:dig($("mTel").value),base:txt.slice(0,cut),fim:txt.slice(cut)};$("orcLink").value="";$("orcBox").hidden=false;orcRender();
+  const txt=`👑 *Orçamento Do Rei · ${cod}*${nome?"\nPara: "+nome:""}\n\n${c.it.map(i=>`• ${i.q}× ${i.nome} — ${brl(i.v)}`).join("\n")}\n\n${c.modo==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada: grátis"}\n*Total no Pix: ${brl(pix)}*\nNo cartão de crédito à vista: ${brl(car)}\nParcelado: os juros variam conforme o número de parcelas e aparecem no link de pagamento antes de você confirmar.\n\n⏳ *Válido até ${fmt(val)}* (1 dia). Depois desse prazo, preços e disponibilidade podem mudar.\n\nPara confirmar, é só responder esta mensagem.\n_Cuidado com o corpo, feito com verdade e serviço._`;
+  const cut=txt.indexOf("\n\n⏳");ORC={cod,pix,car,tel:dig($("mTel").value),base:txt.slice(0,cut),fim:txt.slice(cut)};$("orcLink").value="";$("orcParc").value="";$("orcBox").hidden=false;orcRender();
   try{const ref=DB.doc("pedidos/orcamentos");const o={cod,nome,tel:$("mTel").value.trim(),end:c.modo==="entrega"?$("mEnd").value.trim():"",obs:$("mObs").value.trim(),modo:c.modo,frete:fr,itens:c.it,total:pix,totalCartao:car,status:"aberto",criadoEm:agora.toISOString(),validoAte:val.toISOString()};try{await ref.update({[cod]:o})}catch(_){await ref.set({[cod]:o})}}catch(e){}
   $("mMsg").textContent=`Orçamento ${cod} gerado, válido até ${fmt(val)}.`;
 }
@@ -545,12 +546,12 @@ function linkBox(o){const id=`${esc(o._doc)}|${esc(o._key)}`, tel=dig(o.tel);
 function renderOrcs(){const now=Date.now();const l=ORCS.filter(o=>o.status==="aberto");
   $("oList").innerHTML=l.map(o=>{const venc=new Date(o.validoAte).getTime()<now;
     return `<div class="cli" style="grid-template-columns:1fr"><div><b>${esc(o.cod)} · ${esc(o.nome||"Sem nome")}</b><small>${o.itens.map(i=>i.q+"× "+esc(i.nome)).join(", ")}</small>
-    <small>Pix ${brl(+o.total||0)} · Cartão ${brl(+o.totalCartao||0)} · ${venc?`<b style="color:var(--warn)">vencido em ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</b>`:`válido até ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`}</small></div>
+    <small>Pix ${brl(+o.total||0)} · Cartão à vista ${brl(+o.totalCartao||0)} · ${venc?`<b style="color:var(--warn)">vencido em ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</b>`:`válido até ${new Date(o.validoAte).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}`}</small></div>
     <div class="row"><button type="button" class="btn gold" data-oc="${esc(o._key)}|pix">Confirmar · Pix</button><button type="button" class="btn" data-oc="${esc(o._key)}|cartao">Confirmar · Cartão</button><button type="button" class="btn ghost" data-od="${esc(o._key)}">Descartar</button></div></div>`}).join("")||`<p class="note">Nenhum orçamento em aberto. Gere um no quadro "Pedido manual ou orçamento".</p>`}
 async function orcConfirm(key,pag){const o=ORCS.find(x=>x._key===key);if(!o)return;
   const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
   const total=pag==="cartao"?+o.totalCartao:+o.total;
-  const ped={num,nome:o.nome||"",tel:o.tel||"",end:o.end||"",obs:(o.obs?o.obs+" · ":"")+"Orçamento "+o.cod,modo:o.modo||"retirada",pag,frete:+o.frete||0,acrescimo:pag==="cartao"?Math.round((total-(+o.total))*100)/100:0,total,itens:o.itens,status:"aguardando",origem:"orcamento",criadoEm:new Date().toISOString()};
+  const ped={num,nome:o.nome||"",tel:o.tel||"",end:o.end||"",obs:(o.obs?o.obs+" · ":"")+"Orçamento "+o.cod+(pag==="cartao"?" · valor à vista; juros do parcelado cobrados no link":""),modo:o.modo||"retirada",pag,frete:+o.frete||0,acrescimo:pag==="cartao"?Math.round((total-(+o.total))*100)/100:0,total,itens:o.itens,status:"aguardando",origem:"orcamento",criadoEm:new Date().toISOString()};
   try{const ref=DB.doc("pedidos/manual");try{await ref.update({[num]:ped})}catch(_){await ref.set({[num]:ped})}
     await DB.doc("pedidos/orcamentos").update({[key]:{...Object.fromEntries(Object.entries(o).filter(([k])=>k!=="_key")),status:"confirmado",pedido:num}});
     upsertCli(ped).catch(()=>{});toast(`Pedido ${num} criado a partir do ${o.cod}`)}catch(err){toast("Não foi possível confirmar")}}
