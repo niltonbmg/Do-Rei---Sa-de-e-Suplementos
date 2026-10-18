@@ -143,8 +143,8 @@ textarea{min-height:64px;resize:vertical}
 .guia h2{font:500 clamp(28px,3.4vw,38px)/1.05 var(--f-display)}.guia h2 em{color:var(--royal)}
 .gtiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .gt{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:14px 10px;font-size:14px;line-height:1.3;min-height:112px;justify-content:center}
-.gt .gti{width:46px;height:46px;border-radius:50%;background:var(--tint);color:var(--royal);display:flex;align-items:center;justify-content:center}.gt .gti svg{width:26px;height:26px}
-.gt[aria-pressed="true"]{background:#0B2A5B;border-color:#0B2A5B;color:#fff}.gt[aria-pressed="true"] .gti{background:#D4A72C;color:#0B2A5B}
+.gt .gti{width:58px;height:58px;display:block}.gt .gti svg{width:58px;height:58px;display:block}
+.gt[aria-pressed="true"]{background:#0B2A5B;border-color:#0B2A5B;color:#fff}.gt[aria-pressed="true"]{box-shadow:inset 0 0 0 2px #D4A72C}
 @media (max-width:760px){.gtiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .gres{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}.gres>p{margin:0;font-size:15px}
 .gi{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:center}.gi img{width:72px;height:72px;object-fit:contain;background:#fff;border:1px solid var(--line)}
@@ -155,6 +155,11 @@ textarea{min-height:64px;resize:vertical}
 .clis{display:flex;flex-direction:column;max-height:300px;overflow:auto;border-top:1px solid var(--line)}.cli{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;border-bottom:1px solid var(--line);padding:8px 0;font-size:13.5px}.cli small{display:block;color:var(--muted);font-size:12px}.cli .btn{min-height:36px;padding:6px 10px;font-size:13px}
 .orc{white-space:pre-wrap;font:500 12.5px/1.5 var(--f-body);background:var(--tint);padding:12px;margin:6px 0;max-height:320px;overflow:auto}
 .lkb{background:var(--tint);padding:10px 12px;display:flex;flex-direction:column;gap:8px}.lkb input{background:var(--surface)}
+.kits{margin-bottom:22px;display:flex;flex-direction:column;gap:10px}.kits h2{font:500 clamp(28px,3.4vw,38px)/1.05 var(--f-display)}.kits h2 em{color:var(--royal)}
+.kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.kc{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--gold);padding:14px;display:flex;flex-direction:column;gap:6px}
+.kc h3{font:500 26px/1.05 var(--f-display)}.kc p{margin:0;font-size:14px;color:var(--muted)}.kc .price{flex-wrap:wrap;row-gap:2px}.kc .btn,.kc .qty{align-self:flex-start;margin-top:4px}
+.kim{display:flex;gap:6px}.kim img{width:64px;height:64px;object-fit:contain;background:#fff;border:1px solid var(--line)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -246,6 +251,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
   </section>
   <section class="feat" id="feat" aria-label="Destaques"></section>
   <section class="guia" id="guia" aria-label="Guia por objetivo"></section>
+  <section class="kits" id="kits" aria-label="Kits"></section>
   <div class="filters" role="group" aria-label="Categorias" id="filters"></div>
   <section class="grid" id="grid" aria-live="polite"></section>
 </main>
@@ -282,6 +288,7 @@ const PRODUTOS=/*PRODUTOS*/;
 const LABS=/*LABS*/;
 const GUIA=/*GUIA*/;
 const ICO=/*ICO*/;
+const KITS=/*KITS*/;
 let gsel=-1;
 const CATS=["Importados","Nacionais","Cuidados naturais"];
 const brl=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
@@ -289,7 +296,10 @@ const $=id=>document.getElementById(id);
 let cart={}, cat=-1;
 try{cart=JSON.parse(localStorage.getItem("dorei-lista")||"{}")}catch(e){}
 function save(){try{localStorage.setItem("dorei-lista",JSON.stringify(cart))}catch(e){}}
-const byId=id=>PRODUTOS.find(p=>p.id===id);
+const prazoN=p=>parseInt(p.prazo)||0;
+function kitProd(k){const comp=k.itens.map(id=>PRODUTOS.find(p=>p.id===id));const de=comp.reduce((s,p)=>s+(p.preco||0),0);const pz=comp.reduce((a,p)=>prazoN(p)>prazoN(a)?p:a,comp[0]).prazo;
+  return {id:k.id,t1:k.nome,t2:"",preco:comp.some(p=>p.preco==null)?null:k.preco,de,prazo:pz,origem:comp.some(p=>p.origem==="Importado")?"Importado":"Nacional",comp:k.itens,kit:true,marca:"Kit",serve:k.desc}}
+const byId=id=>id&&id[0]==="K"?(KITS.find(k=>k.id===id)?kitProd(KITS.find(k=>k.id===id)):undefined):PRODUTOS.find(p=>p.id===id);
 function items(){return Object.entries(cart).filter(([id,q])=>q>0&&byId(id)&&byId(id).preco!=null).map(([id,q])=>({p:byId(id),q}))}
 function subtotal(){return items().reduce((s,i)=>s+i.p.preco*i.q,0)}
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
@@ -342,7 +352,12 @@ function renderGuia(){
     <p class="note">Orientação geral, não substitui avaliação profissional. Gestantes, lactantes e pessoas em tratamento devem consultar um profissional de saúde.${[A.id,B.id].includes("07")?" Ferro: use apenas com orientação profissional.":""}</p></div>`}
   $("guia").innerHTML=h;
 }
-function renderGrid(){renderFeat();renderGuia();$("grid").innerHTML=PRODUTOS.filter(p=>cat<0||p.cat===cat).map(card).join("")}
+function renderKits(){if(cat>=0){$("kits").hidden=true;return}$("kits").hidden=false;
+  $("kits").innerHTML=`<div class="lbl">Kits Do Rei</div><h2>Combinações <em>prontas</em>, com desconto</h2><div class="kg">${KITS.map(k=>{const p=kitProd(k);const q=cart[k.id]||0;
+   return `<article class="kc"><div class="kim">${k.itens.map(id=>`<img src="${FOTOS[id]}" alt="">`).join("")}</div><div class="lbl" style="color:var(--gold-ink)">${esc(k.sub)}</div><h3>${esc(k.nome)}</h3><p>${esc(k.desc)}</p>
+   <div class="price"><small style="text-decoration:line-through">${brl(p.de)}</small><b>${brl(k.preco)}</b><small>economize ${brl(p.de-k.preco)}</small></div><div class="note">Entrega em ${esc(p.prazo)}</div>
+   ${q?`<div class="qty"><button type="button" data-dec="${k.id}" aria-label="Diminuir">−</button><span>${q}</span><button type="button" data-inc="${k.id}" aria-label="Aumentar">+</button></div>`:`<button type="button" class="btn" data-inc="${k.id}">Adicionar kit</button>`}</article>`}).join("")}</div>`}
+function renderGrid(){renderFeat();renderGuia();renderKits();$("grid").innerHTML=PRODUTOS.filter(p=>cat<0||p.cat===cat).map(card).join("")}
 function renderTotals(){
   const n=items().reduce((s,i)=>s+i.q,0), t=subtotal();
   $("bagCount").textContent=n; $("bagTotal").textContent=brl(t);
@@ -435,7 +450,7 @@ function gerar(){
   const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
   const linhas=it.map(i=>`• ${i.q}× ${i.p.id} ${i.p.t1} ${i.p.t2} — ${brl(i.p.preco*i.q)}`).join("\n");
   const texto=`👑 *Pedido Do Rei · ${num}*\n\n${linhas}\n\n${m==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada"}${ac?"\nAcréscimo cartão: "+brl(ac):""}\n*Total: ${brl(total)}*\n\nNome: ${nome}\nWhatsApp: ${tel}${m==="entrega"?"\nEndereço: "+end:""}${obs?"\nObs.: "+obs:""}\n\nPagamento: ${pg==="cartao"?"cartão de crédito (enviar link de pagamento)":"Pix"}.`;
-  pedido={num,modo:m,pag:pg,ac,frete:fr,total,itens:it.map(i=>({id:i.p.id,q:i.q,nome:`${i.p.id} ${i.p.t1} ${i.p.t2}`,v:i.p.preco*i.q})),texto,pix:(pg==="pix"&&CONFIG.pixChave)?pixCode(total,num):""};
+  pedido={num,modo:m,pag:pg,ac,frete:fr,total,itens:it.map(i=>({id:i.p.id,q:i.q,nome:i.p.kit?`${i.p.id} ${i.p.t1} (${i.p.comp.join(" + ")})`:`${i.p.id} ${i.p.t1} ${i.p.t2}`,v:i.p.preco*i.q,...(i.p.kit?{comp:i.p.comp}:{})})),texto,pix:(pg==="pix"&&CONFIG.pixChave)?pixCode(total,num):""};
   step="pagamento"; renderBag();
   salvarPedido({num,nome,tel,modo:m,end,obs,pag:pg,frete:fr,acrescimo:ac,total,itens:pedido.itens,status:"aguardando",origem:"loja",criadoEm:new Date().toISOString()});
 }
@@ -493,7 +508,7 @@ function renderPanel(){
     <div class="oc">WhatsApp: ${esc(o.tel||"—")}${o.end?" · "+esc(o.end):""}${o.obs?" · Obs.: "+esc(o.obs):""}</div>
     ${o.pag==="cartao"?linkBox(o):""}
     <label style="font-weight:500">Status<select data-st="${esc(o._doc)}|${esc(o._key)}">${Object.entries(ST).map(([k,[t]])=>`<option value="${k}" ${o.status===k?"selected":""}>${t}</option>`).join("")}</select></label></article>`}).join("")||`<p class="note">Nada aqui por enquanto.</p>`;
-  const tot={}; act.filter(o=>o.status!=="comprado").forEach(o=>(o.itens||[]).forEach(i=>{const k=i.id||i.nome;tot[k]=tot[k]||{n:i.nome,q:0};tot[k].q+=+i.q||0}));
+  const tot={}; act.filter(o=>o.status!=="comprado").forEach(o=>(o.itens||[]).forEach(i=>{const ids=i.comp||(i.id&&i.id[0]==="K"&&KITS.find(k=>k.id===i.id)?KITS.find(k=>k.id===i.id).itens:null);(ids?ids.map(id=>{const p=PRODUTOS.find(x=>x.id===id);return {k:id,n:`${id} ${p.t1} ${p.t2}`}}):[{k:i.id||i.nome,n:i.nome}]).forEach(e=>{tot[e.k]=tot[e.k]||{n:e.n,q:0};tot[e.k].q+=+i.q||0})}));
   const rows=Object.values(tot).sort((a,b)=>a.n.localeCompare(b.n));
   renderCli();renderOrcs();
   $("pnBuy").innerHTML=rows.length?rows.map(r=>`<div class="buy"><span>${esc(r.n)}</span><b>${r.q}</b></div>`).join(""):`<p class="note">Nada a comprar no momento.</p>`;
@@ -569,7 +584,7 @@ function orcEdit(key){const o=ORCS.find(x=>x._key===key);if(!o)return;ORC_EDIT=o
 async function orcDiscard(key){const o=ORCS.find(x=>x._key===key);if(!o)return;try{await DB.doc("pedidos/orcamentos").update({[key]:{...Object.fromEntries(Object.entries(o).filter(([k])=>k!=="_key")),status:"descartado"}});toast("Orçamento descartado")}catch(err){toast("Não foi possível descartar")}}
 function parseWhats(t){
   const num=(t.match(/DR\d{6,}/)||[])[0]||("DR"+Date.now().toString().slice(-9));
-  const itens=[];t.split("\n").forEach(l=>{const m=l.match(/(\d+)\s*[×x]\s*(\d{2})\s+(.+?)\s+[—-]\s+R\$\s*([\d.,]+)/);if(m){const p=byId(m[2]);itens.push({id:m[2],q:+m[1],nome:p?`${p.id} ${p.t1} ${p.t2}`:m[2]+" "+m[3],v:+m[4].replace(/\./g,"").replace(",",".")})}});
+  const itens=[];t.split("\n").forEach(l=>{const m=l.match(/(\d+)\s*[×x]\s*(\d{2}|K\d)\s+(.+?)\s+[—-]\s+R\$\s*([\d.,]+)/);if(m){const p=byId(m[2]);itens.push({id:m[2],q:+m[1],nome:p?`${p.id} ${p.t1} ${p.t2}`:m[2]+" "+m[3],v:+m[4].replace(/\./g,"").replace(",",".")})}});
   const g=re=>((t.match(re)||[])[1]||"").trim();
   const total=+(g(/Total:\s*R\$\s*([\d.,]+)/).replace(/\./g,"").replace(",","."))||itens.reduce((s,i)=>s+i.v,0);
   return {num,itens,total,nome:g(/Nome:\s*(.+)/),tel:g(/WhatsApp:\s*(.+)/),end:g(/Endereço:\s*(.+)/),obs:g(/Obs\.:\s*(.+)/),modo:/Entrega:/.test(t)?"entrega":"retirada",pag:/cart[ãa]o/i.test(t)?"cartao":"pix",status:"aguardando",origem:"whatsapp",criadoEm:new Date().toISOString()};

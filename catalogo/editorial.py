@@ -6,6 +6,7 @@ from dados import D
 from labs import LABS
 from guia import GUIA
 from icones import ICO
+from kits import KITS
 T=[("Multivitamínico","2 por dia"),("Vitamina C","1.000 mg"),("Vitamina B12","metilcobalamina"),("N-acetilcisteína","600 mg"),("Ômega 3","concentrado"),("Vitamina D3 + K2","em gotas"),("Ferro quelato","+ vitamina C"),("Creatina","monohidratada"),("Shampoo em barra","aloe vera"),("Condicionador em barra","pitaia rosa"),("Creme dental","menta, sem flúor")]
 PN=["Two-Per-Day","Gold C®","Methyl B-12","NAC 600 mg","Omegafor Plus","Bio Synergy D3 + K2 MK-7","Ferro Plus","Creatina Monohidratada","Shampoo Sólido Aloe Vera","Condicionador Sólido Pitaia Rosa","Ultra Mint Flex"]
 SV=["Completa as vitaminas e minerais do dia a dia","Auxilia na imunidade e na formação do colágeno","Auxilia na energia e no sistema nervoso","Antioxidante que auxilia na proteção das células","Auxilia na manutenção de triglicerídeos saudáveis","Auxilia na saúde dos ossos, dentes e na imunidade","Auxilia na formação das células vermelhas do sangue","Auxilia no desempenho em treinos intensos","Limpa com suavidade e controla a oleosidade","Hidrata e amacia sem pesar os fios","Higiene bucal com xilitol, sem flúor"]
@@ -53,13 +54,13 @@ def feature():
 {ftr(2,True)}</div>'''
 pages.append(feature()); pg+=1
 # manifesto + sumario
-pstart=7; idx=""; p=pstart
+pstart=8; idx=""; p=pstart
 for k,(a,b,d,ids) in enumerate(GR):
     p+=1
     items="".join(f'<div class="ii"><span>{i+1:02d}</span>{T[i][0]} <em>{T[i][1]}</em><b>p. {p+n:02d}</b></div>' for n,i in enumerate(ids))
     idx+=f'<div class="ix"><div class="ixh"><span class="ixn">0{k+1}</span>{a} <em>{b}</em></div>{items}</div>'
     p+=len(ids)
-idx+=f'<div class="ix"><div class="ixh"><span class="ixn">04</span>Tabela de <em>preços.</em><b>p. {p:02d}</b></div></div>'
+idx+=f'<div class="ix"><div class="ixh"><span class="ixn">04</span>Tabela de <em>preços.</em><b>p. {p:02d}</b></div></div><div class="ix"><div class="ixh"><span class="ixn">05</span>Kits <em>Do Rei.</em><b>p. 07</b></div></div>'
 pages.append(f'''<div class="page">{hdr("MANIFESTO","03")}
 <div class="mf"><div class="mq">“</div><h1>Cuidado com o corpo,<br><em>feito com verdade<br>e serviço.</em></h1>
 <p>Este catálogo existe para ajudar você a escolher, não para empurrar. Cada ficha diz o que o produto é, para quem serve e quando não é para você. Vendemos só o que compraríamos para a nossa própria família, com preço justo e atendimento de quem conhece você pelo nome.</p></div>
@@ -77,7 +78,11 @@ labp=f'''<div class="page">{hdr("LABORATÓRIOS","05")}<h2 class="big">Laboratór
 <div class="labs">{"".join(f'<div><b>{k}</b><span>{v[0]}</span><p>{v[1]}</p></div>' for k,v in LABS.items() if not v[2])}</div>{ftr(5)}</div>'''
 pages.append(labp)
 rows_g="".join(f'<div class="gr"><div class="gq"><span class="gic">{ICO[n]}</span>{q}</div><div class="gp"><b>{int(a):02d}</b> {T[int(a)-1][0]} <em>{T[int(a)-1][1]}</em><span>+ {int(b):02d} {T[int(b)-1][0]} {T[int(b)-1][1]}</span></div><p>{w}</p></div>' for n,(q,a,b,w) in enumerate(GUIA))
-pages.append(f'''<div class="page">{hdr("GUIA RÁPIDO","06")}<h2 class="big">Qual é o seu <em>objetivo?</em></h2><p class="gi">Encontre seu objetivo, veja a indicação principal e o complemento. Os números levam às fichas.</p><div class="guia">{rows_g}</div><p class="note">Orientação geral, não substitui avaliação profissional. Gestantes, lactantes, crianças e pessoas em tratamento devem consultar um profissional de saúde. Ferro: use apenas com orientação.</p>{ftr(6)}</div>'''); pg=7
+pages.append(f'''<div class="page">{hdr("GUIA RÁPIDO","06")}<h2 class="big">Qual é o seu <em>objetivo?</em></h2><p class="gi">Encontre seu objetivo, veja a indicação principal e o complemento. Os números levam às fichas.</p><div class="guia">{rows_g}</div><p class="note">Orientação geral, não substitui avaliação profissional. Gestantes, lactantes, crianças e pessoas em tratamento devem consultar um profissional de saúde. Ferro: use apenas com orientação.</p>{ftr(6)}</div>''')
+def pv(x): return float(x.replace(".","").replace(",","."))
+def br(v): return f"{v:,.2f}".replace(",","X").replace(".",",").replace("X",".")
+kc="".join(f'<div class="kt"><div class="kti">{"".join(f"<img src=fotos_std/{i}.jpg>" for i in k["itens"])}</div><div class="ktb"><span>{k["sub"].upper()}</span><b>{k["nome"]}</b><p>{k["desc"]}</p><div class="ktp"><s>R$ {br(sum(pv(P[int(i)-1][5]) for i in k["itens"]))}</s> <strong>R$ {br(k["preco"])}</strong></div></div></div>' for k in KITS)
+pages.append(f'''<div class="page">{hdr("KITS DO REI","07")}<h2 class="big">Kits <em>Do Rei.</em></h2><p class="gi">Combinações prontas com desconto. Peça pelo nome do kit.</p><div class="kts">{kc}</div>{ftr(7)}</div>'''); pg=8
 def product(i,n):
     nm,m,o,e,d,p,pd,pr,desc=P[i]; x=D[i]; dk=i in DARK
     sup=x["porcao"] is not None
@@ -176,8 +181,9 @@ h3{font:500 46px/1.02 'Cormorant Garamond',serif;color:var(--n);margin:2mm 0 3mm
 .rg h4{font:400 26px 'Cormorant Garamond',serif;color:#fff;margin:0 0 2mm}.rg h4 em{color:var(--a)}.rg p{font-size:11px;color:#B9C6DD;margin:0;line-height:1.55}
 .rp{font:600 24px Montserrat,sans-serif;color:#fff;text-align:right}.rp small{font-size:12px;margin-right:1mm}.rp span{display:block;font:500 8px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--a)}
 .fale{display:flex;gap:4mm;align-items:center;margin-top:8mm;background:var(--n);color:#fff;text-decoration:none;padding:5mm 6mm;border-left:3px solid var(--a)}.fale span{font-size:22px}.fale b{display:block;font-size:14px;color:var(--a)}.fale div{font-size:11px}
-.gic{display:inline-flex;width:9mm;height:9mm;border-radius:50%;background:var(--l);color:var(--n);align-items:center;justify-content:center;margin-right:3mm;vertical-align:middle;flex:none}.gic svg{width:5.5mm;height:5.5mm}.gq{display:flex;align-items:center}
+.gic{display:inline-flex;width:10mm;height:10mm;align-items:center;justify-content:center;margin-right:3mm;vertical-align:middle;flex:none}.gic svg{width:10mm;height:10mm}.gq{display:flex;align-items:center}
 .gi{font-size:12px;color:var(--m);margin:-6mm 0 6mm}.guia{border-top:1.5px solid var(--n)}.gr{display:grid;grid-template-columns:52mm 1fr;gap:1mm 6mm;padding:3.2mm 0;border-bottom:1px solid var(--b)}.gq{font:500 17px/1.2 'Cormorant Garamond',serif;color:var(--n);grid-row:span 2}.gp{font-size:12px}.gp b{font:600 9px 'JetBrains Mono',monospace;color:var(--a)}.gp em{color:var(--r)}.gp span{display:block;font-size:10.5px;color:var(--m);margin-top:0.5mm}.gr p{font-size:10px;color:var(--m);margin:0}
+.kts{display:flex;flex-direction:column;gap:5mm}.kt{display:grid;grid-template-columns:48mm 1fr;gap:6mm;border:1px solid var(--b);border-top:2px solid var(--a);padding:4mm}.kti{display:flex;gap:2mm}.kti img{width:23mm;height:23mm;object-fit:contain;background:#fff;border:1px solid var(--b)}.ktb span{font:600 8px 'JetBrains Mono',monospace;letter-spacing:2px;color:#9A7412}.ktb b{display:block;font:500 22px 'Cormorant Garamond',serif;color:var(--n)}.ktb p{font-size:10.5px;color:var(--m);margin:1mm 0 2mm}.ktp s{font-size:10px;color:var(--m)}.ktp strong{font:600 16px Montserrat,sans-serif;color:var(--n)}
 .tp{width:100%;border-collapse:collapse;font-size:10px} .tp th{text-align:left;font:600 7.5px 'JetBrains Mono',monospace;letter-spacing:2px;color:var(--r);padding:2mm;border-bottom:1.5px solid var(--n)}
 .tp td{padding:2.2mm 2mm;border-bottom:1px solid var(--b)} .tp td span{color:var(--m);font-size:9px} .tp .n{font:500 9px 'JetBrains Mono',monospace;color:var(--a)} .tp .p{text-align:right;font-weight:700;color:var(--n);white-space:nowrap}
 .note{font-size:8.5px;color:var(--m);margin-top:6mm;line-height:1.6}'''

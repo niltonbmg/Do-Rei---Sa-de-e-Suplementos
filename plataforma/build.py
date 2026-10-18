@@ -24,7 +24,8 @@ for p,(a,c,s) in zip(prods,PT): p["t1"],p["t2"],p["serve"]=a,c,s
 from labs import LABS
 from guia import GUIA
 from icones import ICO
-html=open("template.html").read().replace("/*PRODUTOS*/",json.dumps(prods,ensure_ascii=False)).replace("/*LABS*/",json.dumps({k:[v[0],v[1]] for k,v in LABS.items()},ensure_ascii=False)).replace("/*GUIA*/",json.dumps(GUIA,ensure_ascii=False)).replace("/*ICO*/",json.dumps(ICO))
+from kits import KITS
+html=open("template.html").read().replace("/*PRODUTOS*/",json.dumps(prods,ensure_ascii=False)).replace("/*LABS*/",json.dumps({k:[v[0],v[1]] for k,v in LABS.items()},ensure_ascii=False)).replace("/*GUIA*/",json.dumps(GUIA,ensure_ascii=False)).replace("/*ICO*/",json.dumps(ICO)).replace("/*KITS*/",json.dumps(KITS,ensure_ascii=False))
 import base64
 from PIL import Image
 import io

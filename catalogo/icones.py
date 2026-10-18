@@ -1,13 +1,15 @@
-# Ícones de linha (24x24) para os objetivos do guia
-P='fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"'
+# Ícones duotone da marca (48x48): círculo azul-marinho, símbolo dourado, mini coroa no topo
+G='#D4A72C'; N='#0B2A5B'; W='#FFFFFF'
+CROWN=f'<path d="M18 9l2.2 2.4L24 7.5l3.8 3.9L30 9l-1 5H19z" fill="{G}"/>'
+def ic(sym): return f'<svg viewBox="0 0 48 48"><circle cx="24" cy="26" r="21" fill="{N}"/>{CROWN}<g transform="translate(0,3)">{sym}</g></svg>'
 ICO=[
-f'<svg viewBox="0 0 24 24" {P}><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19l7-7"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><path d="M12 20s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 9c0 6-8 11-8 11z"/><path d="M6 11h3l1.5-2 2 4 1.5-2H18"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><path d="M3 10v4M6 8v8M18 8v8M21 10v4M6 12h12"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><path d="M12 21V11"/><path d="M12 11C12 6 8 3 4 3c0 5 3 8 8 8z"/><path d="M12 14c0-4 3-7 8-7 0 4-3 7-8 7z"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2"/></svg>',
-f'<svg viewBox="0 0 24 24" {P}><path d="M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z"/><path d="M9.5 15a2.5 2.5 0 002.5 2.5"/></svg>',
+ic(f'<path d="M14 33c0-10 6.5-16 20-17-1 13-7.5 19-20 17z" fill="{G}"/><path d="M15 32l11-10" stroke="{N}" stroke-width="1.8" stroke-linecap="round"/>'),
+ic(f'<path d="M26 12L15 27h8l-2 11 12-16h-8z" fill="{G}"/>'),
+ic(f'<path d="M24 12l10 4v7c0 7-4.5 11-10 13-5.5-2-10-6-10-13v-7z" fill="{G}"/><path d="M19.5 24l3.2 3.2 6-6" fill="none" stroke="{N}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>'),
+ic(f'<circle cx="24" cy="25" r="6.5" fill="{G}"/><g stroke="{G}" stroke-width="2.4" stroke-linecap="round"><path d="M24 12v3M24 35v3M11 25h3M34 25h3M14.8 15.8l2.1 2.1M31.1 32.1l2.1 2.1M14.8 34.2l2.1-2.1M31.1 17.9l2.1-2.1"/></g>'),
+ic(f'<path d="M24 36s-11-6.5-11-14.5A6 6 0 0124 18a6 6 0 0111 3.5C35 29.5 24 36 24 36z" fill="{G}"/><path d="M16 25h4l2-3 3 6 2-3h5" fill="none" stroke="{N}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'),
+ic(f'<g fill="{G}"><rect x="11" y="20" width="4" height="10" rx="1.5"/><rect x="15.5" y="17" width="4" height="16" rx="1.5"/><rect x="28.5" y="17" width="4" height="16" rx="1.5"/><rect x="33" y="20" width="4" height="10" rx="1.5"/><rect x="19" y="23.5" width="10" height="3" rx="1"/></g>'),
+ic(f'<path d="M24 37V25" stroke="{G}" stroke-width="2.4" stroke-linecap="round"/><path d="M24 25c0-6-4.5-10-11-10 0 6.5 4.5 10 11 10z" fill="{G}"/><path d="M24 29c0-5 4-8.5 10-8.5 0 5-4 8.5-10 8.5z" fill="{G}"/>'),
+ic(f'<g fill="{G}"><circle cx="19" cy="22" r="4"/><circle cx="27" cy="20" r="4"/><circle cx="23" cy="28" r="4"/><circle cx="31" cy="27" r="3.5"/><circle cx="16" cy="30" r="3.2"/></g><path d="M27 16c1-2 3-3 5-3" stroke="{G}" stroke-width="1.8" fill="none" stroke-linecap="round"/>'),
+ic(f'<path d="M24 12s9 9.5 9 16a9 9 0 01-18 0c0-6.5 9-16 9-16z" fill="{G}"/><path d="M19.5 29a4.5 4.5 0 004.5 4.5" fill="none" stroke="{N}" stroke-width="2" stroke-linecap="round"/>'),
 ]
