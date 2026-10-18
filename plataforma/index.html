@@ -221,7 +221,10 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
           <label style="flex-direction:row;align-items:center;gap:8px;font-weight:500"><input type="checkbox" id="orcPix" checked>Incluir Pix copia e cola</label>
           <button class="btn ghost" type="button" id="orcUpd">Atualizar orçamento</button>
           <pre class="orc" id="orcTxt"></pre>
-          <div class="seg"><button class="btn ghost" type="button" id="orcCopy">Copiar</button><a class="btn ghost" id="orcWa" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Enviar no WhatsApp</a></div></div></div>
+          <div class="seg"><button class="btn ghost" type="button" id="orcCopy">1. Copiar orçamento</button><a class="btn ghost" id="orcWa" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">1. Enviar orçamento</a></div>
+          <div id="orcPixBox" hidden class="lkb"><div class="lbl">Pix copia e cola · enviar em mensagem separada</div><div class="code" id="orcPixCode"></div>
+          <div class="seg"><button class="btn ghost" type="button" id="orcPixCopy">2. Copiar código Pix</button><a class="btn gold" id="orcPixWa" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">2. Enviar código Pix</a></div>
+          <p class="note">Mandar o código sozinho numa mensagem facilita: o cliente toca e segura, copia e cola no banco, sem pegar texto a mais.</p></div></div></div>
       <div class="pn-box"><div class="lbl">Registrar pedido do WhatsApp</div><p class="note">Cole aqui a mensagem do pedido que chegou no WhatsApp.</p>
         <textarea id="pnPaste" rows="7" aria-label="Mensagem do pedido"></textarea><button class="btn wide" type="button" id="pnAdd">Registrar pedido</button><p class="note" id="pnMsg"></p></div>
     </aside>
@@ -394,7 +397,7 @@ function renderBag(){
       <div>${o.itens.map(i=>`<div class="tot"><span>${i.q}× ${esc(i.nome)}</span><span>${brl(i.v)}</span></div>`).join("")}
       <div class="tot"><span>${o.modo==="entrega"?"Entrega":"Retirada"}</span><span>${o.frete?brl(o.frete):"grátis"}</span></div>${o.ac?`<div class="tot"><span>Cartão de crédito</span><span>${brl(o.ac)}</span></div>`:""}
       <div class="tot big" style="margin-top:6px"><span>Total</span><span>${brl(o.total)}</span></div></div>
-      <div class="pix">${o.pag==="cartao"?`<div class="lbl">Cartão de crédito</div><p class="note" style="text-align:center;margin:0">Envie o pedido pelo WhatsApp. Respondemos com o link de pagamento para você pagar com cartão, à vista ou parcelado.</p>`:CONFIG.pixChave?`<div class="lbl">Pague com Pix</div><div id="qr"></div><div class="code" id="pixCode">${esc(o.pix)}</div><button type="button" class="btn wide" id="copyPix">Copiar código Pix</button>`
+      <div class="pix">${o.pag==="cartao"?`<div class="lbl">Cartão de crédito</div><p class="note" style="text-align:center;margin:0">Envie o pedido pelo WhatsApp. Respondemos com o link de pagamento para você pagar com cartão, à vista ou parcelado.</p>`:CONFIG.pixChave?`<div class="lbl">Pague com Pix · ${brl(o.total)}</div><button type="button" class="btn wide gold" id="copyPix">Copiar código Pix copia e cola</button><p class="note" style="margin:0;text-align:center">Depois abra o app do banco › Pix › <b>Pix copia e cola</b> e cole. Ou leia o QR code com outro celular:</p><div id="qr"></div><div class="code" id="pixCode">${esc(o.pix)}</div>`
         :`<div class="lbl">Pix</div><p class="note" style="text-align:center;margin:0">A chave Pix será enviada pelo WhatsApp junto com a confirmação do pedido.</p>`}</div>
       <div><div class="lbl">Depois de pagar</div><p style="margin:6px 0 0">${o.pag==="cartao"?"Pague pelo link que enviaremos. Confirmamos e avisamos quando chegar.":"Envie o pedido pelo WhatsApp com o comprovante. Confirmamos e avisamos quando chegar."}</p></div>
       ${CONFIG.whatsapp?"":`<p class="note">Copie o pedido e envie para a Do Rei no WhatsApp.</p>`}`;
@@ -527,8 +530,9 @@ async function mSave(){const c=mCalc(), nome=$("mNome").value.trim();
   catch(err){$("mMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
 let ORC=null, ORC_EDIT=null;
 function orcText(){const o=ORC;if(!o)return"";const link=($("orcLink").value||"").trim(), px=$("orcPix").checked&&CONFIG.pixChave;
-  return o.base+(px?`\n\n💠 *Pix copia e cola* (${brl(o.pix)}):\n${pixCode(o.pix,o.cod)}`:"")+((""+($("orcParc").value||"")).trim()?`\n\n💳 *Parcelado (simulação):* ${$("orcParc").value.trim()}`:"")+(link?`\n\n💳 *Pagar no cartão* (à vista ${brl(o.car)} ou parcelado):\n${link}`:"")+o.fim}
-function orcRender(){const t=orcText();$("orcTxt").textContent=t;$("orcWa").href="https://wa.me/"+(ORC.tel?"55"+ORC.tel:"")+"?text="+encodeURIComponent(t)}
+  return o.base+(px?`\n\n💠 *Pix:* ${brl(o.pix)}. O código Pix copia e cola vai na próxima mensagem: toque e segure nela e escolha *Copiar*.`:"")+((""+($("orcParc").value||"")).trim()?`\n\n💳 *Parcelado (simulação):* ${$("orcParc").value.trim()}`:"")+(link?`\n\n💳 *Pagar no cartão* (à vista ${brl(o.car)} ou parcelado):\n${link}`:"")+o.fim}
+function orcRender(){const t=orcText();$("orcTxt").textContent=t;$("orcWa").href="https://wa.me/"+(ORC.tel?"55"+ORC.tel:"")+"?text="+encodeURIComponent(t);
+  const px=$("orcPix").checked&&CONFIG.pixChave;$("orcPixBox").hidden=!px;if(px){const c=pixCode(ORC.pix,ORC.cod);$("orcPixCode").textContent=c;$("orcPixWa").href="https://wa.me/"+(ORC.tel?"55"+ORC.tel:"")+"?text="+encodeURIComponent(c)}}
 async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
   if(!c.it.length){$("mMsg").textContent="Escolha ao menos um produto para o orçamento.";return}
   const agora=new Date(), val=new Date(agora.getTime()+24*3600*1000);
@@ -584,6 +588,7 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
   if(t.id==="mOrc"){mOrc();return}
   if(t.id==="orcCopy"){copy($("orcTxt").textContent,"Orçamento copiado",$("orcTxt"));return}
   if(t.id==="orcUpd"){if(ORC)orcRender();return}
+  if(t.id==="orcPixCopy"){copy($("orcPixCode").textContent,"Código Pix copiado",$("orcPixCode"));return}
   if(t.id==="cSave"){const c={nome:$("cNome").value.trim(),tel:$("cTel").value.trim(),end:$("cEnd").value.trim(),obs:$("cObs").value.trim()};if(!c.nome||dig(c.tel).length<10){$("cMsg").textContent="Informe nome e WhatsApp com DDD.";return}
     try{await upsertCli(c);["cNome","cTel","cEnd","cObs"].forEach(id=>$(id).value="");$("cMsg").textContent="Cliente salvo."}catch(err){$("cMsg").textContent="Não foi possível salvar."}return}
   if(t.dataset.cnew){const c=clientes().find(x=>x.k===t.dataset.cnew);if(c){$("mNome").value=c.nome||"";$("mTel").value=c.tel||"";$("mEnd").value=c.end||"";if(c.end){document.querySelector('input[name="mModo"][value="entrega"]').checked=true;mTotal()}$("manualBox").scrollIntoView({behavior:"smooth",block:"start"});$("mMsg").textContent="Escolha os produtos para "+(c.nome||"o cliente")+"."}return}
