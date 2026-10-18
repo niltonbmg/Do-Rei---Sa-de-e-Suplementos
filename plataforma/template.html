@@ -149,6 +149,7 @@ textarea{min-height:64px;resize:vertical}
 .labx{background:var(--tint);padding:10px 12px;font-size:13px}.labx p{margin:4px 0 0;color:var(--muted)}
 .mprods{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto;border:1px solid var(--line);padding:8px}.mp{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;font-size:13.5px}.mp small{display:block;color:var(--muted)}
 .clis{display:flex;flex-direction:column;max-height:300px;overflow:auto;border-top:1px solid var(--line)}.cli{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;border-bottom:1px solid var(--line);padding:8px 0;font-size:13.5px}.cli small{display:block;color:var(--muted);font-size:12px}.cli .btn{min-height:36px;padding:6px 10px;font-size:13px}
+.orc{white-space:pre-wrap;font:500 12.5px/1.5 var(--f-body);background:var(--tint);padding:12px;margin:6px 0;max-height:320px;overflow:auto}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -197,7 +198,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
           <label>Nome<input id="cNome" autocomplete="off"></label><label>WhatsApp<input id="cTel" inputmode="tel" autocomplete="off"></label>
           <label>Endereço<input id="cEnd" autocomplete="off"></label><label>Observação<input id="cObs" autocomplete="off"></label>
           <button class="btn wide" type="button" id="cSave">Salvar cliente</button><p class="note" id="cMsg"></p></div></details></div>
-      <div class="pn-box" id="manualBox"><div class="lbl">Cadastrar pedido manualmente</div><p class="note">Para quem pediu por mensagem, ligação ou pessoalmente.</p>
+      <div class="pn-box" id="manualBox"><div class="lbl">Pedido manual ou orçamento</div><p class="note">Para quem pediu por mensagem, ligação ou pessoalmente. Use os mesmos campos para gerar um orçamento válido por 1 dia.</p>
         <label>Nome do cliente<input id="mNome" autocomplete="off"></label>
         <label>WhatsApp<input id="mTel" inputmode="tel" autocomplete="off"></label>
         <div class="mprods" id="mProds"></div>
@@ -207,7 +208,9 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
         <label>Status inicial<select id="mSt"><option value="aguardando">Aguardando pagamento</option><option value="pago">Pago</option></select></label>
         <label>Observação<input id="mObs" autocomplete="off"></label>
         <div class="tot big"><span>Total</span><span id="mTot">R$ 0,00</span></div>
-        <button class="btn wide gold" type="button" id="mSave">Salvar pedido</button><p class="note" id="mMsg"></p></div>
+        <div class="seg"><button class="btn gold" type="button" id="mSave">Salvar pedido</button><button class="btn" type="button" id="mOrc">Gerar orçamento</button></div><p class="note" id="mMsg"></p>
+        <div id="orcBox" hidden><div class="lbl">Orçamento · válido por 1 dia</div><pre class="orc" id="orcTxt"></pre>
+          <div class="seg"><button class="btn ghost" type="button" id="orcCopy">Copiar</button><a class="btn ghost" id="orcWa" target="_blank" rel="noopener" style="text-align:center;text-decoration:none">Enviar no WhatsApp</a></div></div></div>
       <div class="pn-box"><div class="lbl">Registrar pedido do WhatsApp</div><p class="note">Cole aqui a mensagem do pedido que chegou no WhatsApp.</p>
         <textarea id="pnPaste" rows="7" aria-label="Mensagem do pedido"></textarea><button class="btn wide" type="button" id="pnAdd">Registrar pedido</button><p class="note" id="pnMsg"></p></div>
     </aside>
@@ -507,6 +510,18 @@ async function mSave(){const c=mCalc(), nome=$("mNome").value.trim();
     upsertCli(o).catch(()=>{});
     mq={};["mNome","mTel","mEnd","mObs"].forEach(id=>$(id).value="");renderManual();$("mMsg").textContent=`Pedido ${num} salvo · ${brl(o.total)}.`}
   catch(err){$("mMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
+async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
+  if(!c.it.length){$("mMsg").textContent="Escolha ao menos um produto para o orçamento.";return}
+  const agora=new Date(), val=new Date(agora.getTime()+24*3600*1000);
+  const cod="ORC"+agora.toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
+  const fmt=d=>d.toLocaleDateString("pt-BR")+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  const sub=c.sub, fr=c.fr, pix=sub+fr, car=Math.round(pix*(1+CONFIG.acrescimoCartao)*100)/100;
+  const txt=`👑 *Orçamento Do Rei · ${cod}*${nome?"\nPara: "+nome:""}\n\n${c.it.map(i=>`• ${i.q}× ${i.nome} — ${brl(i.v)}`).join("\n")}\n\n${c.modo==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada: grátis"}\n*Total no Pix: ${brl(pix)}*\nNo cartão de crédito: ${brl(car)} (à vista ou parcelado)\n\n⏳ *Válido até ${fmt(val)}* (1 dia). Depois desse prazo, preços e disponibilidade podem mudar.\n\nPara confirmar, é só responder esta mensagem.\n_Cuidado com o corpo, feito com verdade e serviço._`;
+  $("orcTxt").textContent=txt;$("orcBox").hidden=false;
+  const tel=dig($("mTel").value);$("orcWa").href="https://wa.me/"+(tel?"55"+tel:"")+"?text="+encodeURIComponent(txt);
+  try{const ref=DB.doc("pedidos/orcamentos");const o={cod,nome,tel:$("mTel").value.trim(),itens:c.it,total:pix,totalCartao:car,criadoEm:agora.toISOString(),validoAte:val.toISOString()};try{await ref.update({[cod]:o})}catch(_){await ref.set({[cod]:o})}}catch(e){}
+  $("mMsg").textContent=`Orçamento ${cod} gerado, válido até ${fmt(val)}.`;
+}
 function parseWhats(t){
   const num=(t.match(/DR\d{6,}/)||[])[0]||("DR"+Date.now().toString().slice(-9));
   const itens=[];t.split("\n").forEach(l=>{const m=l.match(/(\d+)\s*[×x]\s*(\d{2})\s+(.+?)\s+[—-]\s+R\$\s*([\d.,]+)/);if(m){const p=byId(m[2]);itens.push({id:m[2],q:+m[1],nome:p?`${p.id} ${p.t1} ${p.t2}`:m[2]+" "+m[3],v:+m[4].replace(/\./g,"").replace(",",".")})}});
@@ -518,6 +533,8 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
   if(t.dataset.minc){mq[t.dataset.minc]=(mq[t.dataset.minc]||0)+1;renderManual();return}
   if(t.dataset.mdec){mq[t.dataset.mdec]=Math.max(0,(mq[t.dataset.mdec]||0)-1);renderManual();return}
   if(t.id==="mSave"){mSave();return}
+  if(t.id==="mOrc"){mOrc();return}
+  if(t.id==="orcCopy"){copy($("orcTxt").textContent,"Orçamento copiado",$("orcTxt"));return}
   if(t.id==="cSave"){const c={nome:$("cNome").value.trim(),tel:$("cTel").value.trim(),end:$("cEnd").value.trim(),obs:$("cObs").value.trim()};if(!c.nome||dig(c.tel).length<10){$("cMsg").textContent="Informe nome e WhatsApp com DDD.";return}
     try{await upsertCli(c);["cNome","cTel","cEnd","cObs"].forEach(id=>$(id).value="");$("cMsg").textContent="Cliente salvo."}catch(err){$("cMsg").textContent="Não foi possível salvar."}return}
   if(t.dataset.cnew){const c=clientes().find(x=>x.k===t.dataset.cnew);if(c){$("mNome").value=c.nome||"";$("mTel").value=c.tel||"";$("mEnd").value=c.end||"";if(c.end){document.querySelector('input[name="mModo"][value="entrega"]').checked=true;mTotal()}$("manualBox").scrollIntoView({behavior:"smooth",block:"start"});$("mMsg").textContent="Escolha os produtos para "+(c.nome||"o cliente")+"."}return}
