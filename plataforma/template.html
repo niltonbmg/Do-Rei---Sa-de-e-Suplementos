@@ -225,7 +225,7 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
         <div class="mprods" id="mProds"></div>
         <div class="seg"><label><input type="radio" name="mModo" value="retirada" checked>Retirada</label><label><input type="radio" name="mModo" value="entrega">Entrega</label></div>
         <label id="mEndW" hidden>Endereço<input id="mEnd" autocomplete="off"></label>
-        <div class="seg"><label><input type="radio" name="mPag" value="pix" checked>Pix</label><label><input type="radio" name="mPag" value="cartao">Cartão (+5%)</label></div>
+        <div class="seg"><label><input type="radio" name="mPag" value="pix" checked>Pix</label><label><input type="radio" name="mPag" value="cartao">Cartão</label></div>
         <label>Status inicial<select id="mSt"><option value="aguardando">Aguardando pagamento</option><option value="pago">Pago</option></select></label>
         <label>Observação<input id="mObs" autocomplete="off"></label>
         <div class="tot big"><span>Total</span><span id="mTot">R$ 0,00</span></div>
@@ -292,7 +292,7 @@ const CONFIG={
   pixNome:"NILTON DIAS SAMPAIO",       // nome do recebedor (até 25 letras, sem acento)
   pixCidade:"LUIS EDUARDO MAGALHAES",  // cidade do recebedor (até 15 letras, sem acento)
   freteGratisAcima:150, taxaEntrega:10, pedidoMinimoEntrega:50,
-  acrescimoCartao:0.05     // cartão de crédito: +5% sobre o total
+  acrescimoCartao:0        // cartão em 1x: mesmo preço do Pix (sem acréscimo)
 };
 const PRODUTOS=/*PRODUTOS*/;
 const LABS=/*LABS*/;
@@ -409,7 +409,7 @@ function renderBag(){
       <label>Nome completo<input id="fNome" required autocomplete="name" value="${esc(d.nome||"")}"></label>
       <label>WhatsApp<input id="fTel" required inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" value="${esc(d.tel||"")}"></label>
       <div class="seg"><label><input type="radio" name="modo" id="mRet" value="retirada" ${d.modo!=="entrega"?"checked":""}>Retirar</label><label><input type="radio" name="modo" id="mEnt" value="entrega" ${d.modo==="entrega"?"checked":""}>Receber em casa</label></div>
-      <div class="lbl" style="margin-top:4px">Forma de pagamento</div><div class="seg"><label><input type="radio" name="pag" id="pPix" value="pix" ${d.pag!=="cartao"?"checked":""}>Pix (melhor preço)</label><label><input type="radio" name="pag" id="pCar" value="cartao" ${d.pag==="cartao"?"checked":""}>Cartão de crédito</label></div>
+      <div class="lbl" style="margin-top:4px">Forma de pagamento</div><div class="seg"><label><input type="radio" name="pag" id="pPix" value="pix" ${d.pag!=="cartao"?"checked":""}>Pix</label><label><input type="radio" name="pag" id="pCar" value="cartao" ${d.pag==="cartao"?"checked":""}>Cartão de crédito</label></div>
       <label id="endW" ${d.modo==="entrega"?"":"hidden"}>Endereço de entrega<textarea id="fEnd" autocomplete="street-address">${esc(d.end||"")}</textarea></label>
       <label>Observação (opcional)<textarea id="fObs">${esc(d.obs||"")}</textarea></label>
       <p class="note warn" id="fErr" hidden></p></form>`;
@@ -438,7 +438,7 @@ function updateFoot(){
   $("bagFoot").innerHTML=`<div class="tot"><span>Subtotal</span><span>${brl(sub)}</span></div><div class="tot"><span>${m==="entrega"?"Entrega":"Retirada"}</span><span>${fr?brl(fr):"grátis"}</span></div>
    ${ac?`<div class="tot"><span>Cartão de crédito (+${CONFIG.acrescimoCartao*100}%)</span><span>${brl(ac)}</span></div>`:""}
    <div class="tot big"><span>Total</span><span>${brl(sub+fr+ac)}</span></div>
-   ${pag()==="pix"?`<p class="note">Pague no Pix e economize ${CONFIG.acrescimoCartao*100}%.</p>`:`<p class="note">Cartão em 1x sem juros. Parcelado: juros conforme o número de parcelas, mostrados no link.</p>`}
+   ${pag()==="pix"?"":`<p class="note">Cartão em 1x sem juros. Parcelado: juros conforme o número de parcelas, mostrados no link.</p>`}
    ${m==="entrega"&&sub<CONFIG.pedidoMinimoEntrega?`<p class="note warn">Entrega a partir de ${brl(CONFIG.pedidoMinimoEntrega)}. Escolha retirada ou adicione itens.</p>`:""}
    <div class="seg"><button class="btn ghost" type="button" id="back">Voltar</button><button class="btn gold" type="button" id="gen" ${m==="entrega"&&sub<CONFIG.pedidoMinimoEntrega?"disabled":""}>Gerar pedido</button></div>`;
 }
@@ -578,7 +578,7 @@ async function mOrc(){const c=mCalc(), nome=$("mNome").value.trim();
   const cod=ORC_EDIT||("ORC"+agora.toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100)));
   const fmt=d=>d.toLocaleDateString("pt-BR")+" às "+d.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   const sub=c.sub, fr=c.fr, pix=sub+fr, car=Math.round(pix*(1+CONFIG.acrescimoCartao)*100)/100;
-  const txt=`👑 *Orçamento Do Rei · ${cod}*${nome?"\nPara: "+nome:""}\n\n${c.it.map(i=>`• ${i.q}× ${i.nome} — ${brl(i.v)}`).join("\n")}\n\n${c.modo==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada: grátis"}\n*Total no Pix: ${brl(pix)}*\nCartão em 1x: ${brl(car)} *sem juros*\nCartão parcelado (2x ou mais): juros conforme o número de parcelas, mostrados no link antes de você confirmar.\n\n⏳ *Válido até ${fmt(val)}* (1 dia). Depois desse prazo, preços e disponibilidade podem mudar.\n\nPara confirmar, é só responder esta mensagem.\n_Cuidado com o corpo, feito com verdade e serviço._`;
+  const txt=`👑 *Orçamento Do Rei · ${cod}*${nome?"\nPara: "+nome:""}\n\n${c.it.map(i=>`• ${i.q}× ${i.nome} — ${brl(i.v)}`).join("\n")}\n\n${c.modo==="entrega"?"Entrega: "+(fr?brl(fr):"grátis"):"Retirada: grátis"}\n*Total no Pix: ${brl(pix)}*\nCartão em 1x: ${brl(car)} *sem juros* (mesmo valor do Pix)\nCartão parcelado (2x ou mais): juros conforme o número de parcelas, mostrados no link antes de você confirmar.\n\n⏳ *Válido até ${fmt(val)}* (1 dia). Depois desse prazo, preços e disponibilidade podem mudar.\n\nPara confirmar, é só responder esta mensagem.\n_Cuidado com o corpo, feito com verdade e serviço._`;
   const cut=txt.indexOf("\n\n⏳");ORC={cod,pix,car,tel:dig($("mTel").value),base:txt.slice(0,cut),fim:txt.slice(cut)};$("orcLink").value="";$("orcParc").value="";$("orcBox").hidden=false;orcRender();
   try{const ref=DB.doc("pedidos/orcamentos");const o={cod,nome,tel:$("mTel").value.trim(),end:c.modo==="entrega"?$("mEnd").value.trim():"",obs:$("mObs").value.trim(),modo:c.modo,frete:fr,itens:c.it,total:pix,totalCartao:car,status:"aberto",criadoEm:agora.toISOString(),validoAte:val.toISOString()};try{await ref.update({[cod]:o})}catch(_){await ref.set({[cod]:o})}}catch(e){}
   $("mMsg").textContent=`Orçamento ${cod} ${ORC_EDIT?"atualizado":"gerado"}, válido até ${fmt(val)}.`;ORC_EDIT=null;$("mOrc").textContent="Gerar orçamento";$("mEditTag").hidden=true;
