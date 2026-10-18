@@ -160,6 +160,7 @@ textarea{min-height:64px;resize:vertical}
 .kc{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--gold);padding:14px;display:flex;flex-direction:column;gap:6px}
 .kc h3{font:500 26px/1.05 var(--f-display)}.kc p{margin:0;font-size:14px;color:var(--muted)}.kc .price{flex-wrap:wrap;row-gap:2px}.kc .btn,.kc .qty{align-self:flex-start;margin-top:4px}
 .kim{display:flex;gap:6px}.kim img{width:64px;height:64px;object-fit:contain;background:#fff;border:1px solid var(--line)}
+.kchk{display:flex;gap:8px;align-items:center;font-size:13.5px;font-weight:500}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -200,6 +201,15 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
     <div class="pn-col"><div class="pn-filters" id="pnFilters"></div><div id="pnList"></div></div>
     <aside class="pn-side">
       <div class="pn-box"><div class="lbl">Comprar nesta semana</div><p class="note">Soma dos pedidos aguardando pagamento e pagos.</p><div id="pnBuy"></div></div>
+      <div class="pn-box"><div class="lbl">Montar kit</div><p class="note">Escolha os produtos, o desconto e o nome. O kit fica disponível nos pedidos manuais e orçamentos.</p>
+        <div class="mprods" id="kProds"></div>
+        <label>Desconto (%)<input id="kDesc" type="number" min="0" max="30" step="1" value="5" inputmode="numeric"></label>
+        <div class="tot"><span>Separado</span><span id="kDe">R$ 0,00</span></div><div class="tot big"><span>Preço do kit</span><span id="kPor">R$ 0,00</span></div>
+        <label>Nome do kit<input id="kNome" autocomplete="off" placeholder="Ex.: Kit Energia Real"></label>
+        <button class="btn ghost" type="button" id="kSug">Sugerir nomes</button><div class="gchips" id="kSugs" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        <label>Descrição curta (opcional)<input id="kTxt" autocomplete="off"></label>
+        <button class="btn wide gold" type="button" id="kSave">Salvar kit</button><p class="note" id="kMsg"></p>
+        <div class="lbl" style="margin-top:6px">Meus kits</div><div id="kList"></div></div>
       <div class="pn-box"><div class="lbl">Orçamentos em aberto</div><div id="oList"></div></div>
       <div class="pn-box"><div class="lbl">Clientes</div>
         <input id="cBusca" placeholder="Buscar por nome ou telefone" aria-label="Buscar cliente" autocomplete="off">
@@ -476,7 +486,7 @@ document.addEventListener("click",e=>{
   if(t.id==="newOrder"){cart={};save();pedido=null;step="lista";renderGrid();renderTotals();renderBag();return}
 });
 $("scrim").addEventListener("click",closeAll);
-document.addEventListener("input",e=>{if(e.target.id==="cBusca"){cq=e.target.value;renderCli()}if((e.target.id==="orcLink"||e.target.id==="orcParc")&&ORC)orcRender();});
+document.addEventListener("input",e=>{if(e.target.id==="cBusca"){cq=e.target.value;renderCli()}if((e.target.id==="orcLink"||e.target.id==="orcParc")&&ORC)orcRender();if(e.target.id==="kDesc")kTot();});
 document.addEventListener("change",e=>{if(e.target.name==="modo"){$("endW").hidden=modo()!=="entrega";updateFoot()}if(e.target.name==="pag")updateFoot()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
 renderFilters();renderGrid();renderTotals();
@@ -493,7 +503,7 @@ let started=false;
 async function startPanel(){if(started)return;started=true;
   try{DB=DB||await window.claude.use("db")}catch(e){}
   if(!DB){$("pnState").textContent="Não foi possível abrir os pedidos agora. Recarregue a página.";return}
-  DB.collection("pedidos").onSnapshot(s=>{ORDERS=[];CLI={};s.docs.forEach(d=>{const x=d.data()||{};if(d.id==="clientes"){Object.values(x).forEach(c=>{if(c&&c.tel)CLI[dig(c.tel)]=c});return}if(d.id==="orcamentos"){ORCS=Object.entries(x).filter(([k,v])=>v&&v.cod).map(([k,v])=>({...v,_key:k})).sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));return}Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==="object"&&v.num)ORDERS.push({...v,_doc:d.id,_key:k})})});ORDERS.sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));renderPanel()},e=>{$("pnState").textContent="Erro ao carregar pedidos: "+e.message});
+  DB.collection("pedidos").onSnapshot(s=>{ORDERS=[];CLI={};s.docs.forEach(d=>{const x=d.data()||{};if(d.id==="clientes"){Object.values(x).forEach(c=>{if(c&&c.tel)CLI[dig(c.tel)]=c});return}if(d.id==="kits"){MYKITS=Object.values(x).filter(k=>k&&k.id&&!k.excluido);return}if(d.id==="orcamentos"){ORCS=Object.entries(x).filter(([k,v])=>v&&v.cod).map(([k,v])=>({...v,_key:k})).sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));return}Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==="object"&&v.num)ORDERS.push({...v,_doc:d.id,_key:k})})});ORDERS.sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));renderPanel()},e=>{$("pnState").textContent="Erro ao carregar pedidos: "+e.message});
 }
 function renderPanel(){
   const act=ORDERS.filter(o=>o.status==="aguardando"||o.status==="pago"||o.status==="comprado");
@@ -511,7 +521,7 @@ function renderPanel(){
     <label style="font-weight:500">Status<select data-st="${esc(o._doc)}|${esc(o._key)}">${Object.entries(ST).map(([k,[t]])=>`<option value="${k}" ${o.status===k?"selected":""}>${t}</option>`).join("")}</select></label></article>`}).join("")||`<p class="note">Nada aqui por enquanto.</p>`;
   const tot={}; act.filter(o=>o.status!=="comprado").forEach(o=>(o.itens||[]).forEach(i=>{const ids=i.comp||(i.id&&i.id[0]==="K"&&KITS.find(k=>k.id===i.id)?KITS.find(k=>k.id===i.id).itens:null);(ids?ids.map(id=>{const p=PRODUTOS.find(x=>x.id===id);return {k:id,n:`${id} ${p.t1} ${p.t2}`}}):[{k:i.id||i.nome,n:i.nome}]).forEach(e=>{tot[e.k]=tot[e.k]||{n:e.n,q:0};tot[e.k].q+=+i.q||0})}));
   const rows=Object.values(tot).sort((a,b)=>a.n.localeCompare(b.n));
-  renderCli();renderOrcs();
+  renderCli();renderOrcs();if($("kList"))renderMyKits();
   $("pnBuy").innerHTML=rows.length?rows.map(r=>`<div class="buy"><span>${esc(r.n)}</span><b>${r.q}</b></div>`).join(""):`<p class="note">Nada a comprar no momento.</p>`;
 }
 let CLI={}, cq="", ORCS=[];
@@ -525,12 +535,27 @@ function clientes(){const m={};Object.values(CLI).forEach(c=>{const k=dig(c.tel)
 function renderCli(){const q=cq.toLowerCase(), qd=dig(cq);
   const l=clientes().filter(c=>!q||c.nome.toLowerCase().includes(q)||(qd&&c.k.includes(qd)));
   $("cList").innerHTML=l.map(c=>`<div class="cli"><div><b>${esc(c.nome||"Sem nome")}</b><small>${esc(c.tel)} · ${c.n} pedido(s) · ${brl(c.gasto)}${c.ult?" · último "+new Date(c.ult).toLocaleDateString("pt-BR"):""}</small></div><button class="btn ghost" type="button" data-cnew="${c.k}">Novo pedido</button></div>`).join("")||`<p class="note">${ORDERS.length||Object.keys(CLI).length?"Nenhum cliente encontrado.":"Os clientes aparecem aqui conforme os pedidos são registrados."}</p>`}
+let MYKITS=[], kSel={};
+const TEMA={"01":"Base","02":"Guarda","03":"Energia","04":"Proteção","05":"Coração","06":"Sol","07":"Força","08":"Treino","09":"Natural","10":"Natural","11":"Natural"};
+function r90(v){return Math.max(0.9,Math.floor(v)+0.9-(v-Math.floor(v)>=0.9?0:1)+((v-Math.floor(v))>=0.9?0:0))}
+function kCalc(){const ids=Object.keys(kSel).filter(k=>kSel[k]);const de=ids.reduce((s,id)=>s+(PRODUTOS.find(p=>p.id===id).preco||0),0);const d=Math.min(30,Math.max(0,+$("kDesc").value||0));
+  let v=de*(1-d/100);v=Math.floor(v)-1+0.9;if(v+1<=de*(1-d/100))v+=1;return {ids,de,por:ids.length?Math.round(v*100)/100:0}}
+function renderKitBuilder(){$("kProds").innerHTML=PRODUTOS.filter(p=>p.preco!=null).map(p=>`<label class="kchk"><input type="checkbox" data-ks="${p.id}" ${kSel[p.id]?"checked":""}>${p.id} · ${esc(p.t1)} ${esc(p.t2)} <small style="color:var(--muted)">${brl(p.preco)}</small></label>`).join("");kTot();renderMyKits()}
+function kTot(){const c=kCalc();$("kDe").textContent=brl(c.de);$("kPor").textContent=brl(c.por)}
+function kSuggest(){const c=kCalc();if(!c.ids.length){$("kMsg").textContent="Escolha os produtos primeiro.";return}
+  const t=[...new Set(c.ids.map(id=>TEMA[id]))];const a=t[0],b=t[1]||"";
+  const sug=[`Kit ${a} Real`,b?`Kit ${a} & ${b}`:`Kit ${a} da Coroa`,`Combo Rei ${b||a}`,b?`Kit Real ${a} ${b}`:`Kit Rotina ${a}`];
+  $("kSugs").innerHTML=sug.map(x=>`<button type="button" class="chip" data-kn="${esc(x)}">${esc(x)}</button>`).join("")}
+function renderMyKits(){$("kList").innerHTML=MYKITS.map(k=>`<div class="cli"><div><b>${esc(k.nome)}</b><small>${k.itens.map(id=>id).join(" + ")} · ${brl(k.preco)}${k.de?" (de "+brl(k.de)+")":""}</small></div><button type="button" class="btn ghost" data-kdel="${esc(k.id)}">Excluir</button></div>`).join("")||`<p class="note">Nenhum kit criado ainda.</p>`}
+async function kSave(){const c=kCalc(), nome=$("kNome").value.trim();if(c.ids.length<2){$("kMsg").textContent="Escolha ao menos 2 produtos.";return}if(!nome){$("kMsg").textContent="Dê um nome ao kit (ou toque em Sugerir nomes).";return}
+  const id="KX"+Date.now().toString(36).toUpperCase();const k={id,nome,sub:"Kit personalizado",itens:c.ids,preco:c.por,de:c.de,desc:$("kTxt").value.trim()||c.ids.map(i=>{const p=PRODUTOS.find(x=>x.id===i);return p.t1+" "+p.t2}).join(" + "),criadoEm:new Date().toISOString()};
+  try{const ref=DB.doc("pedidos/kits");try{await ref.update({[id]:k})}catch(_){await ref.set({[id]:k})}kSel={};["kNome","kTxt"].forEach(x=>$(x).value="");$("kSugs").innerHTML="";renderKitBuilder();$("kMsg").textContent=`${nome} salvo por ${brl(c.por)}.`}catch(err){$("kMsg").textContent="Não foi possível salvar o kit."}}
 let mq={};
 function renderManual(){
-  $("mProds").innerHTML=PRODUTOS.filter(p=>p.preco!=null).map(p=>`<div class="mp"><div>${p.id} · ${esc(p.t1)} ${esc(p.t2)}<small>${brl(p.preco)}</small></div><div class="qty"><button type="button" data-mdec="${p.id}" aria-label="Diminuir">−</button><span>${mq[p.id]||0}</span><button type="button" data-minc="${p.id}" aria-label="Aumentar">+</button></div></div>`).join("");
+  $("mProds").innerHTML=[...PRODUTOS.filter(p=>p.preco!=null),...KITS.map(kitProd),...MYKITS.map(k=>({...kitProd(k),id:k.id,t1:k.nome}))].map(p=>`<div class="mp"><div>${p.id} · ${esc(p.t1)} ${esc(p.t2)}<small>${brl(p.preco)}</small></div><div class="qty"><button type="button" data-mdec="${p.id}" aria-label="Diminuir">−</button><span>${mq[p.id]||0}</span><button type="button" data-minc="${p.id}" aria-label="Aumentar">+</button></div></div>`).join("");
   mTotal();
 }
-function mCalc(){const it=PRODUTOS.filter(p=>mq[p.id]>0).map(p=>({id:p.id,q:mq[p.id],nome:`${p.id} ${p.t1} ${p.t2}`,v:p.preco*mq[p.id]}));
+function mCalc(){const all=[...PRODUTOS.filter(p=>p.preco!=null),...KITS.map(kitProd),...MYKITS.map(k=>({...kitProd(k),id:k.id,t1:k.nome}))];const it=all.filter(p=>mq[p.id]>0).map(p=>({id:p.id,q:mq[p.id],nome:p.kit?`${p.t1} (${p.comp.join(" + ")})`:`${p.id} ${p.t1} ${p.t2}`,v:p.preco*mq[p.id],...(p.kit?{comp:p.comp}:{})}));
   const sub=it.reduce((s,i)=>s+i.v,0), modo=document.querySelector('input[name="mModo"]:checked').value, pag=document.querySelector('input[name="mPag"]:checked').value;
   const fr=modo==="entrega"?(sub>=CONFIG.freteGratisAcima?0:CONFIG.taxaEntrega):0, ac=pag==="cartao"?Math.round((sub+fr)*CONFIG.acrescimoCartao*100)/100:0;
   return {it,sub,fr,ac,total:sub+fr+ac,modo,pag}}
@@ -599,6 +624,10 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
   if(t.dataset.oc){const [k,p]=t.dataset.oc.split("|");orcConfirm(k,p);return}
   if(t.dataset.od){orcDiscard(t.dataset.od);return}
   if(t.dataset.oe){orcEdit(t.dataset.oe);return}
+  if(t.id==="kSug"){kSuggest();return}
+  if(t.dataset.kn){$("kNome").value=t.dataset.kn;return}
+  if(t.id==="kSave"){kSave();return}
+  if(t.dataset.kdel){const k=MYKITS.find(x=>x.id===t.dataset.kdel);if(k){try{await DB.doc("pedidos/kits").update({[k.id]:{...k,excluido:true}});toast("Kit excluído")}catch(e){toast("Não foi possível excluir")}}return}
   if(t.id==="mSave"){mSave();return}
   if(t.id==="mOrc"){mOrc();return}
   if(t.id==="orcCopy"){copy($("orcTxt").textContent,"Orçamento copiado",$("orcTxt"));return}
@@ -607,10 +636,10 @@ document.addEventListener("click",async e=>{const t=e.target.closest("button");i
   if(t.id==="cSave"){const c={nome:$("cNome").value.trim(),tel:$("cTel").value.trim(),end:$("cEnd").value.trim(),obs:$("cObs").value.trim()};if(!c.nome||dig(c.tel).length<10){$("cMsg").textContent="Informe nome e WhatsApp com DDD.";return}
     try{await upsertCli(c);["cNome","cTel","cEnd","cObs"].forEach(id=>$(id).value="");$("cMsg").textContent="Cliente salvo."}catch(err){$("cMsg").textContent="Não foi possível salvar."}return}
   if(t.dataset.cnew){const c=clientes().find(x=>x.k===t.dataset.cnew);if(c){$("mNome").value=c.nome||"";$("mTel").value=c.tel||"";$("mEnd").value=c.end||"";if(c.end){document.querySelector('input[name="mModo"][value="entrega"]').checked=true;mTotal()}$("manualBox").scrollIntoView({behavior:"smooth",block:"start"});$("mMsg").textContent="Escolha os produtos para "+(c.nome||"o cliente")+"."}return}
-  if(t.id==="openPanel"){if(t.dataset.on){showPanel(false)}else{showPanel(true);renderManual()}} if(t.id==="closePanel"||t.id==="closePanel2")showPanel(false);
+  if(t.id==="openPanel"){if(t.dataset.on){showPanel(false)}else{showPanel(true);renderManual();renderKitBuilder()}} if(t.id==="closePanel"||t.id==="closePanel2")showPanel(false);
   if(t.dataset.pnf){pnFilter=t.dataset.pnf;renderPanel()}
   if(t.id==="pnAdd"){const o=parseWhats($("pnPaste").value);if(!o.itens.length){$("pnMsg").textContent="Não encontrei itens. Cole a mensagem completa do pedido.";return}
     try{const ref=DB.doc("pedidos/whatsapp");try{await ref.update({[o.num]:o})}catch(_){await ref.set({[o.num]:o})}upsertCli(o).catch(()=>{});$("pnPaste").value="";$("pnMsg").textContent=`Pedido ${o.num} registrado.`}catch(err){$("pnMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
 });
-document.addEventListener("change",async e=>{if(e.target.id==="orcPix"&&ORC){orcRender();return}if(e.target.name==="mModo"||e.target.name==="mPag"){mTotal();return}if(e.target.dataset.st){try{const [d,k]=e.target.dataset.st.split("|");const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;await DB.doc("pedidos/"+d).update({[k]:{...clean,status:e.target.value}})}catch(err){toast("Não foi possível mudar o status")}}});
+document.addEventListener("change",async e=>{if(e.target.dataset&&e.target.dataset.ks){kSel[e.target.dataset.ks]=e.target.checked;kTot();return}if(e.target.id==="orcPix"&&ORC){orcRender();return}if(e.target.name==="mModo"||e.target.name==="mPag"){mTotal();return}if(e.target.dataset.st){try{const [d,k]=e.target.dataset.st.split("|");const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;await DB.doc("pedidos/"+d).update({[k]:{...clean,status:e.target.value}})}catch(err){toast("Não foi possível mudar o status")}}});
 </script>
