@@ -147,6 +147,8 @@ textarea{min-height:64px;resize:vertical}
 .gi b{display:block;font:500 22px/1.1 var(--f-display)}.gi b em{color:var(--royal)}.gi small{color:var(--muted);font-size:13.5px}
 .gres .btn{align-self:flex-start}
 .labx{background:var(--tint);padding:10px 12px;font-size:13px}.labx p{margin:4px 0 0;color:var(--muted)}
+.mprods{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow:auto;border:1px solid var(--line);padding:8px}.mp{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;font-size:13.5px}.mp small{display:block;color:var(--muted)}
+.clis{display:flex;flex-direction:column;max-height:300px;overflow:auto;border-top:1px solid var(--line)}.cli{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;border-bottom:1px solid var(--line);padding:8px 0;font-size:13.5px}.cli small{display:block;color:var(--muted);font-size:12px}.cli .btn{min-height:36px;padding:6px 10px;font-size:13px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0B2A5B;color:#fff;padding:10px 16px;z-index:40;font-size:14px;border-left:3px solid #D4A72C}
 
 /* barra fixa no celular */
@@ -187,6 +189,25 @@ footer em{font-family:var(--f-display);font-size:18px;color:var(--ink)}
     <div class="pn-col"><div class="pn-filters" id="pnFilters"></div><div id="pnList"></div></div>
     <aside class="pn-side">
       <div class="pn-box"><div class="lbl">Comprar nesta semana</div><p class="note">Soma dos pedidos aguardando pagamento e pagos.</p><div id="pnBuy"></div></div>
+      <div class="pn-box"><div class="lbl">Clientes</div>
+        <input id="cBusca" placeholder="Buscar por nome ou telefone" aria-label="Buscar cliente" autocomplete="off">
+        <div class="clis" id="cList"></div>
+        <details><summary class="note" style="cursor:pointer">+ Cadastrar cliente</summary>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+          <label>Nome<input id="cNome" autocomplete="off"></label><label>WhatsApp<input id="cTel" inputmode="tel" autocomplete="off"></label>
+          <label>Endereço<input id="cEnd" autocomplete="off"></label><label>Observação<input id="cObs" autocomplete="off"></label>
+          <button class="btn wide" type="button" id="cSave">Salvar cliente</button><p class="note" id="cMsg"></p></div></details></div>
+      <div class="pn-box" id="manualBox"><div class="lbl">Cadastrar pedido manualmente</div><p class="note">Para quem pediu por mensagem, ligação ou pessoalmente.</p>
+        <label>Nome do cliente<input id="mNome" autocomplete="off"></label>
+        <label>WhatsApp<input id="mTel" inputmode="tel" autocomplete="off"></label>
+        <div class="mprods" id="mProds"></div>
+        <div class="seg"><label><input type="radio" name="mModo" value="retirada" checked>Retirada</label><label><input type="radio" name="mModo" value="entrega">Entrega</label></div>
+        <label id="mEndW" hidden>Endereço<input id="mEnd" autocomplete="off"></label>
+        <div class="seg"><label><input type="radio" name="mPag" value="pix" checked>Pix</label><label><input type="radio" name="mPag" value="cartao">Cartão (+5%)</label></div>
+        <label>Status inicial<select id="mSt"><option value="aguardando">Aguardando pagamento</option><option value="pago">Pago</option></select></label>
+        <label>Observação<input id="mObs" autocomplete="off"></label>
+        <div class="tot big"><span>Total</span><span id="mTot">R$ 0,00</span></div>
+        <button class="btn wide gold" type="button" id="mSave">Salvar pedido</button><p class="note" id="mMsg"></p></div>
       <div class="pn-box"><div class="lbl">Registrar pedido do WhatsApp</div><p class="note">Cole aqui a mensagem do pedido que chegou no WhatsApp.</p>
         <textarea id="pnPaste" rows="7" aria-label="Mensagem do pedido"></textarea><button class="btn wide" type="button" id="pnAdd">Registrar pedido</button><p class="note" id="pnMsg"></p></div>
     </aside>
@@ -421,6 +442,7 @@ document.addEventListener("click",e=>{
   if(t.id==="newOrder"){cart={};save();pedido=null;step="lista";renderGrid();renderTotals();renderBag();return}
 });
 $("scrim").addEventListener("click",closeAll);
+document.addEventListener("input",e=>{if(e.target.id==="cBusca"){cq=e.target.value;renderCli()}});
 document.addEventListener("change",e=>{if(e.target.name==="modo"){$("endW").hidden=modo()!=="entrega";updateFoot()}if(e.target.name==="pag")updateFoot()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAll()});
 renderFilters();renderGrid();renderTotals();
@@ -432,12 +454,12 @@ async function salvarPedido(o){try{const db=DB||await window.claude?.use?.("db")
   USER=await window.claude?.use?.("user"); if(!USER||!(await USER.isOwner()))return;
   $("openPanel").hidden=false;
 }catch(e){}})();
-function showPanel(on){$("painel").hidden=!on;$("loja").hidden=on;document.querySelector("footer").hidden=on;$("mbar").style.visibility=on?"hidden":"";if(on)startPanel();window.scrollTo(0,0)}
+function showPanel(on){$("painel").hidden=!on;$("loja").hidden=on;document.querySelector("footer").hidden=on;$("mbar").style.visibility=on?"hidden":"";$("fale").hidden=on;if(on)startPanel();window.scrollTo(0,0)}
 let started=false;
 async function startPanel(){if(started)return;started=true;
   try{DB=DB||await window.claude.use("db")}catch(e){}
   if(!DB){$("pnState").textContent="Não foi possível abrir os pedidos agora. Recarregue a página.";return}
-  DB.collection("pedidos").onSnapshot(s=>{ORDERS=[];s.docs.forEach(d=>{const x=d.data()||{};Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==="object"&&v.num)ORDERS.push({...v,_doc:d.id,_key:k})})});ORDERS.sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));renderPanel()},e=>{$("pnState").textContent="Erro ao carregar pedidos: "+e.message});
+  DB.collection("pedidos").onSnapshot(s=>{ORDERS=[];CLI={};s.docs.forEach(d=>{const x=d.data()||{};if(d.id==="clientes"){Object.values(x).forEach(c=>{if(c&&c.tel)CLI[dig(c.tel)]=c});return}Object.entries(x).forEach(([k,v])=>{if(v&&typeof v==="object"&&v.num)ORDERS.push({...v,_doc:d.id,_key:k})})});ORDERS.sort((a,b)=>String(b.criadoEm).localeCompare(String(a.criadoEm)));renderPanel()},e=>{$("pnState").textContent="Erro ao carregar pedidos: "+e.message});
 }
 function renderPanel(){
   const act=ORDERS.filter(o=>o.status==="aguardando"||o.status==="pago"||o.status==="comprado");
@@ -447,15 +469,45 @@ function renderPanel(){
   const soma=act.reduce((s,o)=>s+(+o.total||0),0);
   $("pnState").textContent=ORDERS.length?`${act.length} pedido(s) em andamento · ${brl(soma)}`:"Nenhum pedido ainda. Os pedidos feitos na loja aparecem aqui sozinhos; os que chegarem só pelo WhatsApp, cole ao lado para registrar.";
   $("pnList").innerHTML=list.map(o=>{const [sl,sc]=ST[o.status]||ST.aguardando;const dt=o.criadoEm?new Date(o.criadoEm).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"";
-    return `<article class="ord" style="--st:${sc}"><div class="oh"><span class="on">${esc(o.num||o.id)} · ${dt}</span><span class="pill">${o.pag==="cartao"?"Cartão":"Pix"} · ${o.modo==="entrega"?"Entrega":"Retirada"}${o.origem==="whatsapp"?" · WhatsApp":""}</span></div>
+    return `<article class="ord" style="--st:${sc}"><div class="oh"><span class="on">${esc(o.num||o.id)} · ${dt}</span><span class="pill">${o.pag==="cartao"?"Cartão":"Pix"} · ${o.modo==="entrega"?"Entrega":"Retirada"}${o.origem==="whatsapp"?" · WhatsApp":o.origem==="manual"?" · Manual":""}</span></div>
     <div class="oh"><b>${esc(o.nome||"Sem nome")}</b><b class="ot">${brl(+o.total||0)}</b></div>
     <ul>${(o.itens||[]).map(i=>`<li>${i.q}× ${esc(i.nome)}</li>`).join("")}</ul>
     <div class="oc">WhatsApp: ${esc(o.tel||"—")}${o.end?" · "+esc(o.end):""}${o.obs?" · Obs.: "+esc(o.obs):""}</div>
     <label style="font-weight:500">Status<select data-st="${esc(o._doc)}|${esc(o._key)}">${Object.entries(ST).map(([k,[t]])=>`<option value="${k}" ${o.status===k?"selected":""}>${t}</option>`).join("")}</select></label></article>`}).join("")||`<p class="note">Nada aqui por enquanto.</p>`;
   const tot={}; act.filter(o=>o.status!=="comprado").forEach(o=>(o.itens||[]).forEach(i=>{const k=i.id||i.nome;tot[k]=tot[k]||{n:i.nome,q:0};tot[k].q+=+i.q||0}));
   const rows=Object.values(tot).sort((a,b)=>a.n.localeCompare(b.n));
+  renderCli();
   $("pnBuy").innerHTML=rows.length?rows.map(r=>`<div class="buy"><span>${esc(r.n)}</span><b>${r.q}</b></div>`).join(""):`<p class="note">Nada a comprar no momento.</p>`;
 }
+let CLI={}, cq="";
+const dig=t=>String(t||"").replace(/\D/g,"").replace(/^55(?=\d{10,11}$)/,"");
+async function upsertCli(c){const k=dig(c.tel);if(!k||!DB)return;const prev=CLI[k]||{};const v={nome:c.nome||prev.nome||"",tel:c.tel||prev.tel||"",end:c.end||prev.end||"",obs:c.obs??prev.obs??""};
+  const ref=DB.doc("pedidos/clientes");try{await ref.update({["c"+k]:v})}catch(_){await ref.set({["c"+k]:v})}}
+function clientes(){const m={};Object.values(CLI).forEach(c=>{const k=dig(c.tel);if(k)m[k]={...c,n:0,gasto:0,ult:""}});
+  ORDERS.forEach(o=>{const k=dig(o.tel);if(!k)return;m[k]=m[k]||{nome:o.nome,tel:o.tel,end:o.end||"",n:0,gasto:0,ult:""};const c=m[k];
+    if(o.status!=="cancelado"){c.n++;c.gasto+=+o.total||0}if(!c.ult||String(o.criadoEm)>c.ult)c.ult=String(o.criadoEm);if(!c.end&&o.end)c.end=o.end});
+  return Object.entries(m).map(([k,c])=>({k,...c})).sort((a,b)=>b.ult.localeCompare(a.ult)||a.nome.localeCompare(b.nome))}
+function renderCli(){const q=cq.toLowerCase(), qd=dig(cq);
+  const l=clientes().filter(c=>!q||c.nome.toLowerCase().includes(q)||(qd&&c.k.includes(qd)));
+  $("cList").innerHTML=l.map(c=>`<div class="cli"><div><b>${esc(c.nome||"Sem nome")}</b><small>${esc(c.tel)} · ${c.n} pedido(s) · ${brl(c.gasto)}${c.ult?" · último "+new Date(c.ult).toLocaleDateString("pt-BR"):""}</small></div><button class="btn ghost" type="button" data-cnew="${c.k}">Novo pedido</button></div>`).join("")||`<p class="note">${ORDERS.length||Object.keys(CLI).length?"Nenhum cliente encontrado.":"Os clientes aparecem aqui conforme os pedidos são registrados."}</p>`}
+let mq={};
+function renderManual(){
+  $("mProds").innerHTML=PRODUTOS.filter(p=>p.preco!=null).map(p=>`<div class="mp"><div>${p.id} · ${esc(p.t1)} ${esc(p.t2)}<small>${brl(p.preco)}</small></div><div class="qty"><button type="button" data-mdec="${p.id}" aria-label="Diminuir">−</button><span>${mq[p.id]||0}</span><button type="button" data-minc="${p.id}" aria-label="Aumentar">+</button></div></div>`).join("");
+  mTotal();
+}
+function mCalc(){const it=PRODUTOS.filter(p=>mq[p.id]>0).map(p=>({id:p.id,q:mq[p.id],nome:`${p.id} ${p.t1} ${p.t2}`,v:p.preco*mq[p.id]}));
+  const sub=it.reduce((s,i)=>s+i.v,0), modo=document.querySelector('input[name="mModo"]:checked').value, pag=document.querySelector('input[name="mPag"]:checked').value;
+  const fr=modo==="entrega"?(sub>=CONFIG.freteGratisAcima?0:CONFIG.taxaEntrega):0, ac=pag==="cartao"?Math.round((sub+fr)*CONFIG.acrescimoCartao*100)/100:0;
+  return {it,sub,fr,ac,total:sub+fr+ac,modo,pag}}
+function mTotal(){$("mTot").textContent=brl(mCalc().total);$("mEndW").hidden=mCalc().modo!=="entrega"}
+async function mSave(){const c=mCalc(), nome=$("mNome").value.trim();
+  if(!nome||!c.it.length){$("mMsg").textContent="Informe o nome e ao menos um produto.";return}
+  const num="DR"+new Date().toISOString().slice(2,10).replace(/-/g,"")+String(Math.floor(Math.random()*900+100));
+  const o={num,nome,tel:$("mTel").value.trim(),end:c.modo==="entrega"?$("mEnd").value.trim():"",obs:$("mObs").value.trim(),modo:c.modo,pag:c.pag,frete:c.fr,acrescimo:c.ac,total:c.total,itens:c.it,status:$("mSt").value,origem:"manual",criadoEm:new Date().toISOString()};
+  try{const ref=DB.doc("pedidos/manual");try{await ref.update({[num]:o})}catch(_){await ref.set({[num]:o})}
+    upsertCli(o).catch(()=>{});
+    mq={};["mNome","mTel","mEnd","mObs"].forEach(id=>$(id).value="");renderManual();$("mMsg").textContent=`Pedido ${num} salvo · ${brl(o.total)}.`}
+  catch(err){$("mMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
 function parseWhats(t){
   const num=(t.match(/DR\d{6,}/)||[])[0]||("DR"+Date.now().toString().slice(-9));
   const itens=[];t.split("\n").forEach(l=>{const m=l.match(/(\d+)\s*[×x]\s*(\d{2})\s+(.+?)\s+[—-]\s+R\$\s*([\d.,]+)/);if(m){const p=byId(m[2]);itens.push({id:m[2],q:+m[1],nome:p?`${p.id} ${p.t1} ${p.t2}`:m[2]+" "+m[3],v:+m[4].replace(/\./g,"").replace(",",".")})}});
@@ -464,10 +516,16 @@ function parseWhats(t){
   return {num,itens,total,nome:g(/Nome:\s*(.+)/),tel:g(/WhatsApp:\s*(.+)/),end:g(/Endereço:\s*(.+)/),obs:g(/Obs\.:\s*(.+)/),modo:/Entrega:/.test(t)?"entrega":"retirada",pag:/cart[ãa]o/i.test(t)?"cartao":"pix",status:"aguardando",origem:"whatsapp",criadoEm:new Date().toISOString()};
 }
 document.addEventListener("click",async e=>{const t=e.target.closest("button");if(!t)return;
-  if(t.id==="openPanel")showPanel(true); if(t.id==="closePanel")showPanel(false);
+  if(t.dataset.minc){mq[t.dataset.minc]=(mq[t.dataset.minc]||0)+1;renderManual();return}
+  if(t.dataset.mdec){mq[t.dataset.mdec]=Math.max(0,(mq[t.dataset.mdec]||0)-1);renderManual();return}
+  if(t.id==="mSave"){mSave();return}
+  if(t.id==="cSave"){const c={nome:$("cNome").value.trim(),tel:$("cTel").value.trim(),end:$("cEnd").value.trim(),obs:$("cObs").value.trim()};if(!c.nome||dig(c.tel).length<10){$("cMsg").textContent="Informe nome e WhatsApp com DDD.";return}
+    try{await upsertCli(c);["cNome","cTel","cEnd","cObs"].forEach(id=>$(id).value="");$("cMsg").textContent="Cliente salvo."}catch(err){$("cMsg").textContent="Não foi possível salvar."}return}
+  if(t.dataset.cnew){const c=clientes().find(x=>x.k===t.dataset.cnew);if(c){$("mNome").value=c.nome||"";$("mTel").value=c.tel||"";$("mEnd").value=c.end||"";if(c.end){document.querySelector('input[name="mModo"][value="entrega"]').checked=true;mTotal()}$("manualBox").scrollIntoView({behavior:"smooth",block:"start"});$("mMsg").textContent="Escolha os produtos para "+(c.nome||"o cliente")+"."}return}
+  if(t.id==="openPanel"){showPanel(true);renderManual()} if(t.id==="closePanel")showPanel(false);
   if(t.dataset.pnf){pnFilter=t.dataset.pnf;renderPanel()}
   if(t.id==="pnAdd"){const o=parseWhats($("pnPaste").value);if(!o.itens.length){$("pnMsg").textContent="Não encontrei itens. Cole a mensagem completa do pedido.";return}
-    try{const ref=DB.doc("pedidos/whatsapp");try{await ref.update({[o.num]:o})}catch(_){await ref.set({[o.num]:o})}$("pnPaste").value="";$("pnMsg").textContent=`Pedido ${o.num} registrado.`}catch(err){$("pnMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
+    try{const ref=DB.doc("pedidos/whatsapp");try{await ref.update({[o.num]:o})}catch(_){await ref.set({[o.num]:o})}upsertCli(o).catch(()=>{});$("pnPaste").value="";$("pnMsg").textContent=`Pedido ${o.num} registrado.`}catch(err){$("pnMsg").textContent="Não foi possível salvar: "+(err.message||err.code)}}
 });
-document.addEventListener("change",async e=>{if(e.target.dataset.st){try{const [d,k]=e.target.dataset.st.split("|");const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;await DB.doc("pedidos/"+d).update({[k]:{...clean,status:e.target.value}})}catch(err){toast("Não foi possível mudar o status")}}});
+document.addEventListener("change",async e=>{if(e.target.name==="mModo"||e.target.name==="mPag"){mTotal();return}if(e.target.dataset.st){try{const [d,k]=e.target.dataset.st.split("|");const o=ORDERS.find(x=>x._doc===d&&x._key===k);const {_doc,_key,...clean}=o;await DB.doc("pedidos/"+d).update({[k]:{...clean,status:e.target.value}})}catch(err){toast("Não foi possível mudar o status")}}});
 </script>
